@@ -5,7 +5,7 @@ export type UserState = {
   firstName: string,
   lastName: string,
   email: string,
-  image: string,
+  image: string | null,
   id: string,
 }
 
@@ -28,7 +28,7 @@ export const defaultInitState: UserState = {
   firstName: '',
   lastName: '',
   email: '',
-  image: '',
+  image: null,
   id: '',
 }
 

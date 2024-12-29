@@ -1,4 +1,6 @@
-import React, {useState} from "react";
+"use client";
+
+import React, { useState } from "react";
 import { SidebarItemProps } from "@/types";
 import { useRouter } from "next/navigation";
 
@@ -7,7 +9,7 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
 	label,
 	isActive,
 	notificationCount,
-	link
+	link,
 }) => {
 	const router = useRouter();
 	const [isHovered, setIsHovered] = useState(false);
@@ -26,7 +28,7 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
 		<button
 			className={`${baseClasses} ${activeClasses} ${
 				isHovered ? extendedClass : ""
-				}`}
+			}`}
 			onMouseEnter={() => setIsHovered(true)}
 			onMouseLeave={() => setIsHovered(false)}
 			onClick={handleNavigation}
