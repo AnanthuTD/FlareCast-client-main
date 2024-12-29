@@ -6,8 +6,8 @@ import { Divider } from "@/components/signIn/Divider";
 import { useMutationData } from "@/hooks/useMutationData";
 import useZodForm from "@/hooks/useZodForm";
 import { emailSchema } from "./schema";
-import GoogleSignIn from "@/components/GoogleSignIn";
-import AuthLayoutWrapper from "@/components/AuthLayoutWrapper";
+import GoogleSignIn from "@/components/auth/GoogleSignIn";
+import AuthLayoutWrapper from "@/components/auth/AuthLayoutWrapper";
 import { useUserStore } from "@/providers/UserStoreProvider";
 
 function buttonText(

@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect } from "react";
 import { InputField } from "@/components/signup/InputField";
-import AuthLayoutWrapper from "@/components/AuthLayoutWrapper";
+import AuthLayoutWrapper from "@/components/auth/AuthLayoutWrapper";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/signIn/Button";
 import useZodForm from "@/hooks/useZodForm";

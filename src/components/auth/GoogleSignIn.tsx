@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { useGoogleLogin, TokenResponse } from "@react-oauth/google";
 import axiosInstance from "@/axios";
 import { toast, Toaster } from "sonner";
-import axios, { AxiosError } from "axios";
-import { GoogleSignInButton } from "./signIn/GoogleSignInButton";
+import axios from "axios";
+import { GoogleSignInButton } from "@/components/signIn/GoogleSignInButton";
 
 interface GoogleSignInResponse {
     message: string;
