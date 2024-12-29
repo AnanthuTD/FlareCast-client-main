@@ -9,6 +9,8 @@ import { emailSchema } from "./schema";
 import GoogleSignIn from "@/components/auth/GoogleSignIn";
 import AuthLayoutWrapper from "@/components/auth/AuthLayoutWrapper";
 import { useUserStore } from "@/providers/UserStoreProvider";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 function buttonText(
 	signInMethod: "google" | "credential" | null,
@@ -28,6 +30,7 @@ function buttonText(
 }
 
 export default function SignIn() {
+	const router = useRouter();
 	const [signInMethod, setSignInMethod] = React.useState<
 		"google" | "credential" | null
 	>(null);
@@ -62,14 +65,16 @@ export default function SignIn() {
 		if (signInMethod === "google") {
 			console.log("Google sign in");
 			// TODO: Implement google sign in
-
 		} else if (signInMethod === "credential") {
 			const userData = await signInWithCredential(
 				e.currentTarget.email.value,
 				e.currentTarget.password.value
 			);
 
-			if (!error) setUser(userData);
+			if (!error) {
+				setUser(userData);
+				router.replace("/home");
+			}
 		}
 	};
 
@@ -147,9 +152,11 @@ export default function SignIn() {
 					<span className="text-neutral-800">
 						Don&apos;t have an account yet?
 					</span>
-					<button className="font-bold text-indigo-500">
-						Sign up for free
-					</button>
+					<Link href="/signup" passHref>
+						<button className="font-bold text-indigo-500">
+							Sign up for free
+						</button>
+					</Link>
 				</div>
 			</div>
 		</AuthLayoutWrapper>

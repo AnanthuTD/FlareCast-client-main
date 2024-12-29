@@ -4,6 +4,8 @@ import axiosInstance from "@/axios";
 import { toast, Toaster } from "sonner";
 import axios from "axios";
 import { GoogleSignInButton } from "@/components/signIn/GoogleSignInButton";
+import { useUserStore } from "@/providers/UserStoreProvider";
+import { useRouter } from "next/navigation";
 
 interface GoogleSignInResponse {
     message: string;
@@ -16,7 +18,15 @@ interface GoogleSignInResponse {
 }
 
 const GoogleSignIn: React.FC = () => {
+    const router = useRouter();
     const [loading, setLoading] = useState(false);
+    const setUser = useUserStore((state) => state.setUser);
+
+    const handleGoogleLoginSuccess = (user:any) => {
+        console.log("Google login success:", user);
+        setUser(user);
+        router.replace("/home");
+    }
 
     const handleGoogleLoginError = (error: unknown) => {
         if (axios.isAxiosError(error)) {
@@ -40,6 +50,7 @@ const GoogleSignIn: React.FC = () => {
                 description: "You have successfully logged in with Google.",
             });
             console.log("Login data:", data);
+            handleGoogleLoginSuccess(data);
         } catch (error) {
             handleGoogleLoginError(error);
         } finally {

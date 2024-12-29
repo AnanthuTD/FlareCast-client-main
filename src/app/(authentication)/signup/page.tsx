@@ -16,9 +16,14 @@ const SignUpForm: React.FC = () => {
 	const searchParams = useSearchParams();
 	const email = searchParams.get("email");
 
-	const { mutate , error, isPending, data} = useMutationData(["sign-up"], signUp, "signUp", () => {
-		toast.success("Account created successfully");
-	});
+	const { mutate, error, isPending, data } = useMutationData(
+		["sign-up"],
+		signUp,
+		"signUp",
+		() => {
+			toast.success("Account created successfully");
+		}
+	);
 
 	const { register, errors, onFormSubmit } = useZodForm(signUpSchema, mutate);
 
@@ -58,24 +63,25 @@ const SignUpForm: React.FC = () => {
 					}}
 					className="flex relative flex-wrap gap-3 items-center mt-10 w-full max-w-md text-sm tracking-normal leading-loose max-md:max-w-full"
 				>
-					{formFields.map((field, index) => (
-						<div key={index} className="">
-							<InputField
-								key={field.id}
-								id={field.id}
-								label={field.label}
-								type={field.type}
-								defaultValue={field.id === "email" ? email || "" : ""}
-								{...register(field.id)}
-							/>
-							{errors[field.id] && (
-								<p className="text-red-600 text-sm mt-1">
-									{errors[field.id]?.message as string}
-								</p>
-							)}
-						</div>
-					))}
-
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-2 w-full">
+						{formFields.map((field, index) => (
+							<div key={index} className="flex">
+								<InputField
+									key={field.id}
+									id={field.id}
+									label={field.label}
+									type={field.type}
+									defaultValue={field.id === "email" ? email || "" : ""}
+									{...register(field.id)}
+								/>
+								{errors[field.id] && (
+									<p className="text-red-600 text-sm mt-1">
+										{errors[field.id]?.message as string}
+									</p>
+								)}
+							</div>
+						))}
+					</div>
 					<Button
 						type="submit"
 						disabled={isPending}
@@ -95,7 +101,7 @@ const SignUpForm: React.FC = () => {
 
 					<div className="flex z-0 grow shrink gap-2.5 items-start self-stretch pt-6 pr-24 pl-20 my-auto leading-6 min-w-[240px] w-[406px] max-md:px-5 max-md:max-w-full">
 						<span className="text-neutral-800">Already have an account?</span>{" "}
-						<Link href="/" className="text-indigo-500">
+						<Link href="/signin" className="text-indigo-500">
 							Sign In
 						</Link>
 					</div>

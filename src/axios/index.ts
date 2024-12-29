@@ -17,6 +17,11 @@ const userStore = createUserStore();
 axiosInstance.interceptors.request.use(
   (config) => {
     const accessToken = userStore.getState().accessToken; // Access token from Zustand
+
+    console.log('============================================')
+    console.log('accessToken:', accessToken);
+    console.log('============================================')
+
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
@@ -38,7 +43,7 @@ axiosInstance.interceptors.response.use(
       if (!originalRequest._retry) {
         originalRequest._retry = true;
         try {
-          const response = await axios.post('/api/auth/refresh');
+          const response = await axios.get('/api/auth/refresh-token');
           const newAccessToken = response.data.accessToken;
 
           userStore.getState().setAccessToken(newAccessToken);
@@ -47,7 +52,7 @@ axiosInstance.interceptors.response.use(
           return axiosInstance(originalRequest); // Retry the original request
         } catch (refreshError) {
           userStore.getState().clearAccessToken(); // Clear token if refresh fails
-          window.location.href = '/signin';
+          // window.location.href = '/signin';
           return Promise.reject(refreshError);
         }
       }
