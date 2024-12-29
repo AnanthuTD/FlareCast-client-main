@@ -121,3 +121,34 @@ export interface SignInButtonProps {
   children: React.ReactNode;
   onClick?: () => void;
 }
+
+export interface VideoCardProps {
+  duration: string;
+  userName: string;
+  timeAgo: string;
+  title: string;
+  views: number;
+  comments: number;
+  shares: number;
+  thumbnailUrl: string;
+  userAvatarUrl: string;
+}
+
+export interface SectionProps {
+  title: string;
+  videos: VideoCardProps[];
+}
+
+export interface SidebarItemProps {
+  icon: string;
+  label: string;
+  isActive?: boolean;
+  notificationCount?: number;
+  link: string;
+}
+
+export interface WorkspaceProps {
+  name: string;
+  memberCount: number;
+  avatarLabel: string;
+}
