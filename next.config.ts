@@ -11,7 +11,7 @@ const nextConfig: NextConfig = {
 		];
 	},
 	images:{
-		domains: ["cdn.builder.io"],
+		domains: ["cdn.builder.io", "lh3.googleusercontent.com"],
 	}
 };
 

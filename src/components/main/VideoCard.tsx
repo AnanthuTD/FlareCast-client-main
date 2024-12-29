@@ -1,5 +1,10 @@
 import * as React from "react";
 import { VideoCardProps } from "@/types";
+import {
+	Card,
+	CardContent,
+	CardHeader,
+} from "../ui/card";
 
 export const VideoCard: React.FC<VideoCardProps> = ({
 	duration,
@@ -13,40 +18,43 @@ export const VideoCard: React.FC<VideoCardProps> = ({
 	userAvatarUrl,
 }) => {
 	return (
-		<div className="flex grow shrink items-center self-stretch my-auto min-w-[240px] w-[198px]">
-			<div className="flex overflow-hidden flex-1 shrink gap-2.5 items-center self-stretch my-auto w-full rounded-2xl basis-0 bg-white bg-opacity-0 min-w-[240px]">
-				<div className="flex overflow-hidden flex-col flex-1 shrink self-stretch my-auto w-full rounded-2xl basis-0 min-w-[240px]">
+		<>
+			<Card className="w-[350px]">
+				<CardHeader>
 					<div className="flex overflow-hidden flex-col w-full rounded-2xl">
-						<div className="flex gap-2.5 items-start p-2.5 rounded-2xl bg-neutral-800">
-							<div className="flex flex-col w-6">
-								<img
-									loading="lazy"
-									src={thumbnailUrl}
-									className="object-contain w-6 aspect-square rounded-[7992px]"
-									alt=""
-								/>
-								<img
-									loading="lazy"
-									src={thumbnailUrl}
-									className="object-contain mt-2 w-6 aspect-square rounded-[7992px]"
-									alt=""
-								/>
-								<div className="flex items-center p-1 mt-2 w-6 h-6 bg-white rounded-[7992px]">
+						<div className="flex flex-row-reverse gap-2.5 items-start p-2.5 rounded-2xl bg-neutral-800">
+							<div className="flex flex-col items-end">
+								<div className="flex flex-col w-6">
 									<img
 										loading="lazy"
 										src={thumbnailUrl}
-										className="object-contain flex-1 shrink aspect-square basis-0 w-[18px]"
+										className="object-contain w-6 aspect-square rounded-[7992px]"
 										alt=""
 									/>
+									<img
+										loading="lazy"
+										src={thumbnailUrl}
+										className="object-contain mt-2 w-6 aspect-square rounded-[7992px]"
+										alt=""
+									/>
+									<div className="flex items-center p-1 mt-2 w-6 h-6 bg-white rounded-[7992px]">
+										<img
+											loading="lazy"
+											src={thumbnailUrl}
+											className="object-contain flex-1 shrink aspect-square basis-0 w-[18px]"
+											alt=""
+										/>
+									</div>
+								</div>
+								<div className="py-1 pr-3.5 pl-3 text-xs font-medium tracking-normal leading-loose text-white bg-neutral-800 rounded-[7992px]">
+									{duration}
 								</div>
 							</div>
-							<div className="py-1 pr-3.5 pl-3 text-xs font-medium tracking-normal leading-loose text-white bg-neutral-800 rounded-[7992px]">
-								{duration}
-							</div>
-							<div className="flex shrink-0 rounded border-2 border-solid border-neutral-100 h-[18px] w-[18px]" />
 						</div>
 					</div>
-					<div className="flex flex-col p-4 w-full tracking-normal">
+				</CardHeader>
+				<CardContent>
+					<div className="flex flex-col w-full tracking-normal">
 						<div className="flex gap-2 items-start w-full">
 							<img
 								loading="lazy"
@@ -54,7 +62,7 @@ export const VideoCard: React.FC<VideoCardProps> = ({
 								className="object-contain shrink-0 w-8 aspect-square rounded-[7992px]"
 								alt={`${userName}'s avatar`}
 							/>
-							<div className="flex overflow-hidden flex-col w-[103px]">
+							<div className="flex overflow-hidden flex-col w-full">
 								<div className="flex w-full">
 									<div className="flex overflow-hidden items-start text-xs font-medium leading-loose text-neutral-800">
 										<div className="overflow-hidden pr-1">{userName}</div>
@@ -109,8 +117,8 @@ export const VideoCard: React.FC<VideoCardProps> = ({
 							</div>
 						</div>
 					</div>
-				</div>
-			</div>
-		</div>
+				</CardContent>
+			</Card>
+		</>
 	);
 };
