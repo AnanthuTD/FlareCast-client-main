@@ -25,7 +25,7 @@ function AuthLayoutWrapper({
 					</div>
 					<Link href={page === "signup" ? "/signin" : "/signup"}>
 						<button className="pt-1.5 pr-5 pb-2 pl-4 text-sm font-bold leading-6 text-white bg-indigo-500 rounded-[7992px]">
-							Sign up for free
+							{page === "signup" ? "Sign In" : "Sign up for free"}
 						</button>
 					</Link>
 				</div>

@@ -1,14 +1,10 @@
 'use client'
 import React, { useState } from 'react';
-import { HeaderProps } from '../../types';
 import { Button } from './Button';
+import Link from 'next/link';
 
 export const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  const handleSignUp = () => {
-    // Implement sign up logic
-  };
 
   return (
     <header className="flex flex-col justify-center px-16 w-full text-base bg-white h-[72px] max-md:px-5 max-md:max-w-full">
@@ -51,7 +47,7 @@ export const Header: React.FC = () => {
         </div>
 
         <div className="flex flex-1 flex-row-reverse shrink gap-4 items-center self-stretch my-auto basis-0 min-w-[240px] max-md:max-w-full">
-          <Button onClick={handleSignUp}>Sign Up</Button>
+          <Link href={'/signin'}><Button>Sign In</Button></Link>
         </div>
       </nav>
     </header>
