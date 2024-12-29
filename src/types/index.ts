@@ -77,3 +77,47 @@ export interface ContactSectionProps {
   description: string;
   contactItems: ContactItemProps[];
 }
+
+export interface ButtonProps {
+  children: React.ReactNode;
+  variant?: 'primary' | 'secondary';
+  className?: string;
+  onClick?: () => void;
+  disabled?: boolean;
+  type?: 'button' | 'submit';
+}
+
+export interface DividerProps {
+  text: string;
+}
+
+export interface GoogleSignInButtonProps {
+  onClick?: () => void;
+  disabled?: boolean;
+}
+
+export interface SignInInputFieldProps {
+  label: string;
+  placeholder: string;
+  type?: string;
+  value?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+export interface SocialButtonProps {
+  icon: string;
+  text: string;
+  onClick?: () => void;
+}
+
+export interface InputFieldProps {
+  label: string;
+  type?: string;
+  id: string;
+  defaultValue?: string;
+}
+
+export interface SignInButtonProps {
+  children: React.ReactNode;
+  onClick?: () => void;
+}
