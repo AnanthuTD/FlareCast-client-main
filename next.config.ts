@@ -10,7 +10,7 @@ const nextConfig: NextConfig = {
 			},
 			{
 				source: "/api/collaboration/:path*",
-				destination: "http://localhost:4002/api/:path*", // Proxy to collaboration-service
+				destination: "http://localhost:4002/:path*", // Proxy to collaboration-service
 			},
 		];
 	},
