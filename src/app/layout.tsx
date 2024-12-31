@@ -5,6 +5,7 @@ import ReactQueryProvider from "@/react-query";
 import { UserStoreProvider } from "@/providers/UserStoreProvider";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import CheckAuthentication from "@/components/auth/CheckAuthentication";
+import { WorkspaceStoreProvider } from "@/providers/WorkspaceStoreProvider";
 
 const geistSans = Geist({
 	variable: "--font-geist-sans",
@@ -38,9 +39,11 @@ export default function RootLayout({
 					disableTransitionOnChange
 				>
 					<UserStoreProvider>
-						<ReactQueryProvider>
-							<CheckAuthentication>{children}</CheckAuthentication>
-						</ReactQueryProvider>
+						<WorkspaceStoreProvider>
+							<ReactQueryProvider>
+								<CheckAuthentication>{children}</CheckAuthentication>
+							</ReactQueryProvider>
+						</WorkspaceStoreProvider>
 					</UserStoreProvider>
 				</ThemeProvider>
 			</body>

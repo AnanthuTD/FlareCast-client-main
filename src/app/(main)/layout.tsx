@@ -4,7 +4,6 @@ import React from "react";
 function LayoutMain({ children }: { children: React.ReactNode }) {
 	return (
 		<>
-			
 				<UserLayout>{children}</UserLayout>
 		</>
 	);
