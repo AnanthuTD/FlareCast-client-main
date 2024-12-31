@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import {
 	Select,
 	SelectLabel,
@@ -14,6 +14,10 @@ import {
 import { SidebarItem } from "./SidebarItem";
 import { Workspace } from "./Workspace";
 import Image from "next/image";
+import { useWorkspaceStore } from "@/providers/WorkspaceStoreProvider";
+import { fetchWorkspaces } from "@/actions/workspace";
+import { toast } from "sonner";
+import { Badge } from "../ui/badge";
 
 interface UserSidebarProps {
 	sidebarItems: {
@@ -32,11 +36,25 @@ interface UserSidebarProps {
 	activeWorkspaceId: string;
 }
 
-const Sidebar: React.FC<UserSidebarProps> = ({
-	workspaces,
-	sidebarItems,
-	activeWorkspaceId,
-}) => {
+const Sidebar: React.FC<UserSidebarProps> = ({ sidebarItems }) => {
+	const activeWorkspace = useWorkspaceStore((state) => state.selectedWorkspace);
+	const workspaces = useWorkspaceStore((state) => state.workspaces);
+	const setWorkspaces = useWorkspaceStore((state) => state.setWorkspaces);
+
+	useEffect(() => {
+		fetchWorkspaces()
+			.then((workspaces) => {
+				console.log("Fetched workspaces:", workspaces);
+				setWorkspaces(workspaces);
+			})
+			.catch(({ message }: { message: string }) => {
+				console.error("Failed to fetch workspaces:", message);
+				toast.error(`Fetching workspaces failed`, message);
+			});
+	}, [setWorkspaces]);
+
+	console.log(activeWorkspace, workspaces);
+
 	const onChangeActiveWorkspace = (value: string) => {
 		console.log("==========================================");
 		console.log("Workspace changed to ", value);
@@ -66,7 +84,7 @@ const Sidebar: React.FC<UserSidebarProps> = ({
 							<div className="flex items-center justify-between w-full">
 								<div className="flex flex-col self-stretch my-auto w-full">
 									<Select
-										defaultValue={activeWorkspaceId}
+										defaultValue={activeWorkspace.id}
 										onValueChange={onChangeActiveWorkspace}
 									>
 										<SelectTrigger className="w-full text-neutral-400 bg-transparent">
@@ -76,29 +94,16 @@ const Sidebar: React.FC<UserSidebarProps> = ({
 											<SelectGroup>
 												<SelectLabel>Workspaces</SelectLabel>
 												<SelectSeparator />
-												{[{ id: "workspace_id", name: "workspace_name" }].map(
-													(workspace) => (
-														<SelectItem value={workspace.id} key={workspace.id}>
-															{workspace.name}
-														</SelectItem>
-													)
-												)}
-												{[{}].length > 0 &&
-													[
-														{
-															WorkSpace: { id: "id", name: "workspace_name" },
-														},
-													].map(
-														(workspace) =>
-															workspace.WorkSpace && (
-																<SelectItem
-																	value={workspace.WorkSpace.id}
-																	key={workspace.WorkSpace.id}
-																>
-																	{workspace.WorkSpace.name}
-																</SelectItem>
-															)
-													)}
+												{workspaces.owned.map((workspace) => (
+													<SelectItem value={workspace.id} key={workspace.id}>
+														{workspace.name} <Badge className="ml-4" variant={'outline'}>owned</Badge>
+													</SelectItem>
+												))}
+												{workspaces.member.map((workspace) => (
+													<SelectItem value={workspace.id} key={workspace.id}>
+														{workspace.name}
+													</SelectItem>
+												))}
 											</SelectGroup>
 										</SelectContent>
 									</Select>
@@ -147,9 +152,15 @@ const Sidebar: React.FC<UserSidebarProps> = ({
 								/>
 							</div>
 
-							{workspaces.map((workspace, index) => (
-								<Workspace key={index} {...workspace} />
-							))}
+							{[...workspaces.owned, ...workspaces.member].map(
+								(workspace, index) => (
+									<Workspace
+										key={index}
+										{...workspace}
+										avatarLabel={workspace.name[0]}
+									/>
+								)
+							)}
 
 							<div className="flex mt-6 w-full border-b border-gray-500 border-opacity-20 min-h-[1px]" />
 						</div>

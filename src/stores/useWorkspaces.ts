@@ -14,13 +14,18 @@ export interface Workspace {
 
 export type Workspaces = Workspace[];
 
+export type CombinedWorkspaces = {
+	owned: Workspaces;
+	member: Workspaces,
+}
+
 export type WorkspaceState = {
-	workspaces: Workspaces;
+	workspaces: CombinedWorkspaces;
 	selectedWorkspace: Workspace;
 };
 
 export type WorkspaceActions = {
-	setWorkspaces: (workspaces: Workspaces) => void;
+	setWorkspaces: (workspaces: CombinedWorkspaces) => void;
 	setSelectedWorkspace: (workspace: Workspace) => void;
 };
 
@@ -33,7 +38,10 @@ export const defaultInitState: WorkspaceState = {
 		name: "Initial workspace",
 		type: WORKSPACE_TYPE.PERSONAL,
 	},
-	workspaces: [],
+	workspaces: {
+		member: [],
+		owned: []
+	},
 };
 
 export const createWorkspaceStore = (

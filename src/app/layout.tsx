@@ -38,13 +38,13 @@ export default function RootLayout({
 					enableSystem
 					disableTransitionOnChange
 				>
-					<UserStoreProvider>
-						<WorkspaceStoreProvider>
+					<WorkspaceStoreProvider>
+						<UserStoreProvider>
 							<ReactQueryProvider>
 								<CheckAuthentication>{children}</CheckAuthentication>
 							</ReactQueryProvider>
-						</WorkspaceStoreProvider>
-					</UserStoreProvider>
+						</UserStoreProvider>
+					</WorkspaceStoreProvider>
 				</ThemeProvider>
 			</body>
 		</html>
