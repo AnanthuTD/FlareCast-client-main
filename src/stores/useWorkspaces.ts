@@ -5,14 +5,14 @@ enum WORKSPACE_TYPE {
 	PUBLIC,
 }
 
-interface Workspace {
+export interface Workspace {
 	name: string;
 	id: string;
 	memberCount: number;
 	type: WORKSPACE_TYPE;
 }
 
-type Workspaces = Workspace[];
+export type Workspaces = Workspace[];
 
 export type WorkspaceState = {
 	workspaces: Workspaces;
