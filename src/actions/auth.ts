@@ -3,7 +3,7 @@ import axiosInstance from "@/axios";
 export const checkUserExists = async ({ email }: { email: string }) => {
 	try {
 		const response = await axiosInstance.get(
-			`/api/auth/user-exist?email=${email}`
+			`/api/user/auth/user-exist?email=${email}`
 		);
 		return response.data;
 	} catch (error) {
@@ -26,7 +26,7 @@ export const signInWithCredential = async (
 	| never
 > => {
 	try {
-		const response = await axiosInstance.post(`/api/auth/sign-in`, {
+		const response = await axiosInstance.post(`/api/user/auth/sign-in`, {
 			email,
 			password,
 		});
@@ -48,7 +48,7 @@ export const signUp = async ({
 	password: string;
 }) => {
 	try {
-		const response = await axiosInstance.post(`/api/auth/sign-up`, {
+		const response = await axiosInstance.post(`/api/user/auth/sign-up`, {
 			email,
 			firstName,
 			lastName,

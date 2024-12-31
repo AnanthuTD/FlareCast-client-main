@@ -5,8 +5,12 @@ const nextConfig: NextConfig = {
 	rewrites: async () => {
 		return [
 			{
-				source: "/api/:path*",
-				destination: "http://localhost:4000/api/:path*", // Proxy to Backend
+				source: "/api/user/:path*",
+				destination: "http://localhost:4001/api/:path*", // Proxy to user-service
+			},
+			{
+				source: "/api/collaboration/:path*",
+				destination: "http://localhost:4002/api/:path*", // Proxy to collaboration-service
 			},
 		];
 	},
