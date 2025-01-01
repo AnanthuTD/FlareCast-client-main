@@ -60,13 +60,15 @@ export const deleteFolder = async (
 export const renameFolder = async ({
 	workspaceId,
 	folderName,
+	folderId,
 }: {
 	workspaceId: string;
 	folderName: string;
+	folderId: string;
 }): Promise<Folder | never> => {
 	try {
 		const response = await axiosInstance.patch(
-			`/api/collaboration/workspace/${workspaceId}/folder`,
+			`/api/collaboration/workspace/${workspaceId}/folder/${folderId}`,
 			{ name: folderName }
 		);
 		return response.data;

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useOptimistic, useTransition } from "react";
+import React, { useEffect, useOptimistic, useState, useTransition } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import VideoTab from "@/components/library/VideoTab";
 import ArchiveTab from "@/components/library/ArchiveTab";
@@ -36,6 +36,7 @@ export default function VideoLibrary() {
 	const activeWorkspace = useWorkspaceStore((state) => state.selectedWorkspace);
 	const [optimisticFolders, setOptimisticFolders] = useOptimistic(folders);
 	const [isPending, startTransition] = useTransition();
+	const [refetchFolders, setRefetchFolders] = useState(false)
 
 	useEffect(() => {
 		async function handleFetchFolders() {
@@ -50,7 +51,9 @@ export default function VideoLibrary() {
 		}
 
 		handleFetchFolders();
-	}, [activeWorkspace]);
+	}, [activeWorkspace, refetchFolders]);
+
+	const triggerRefetchFolders = () => setRefetchFolders(prev=>!prev)
 
 	async function handleCreateFolder() {
 		startTransition(async () => {
@@ -128,6 +131,7 @@ export default function VideoLibrary() {
 											key={folder.id}
 											{...folder}
 											handleDelete={() => handleDeleteFolder(folder.id)}
+											triggerRefetchFolders={triggerRefetchFolders}
 										/>
 									))}
 								</div>

@@ -12,21 +12,35 @@ import { usePathname, useRouter } from "next/navigation";
 import { useMutationData } from "@/hooks/useMutationData";
 import { renameFolder } from "@/actions/workspace";
 import { Input } from "../../ui/input";
+import { useWorkspaceStore } from "@/providers/WorkspaceStoreProvider";
 
 interface FolderProps extends Props {
 	optimistic?: boolean;
 	handleDelete: (folderId: string) => void;
 }
 
-function Folder({ id, name, videoCount = 0, optimistic = false, handleDelete  }: FolderProps) {
+function Folder({
+	id,
+	name,
+	videoCount = 0,
+	optimistic = false,
+	handleDelete,
+	triggerRefetchFolders,
+}: FolderProps) {
 	const pathName = usePathname();
 	const router = useRouter();
 	const inputRef = useRef<HTMLInputElement | null>(null);
 	const folderCardRef = useRef<HTMLDivElement | null>(null);
 	const [onRename, setOnRename] = useState(false);
+	const activeFolderId = useWorkspaceStore(
+		(state) => state.selectedWorkspace.id
+	);
 
 	const Rename = () => setOnRename(true);
-	const Renamed = () => setOnRename(false);
+	const Renamed = () => {
+		triggerRefetchFolders();
+		setOnRename(false);
+	};
 
 	const { mutate, isPending } = useMutationData(
 		["rename-folders"],
@@ -43,7 +57,11 @@ function Folder({ id, name, videoCount = 0, optimistic = false, handleDelete  }:
 	const updateFolderName = (e: React.FocusEvent<HTMLInputElement, Element>) => {
 		if (inputRef.current && folderCardRef.current) {
 			if (inputRef.current.value) {
-				mutate({ workspaceId: pathName, folderName: inputRef.current.value });
+				mutate({
+					workspaceId: activeFolderId,
+					folderName: inputRef.current.value,
+					folderId: id,
+				});
 			} else {
 				Renamed();
 			}
@@ -102,7 +120,7 @@ function Folder({ id, name, videoCount = 0, optimistic = false, handleDelete  }:
 						</div>
 
 						{/* Dropdown */}
-						<Dropdown handleDelete={handleDelete}/>
+						<Dropdown handleDelete={handleDelete} />
 					</div>
 				</div>
 			</CardHeader>
