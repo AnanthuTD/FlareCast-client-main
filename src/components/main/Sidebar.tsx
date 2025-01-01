@@ -18,6 +18,11 @@ import { useWorkspaceStore } from "@/providers/WorkspaceStoreProvider";
 import { fetchWorkspaces } from "@/actions/workspace";
 import { toast } from "sonner";
 import { Badge } from "../ui/badge";
+import {
+	getDefaultWorkspace,
+	getLocalStorageWorkspace,
+	setLocalStorageWorkspace
+} from "@/components/InitializeWorkspaceStore";
 
 interface UserSidebarProps {
 	sidebarItems: {
@@ -40,16 +45,32 @@ const Sidebar: React.FC<UserSidebarProps> = ({ sidebarItems }) => {
 	const activeWorkspace = useWorkspaceStore((state) => state.selectedWorkspace);
 	const workspaces = useWorkspaceStore((state) => state.workspaces);
 	const setWorkspaces = useWorkspaceStore((state) => state.setWorkspaces);
+	const setSelectedWorkspace = useWorkspaceStore(store => store.setSelectedWorkspace)
 
 	useEffect(() => {
 		fetchWorkspaces()
 			.then((workspaces) => {
+				const { owned, member } = workspaces;
+
+				const localStorageWorkspace = getLocalStorageWorkspace();
+				const selectedWorkspace = getDefaultWorkspace(
+					owned,
+					member,
+					localStorageWorkspace?.id
+				);
+
+				setLocalStorageWorkspace(selectedWorkspace);
+
+				setSelectedWorkspace(selectedWorkspace);
+
+				console.log(selectedWorkspace)
+
 				console.log("Fetched workspaces:", workspaces);
 				setWorkspaces(workspaces);
 			})
-			.catch(({ message }: { message: string }) => {
-				console.error("Failed to fetch workspaces:", message);
-				toast.error(`Fetching workspaces failed`, message);
+			.catch((error) => {
+				console.error("Failed to fetch workspaces:", error);
+				toast.error(`Fetching workspaces failed`);
 			});
 	}, [setWorkspaces]);
 
@@ -83,7 +104,7 @@ const Sidebar: React.FC<UserSidebarProps> = ({ sidebarItems }) => {
 						<div className="flex overflow-hidden items-start py-2.5 pr-3.5 pl-4 w-full bg-white rounded-t-2xl border border-solid border-gray-500 border-opacity-20">
 							<div className="flex items-center justify-between w-full">
 								<div className="flex flex-col self-stretch my-auto w-full">
-									<Select
+									{activeWorkspace && workspaces.owned.length > 0 && <Select
 										defaultValue={activeWorkspace.id}
 										onValueChange={onChangeActiveWorkspace}
 									>
@@ -106,7 +127,7 @@ const Sidebar: React.FC<UserSidebarProps> = ({ sidebarItems }) => {
 												))}
 											</SelectGroup>
 										</SelectContent>
-									</Select>
+									</Select>}
 									<div className="text-xs tracking-normal leading-loose text-gray-500">
 										1 member
 									</div>

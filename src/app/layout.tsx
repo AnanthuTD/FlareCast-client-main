@@ -41,7 +41,9 @@ export default function RootLayout({
 					<WorkspaceStoreProvider>
 						<UserStoreProvider>
 							<ReactQueryProvider>
-								<CheckAuthentication>{children}</CheckAuthentication>
+								<CheckAuthentication>
+									{children}
+								</CheckAuthentication>
 							</ReactQueryProvider>
 						</UserStoreProvider>
 					</WorkspaceStoreProvider>
