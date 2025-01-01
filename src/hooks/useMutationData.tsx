@@ -48,6 +48,8 @@ export const useMutationDataState = (mutationKey: MutationKey) => {
 		},
 	});
 
+	console.log(data)
+
 	const latestVariables = data[data.length - 1];
 	return { latestVariables };
 };

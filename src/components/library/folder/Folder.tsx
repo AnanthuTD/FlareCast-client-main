@@ -69,7 +69,7 @@ function Folder({
 	};
 
 	function handleFolderClick(e: React.MouseEvent<HTMLDivElement>) {
-		router.push(`${pathName}/${id}`);
+		router.push(`${pathName}/folder/${id}`);
 	}
 
 	return (

@@ -18,11 +18,13 @@ export const fetchWorkspaces = async (): Promise<
 };
 
 export const fetchFolders = async (
-	workspaceId: string
+	workspaceId: string,
+	folderId?: string
 ): Promise<Folder[] | never> => {
 	try {
 		const response = await axiosInstance.get(
-			`/api/collaboration/workspace/${workspaceId}/folders`
+			`/api/collaboration/workspace/${workspaceId}/folders`,
+			{ params: { folderId } }
 		);
 		return response.data;
 	} catch (error) {
@@ -31,11 +33,13 @@ export const fetchFolders = async (
 };
 
 export const createFolder = async (
-	workspaceId: string
+	workspaceId: string,
+	folderId?: string
 ): Promise<Folder | never> => {
 	try {
 		const response = await axiosInstance.post(
-			`/api/collaboration/workspace/${workspaceId}/folder`
+			`/api/collaboration/workspace/${workspaceId}/folder`,
+			{ folderId }
 		);
 		return response.data;
 	} catch (error) {
