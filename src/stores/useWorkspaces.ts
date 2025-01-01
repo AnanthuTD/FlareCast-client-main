@@ -32,12 +32,6 @@ export type WorkspaceActions = {
 export type WorkspaceStore = WorkspaceState & WorkspaceActions;
 
 export const defaultInitState: WorkspaceState = {
-	selectedWorkspace: {
-		id: "workspace_id",
-		memberCount: 0,
-		name: "Initial workspace",
-		type: WORKSPACE_TYPE.PERSONAL,
-	},
 	workspaces: {
 		member: [],
 		owned: []

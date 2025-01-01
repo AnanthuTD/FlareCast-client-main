@@ -12,13 +12,6 @@ import { useWorkspaceStore } from "@/providers/WorkspaceStoreProvider";
 import { toast } from "sonner";
 import { Separator } from "@/components/ui/separator";
 
-const sampleFolder = {
-	id: "id",
-	name: "New Folder",
-	videoCount: 1,
-	workspaceId: "workspace_id",
-};
-
 interface OptimisticFolder extends FolderType {
 	optimistic: boolean;
 }
@@ -32,7 +25,7 @@ const optimisticFolder: OptimisticFolder = {
 };
 
 export default function VideoLibrary() {
-	const [folders, setFolders] = React.useState<FolderType[]>([sampleFolder]);
+	const [folders, setFolders] = React.useState<FolderType[]>([]);
 	const activeWorkspace = useWorkspaceStore((state) => state.selectedWorkspace);
 	const [optimisticFolders, setOptimisticFolders] = useOptimistic(folders);
 	const [isPending, startTransition] = useTransition();

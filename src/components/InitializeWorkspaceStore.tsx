@@ -52,16 +52,17 @@ export const InitializeWorkspaceStore = ({children}) => {
 			setLocalStorageWorkspace(selectedWorkspace);
 
 			setSelectedWorkspace(selectedWorkspace);
+            setInitializing(false);
 		} catch (error) {
 			console.error("Failed to initialize workspace store:", error);
         } finally {
-            setInitializing(false);
         }
 	};
 
 	useEffect(() => {
+		setInitializing(true)
 		initializeWorkspaceStore();
-    });
+    }, []);
 
     return <>
         {initializing ?
