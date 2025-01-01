@@ -1,59 +1,71 @@
-'use client'
+"use client";
 
-import {fetchWorkspaces} from "@/actions/workspace";
-import {Workspace} from "@/stores/useWorkspaces";
-import {useWorkspaceStore} from "@/providers/WorkspaceStoreProvider";
-import {useEffect} from "react";
+import { fetchWorkspaces } from "@/actions/workspace";
+import { Workspace } from "@/stores/useWorkspaces";
+import { useWorkspaceStore } from "@/providers/WorkspaceStoreProvider";
+import { useEffect, useState } from "react";
 
 export const getLocalStorageWorkspace = (): Workspace | null => {
-    try {
-        const item = localStorage.getItem("workspaces");
-        return item ? JSON.parse(item) as Workspace : null;
-    } catch {
-        console.warn("Invalid localStorage data.");
-        return null;
-    }
+	try {
+		const item = localStorage.getItem("workspaces");
+		return item ? (JSON.parse(item) as Workspace) : null;
+	} catch {
+		console.warn("Invalid localStorage data.");
+		return null;
+	}
 };
 
 export const setLocalStorageWorkspace = (workspace: Workspace) => {
-    localStorage.setItem("workspaces", JSON.stringify(workspace));
+	localStorage.setItem("workspaces", JSON.stringify(workspace));
 };
 
-export const getDefaultWorkspace = (owned: Workspace[], member: Workspace[], id?: string): Workspace => {
-    return id
-        ? [...owned, ...member].find((workspace) => workspace.id === id) ?? owned[0]
-        : owned[0];
+export const getDefaultWorkspace = (
+	owned: Workspace[],
+	member: Workspace[],
+	id?: string
+): Workspace => {
+	return id
+		? [...owned, ...member].find((workspace) => workspace.id === id) ?? owned[0]
+		: owned[0];
 };
 
-export const InitializeWorkspaceStore = ()=>{
+export const InitializeWorkspaceStore = ({children}) => {
+	const setSelectedWorkspace = useWorkspaceStore(
+		(store) => store.setSelectedWorkspace
+    );
+    const [initializing, setInitializing] = useState(true)
 
-    const setSelectedWorkspace = useWorkspaceStore(store => store.setSelectedWorkspace)
+	const initializeWorkspaceStore = async () => {
+		try {
+			const { owned, member } = await fetchWorkspaces();
+			if (owned.length === 0) {
+				throw new Error("No workspaces found.");
+			}
 
-    const initializeWorkspaceStore = async () => {
-        try {
-            const { owned, member } = await fetchWorkspaces();
-            if (owned.length === 0) {
-                throw new Error("No workspaces found.");
-            }
+			const localStorageWorkspace = getLocalStorageWorkspace();
+			const selectedWorkspace = getDefaultWorkspace(
+				owned,
+				member,
+				localStorageWorkspace?.id
+			);
 
-            const localStorageWorkspace = getLocalStorageWorkspace();
-            const selectedWorkspace = getDefaultWorkspace(
-                owned,
-                member,
-                localStorageWorkspace?.id
-            );
+			setLocalStorageWorkspace(selectedWorkspace);
 
-            setLocalStorageWorkspace(selectedWorkspace);
-
-            setSelectedWorkspace(selectedWorkspace);
-        } catch (error) {
-            console.error("Failed to initialize workspace store:", error);
+			setSelectedWorkspace(selectedWorkspace);
+		} catch (error) {
+			console.error("Failed to initialize workspace store:", error);
+        } finally {
+            setInitializing(false);
         }
-    };
+	};
 
-    useEffect(() => {
-    initializeWorkspaceStore();
-    })
+	useEffect(() => {
+		initializeWorkspaceStore();
+    });
 
-    return null;
+    return <>
+        {initializing ?
+    null : children
 }
+    </>;
+};

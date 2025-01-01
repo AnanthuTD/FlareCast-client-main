@@ -14,7 +14,7 @@ import {
 } from "@/stores/useWorkspaces";
 import { useStore } from "zustand";
 import { fetchWorkspaces } from "@/actions/workspace";
-import {InitializeWorkspaceStore} from "@/components/InitializeWorkspaceStore";
+import { InitializeWorkspaceStore } from "@/components/InitializeWorkspaceStore";
 
 export type WorkspaceStoreApi = ReturnType<typeof createWorkspaceStore>;
 
@@ -26,10 +26,9 @@ export interface WorkspaceStoreProviderProps {
 	children: ReactNode;
 }
 
-
 export const WorkspaceStoreProvider = ({
-										   children,
-									   }: WorkspaceStoreProviderProps) => {
+	children,
+}: WorkspaceStoreProviderProps) => {
 	const storeRef = useRef<WorkspaceStoreApi>();
 
 	if (!storeRef.current) {
@@ -38,8 +37,7 @@ export const WorkspaceStoreProvider = ({
 
 	return (
 		<WorkspaceStoreContext.Provider value={storeRef.current}>
-			{/*<InitializeWorkspaceStore/>*/}
-			{children}
+			<InitializeWorkspaceStore>{children}</InitializeWorkspaceStore>
 		</WorkspaceStoreContext.Provider>
 	);
 };

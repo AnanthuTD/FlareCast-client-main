@@ -50,7 +50,7 @@ const Sidebar: React.FC<UserSidebarProps> = ({ sidebarItems }) => {
 	useEffect(() => {
 		fetchWorkspaces()
 			.then((workspaces) => {
-				const { owned, member } = workspaces;
+				/* const { owned, member } = workspaces;
 
 				const localStorageWorkspace = getLocalStorageWorkspace();
 				const selectedWorkspace = getDefaultWorkspace(
@@ -65,7 +65,7 @@ const Sidebar: React.FC<UserSidebarProps> = ({ sidebarItems }) => {
 
 				console.log(selectedWorkspace)
 
-				console.log("Fetched workspaces:", workspaces);
+				console.log("Fetched workspaces:", workspaces); */
 				setWorkspaces(workspaces);
 			})
 			.catch((error) => {

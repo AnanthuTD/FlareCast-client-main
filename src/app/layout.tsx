@@ -2,10 +2,9 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import ReactQueryProvider from "@/react-query";
-import { UserStoreProvider } from "@/providers/UserStoreProvider";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import CheckAuthentication from "@/components/auth/CheckAuthentication";
-import { WorkspaceStoreProvider } from "@/providers/WorkspaceStoreProvider";
+import { UserStoreProvider } from "@/providers/UserStoreProvider";
 
 const geistSans = Geist({
 	variable: "--font-geist-sans",
@@ -38,15 +37,11 @@ export default function RootLayout({
 					enableSystem
 					disableTransitionOnChange
 				>
-					<WorkspaceStoreProvider>
-						<UserStoreProvider>
-							<ReactQueryProvider>
-								<CheckAuthentication>
-									{children}
-								</CheckAuthentication>
-							</ReactQueryProvider>
-						</UserStoreProvider>
-					</WorkspaceStoreProvider>
+					<UserStoreProvider>
+						<ReactQueryProvider>
+							<CheckAuthentication>{children}</CheckAuthentication>
+						</ReactQueryProvider>
+					</UserStoreProvider>
 				</ThemeProvider>
 			</body>
 		</html>

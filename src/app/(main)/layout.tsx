@@ -1,10 +1,13 @@
 import { UserLayout } from "@/components/main/UserLayout";
+import { WorkspaceStoreProvider } from "@/providers/WorkspaceStoreProvider";
 import React from "react";
 
 function LayoutMain({ children }: { children: React.ReactNode }) {
 	return (
 		<>
-				<UserLayout>{children}</UserLayout>
+				<WorkspaceStoreProvider>
+					<UserLayout>{children}</UserLayout>
+				</WorkspaceStoreProvider>
 		</>
 	);
 }
