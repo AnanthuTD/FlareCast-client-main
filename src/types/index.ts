@@ -134,6 +134,18 @@ export interface VideoCardProps {
   userAvatarUrl: string;
 }
 
+export interface Video {
+  duration: string;
+  userName: string;
+  timeAgo: string;
+  title: string;
+  views: number;
+  comments: number;
+  shares: number;
+  thumbnailUrl: string;
+  userAvatarUrl: string;
+}
+
 export interface SectionProps {
   title: string;
   videos: VideoCardProps[];
@@ -151,4 +163,29 @@ export interface WorkspaceProps {
   name: string;
   memberCount: number;
   avatarLabel: string;
+}
+
+export interface VideoStats {
+  views: number;
+  comments: number;
+  likes: number;
+}
+
+export interface VideoMetadata {
+  duration: string;
+  author: {
+    name: string;
+    avatar: string;
+  };
+  timestamp: string;
+  shared: boolean;
+  title: string;
+  stats: VideoStats;
+}
+
+export interface Folder {
+	name: string;
+	id: string;
+	videoCount: number;
+  workspaceId: string;
 }
