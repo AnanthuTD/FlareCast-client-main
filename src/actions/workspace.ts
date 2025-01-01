@@ -4,9 +4,9 @@ import { Folder, Video } from "@/types";
 
 export const fetchWorkspaces = async (): Promise<
 	| {
-			owned: Workspaces;
-			member: Workspaces;
-	  }
+		owned: Workspaces;
+		member: Workspaces;
+	}
 	| never
 > => {
 	try {
@@ -94,3 +94,18 @@ export const fetchVideosInFolder = async (
 		throw error.response.data;
 	}
 };
+
+export interface FetchParentFolderRes extends Folder {
+	parentFolders: Folder[]
+}
+export const fetchParentFolders = async (workspaceId: string, folderId: string): Promise<FetchParentFolderRes> | never => {
+	try {
+		const response = await axiosInstance.get(
+			`/api/collaboration/workspace/${workspaceId}/folder/${folderId}/parents`
+		);
+		return response.data;
+	} catch (error) {
+		console.error(error)
+		throw error.response.data;
+	}
+}
