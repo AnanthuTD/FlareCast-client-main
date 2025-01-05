@@ -10,7 +10,7 @@ import GoogleSignIn from "@/components/auth/GoogleSignIn";
 import AuthLayoutWrapper from "@/components/auth/AuthLayoutWrapper";
 import { useUserStore } from "@/providers/UserStoreProvider";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 function buttonText(
 	signInMethod: "google" | "credential" | null,
@@ -30,6 +30,7 @@ function buttonText(
 }
 
 export default function SignIn() {
+	const searchParams = useSearchParams();
 	const router = useRouter();
 	const [signInMethod, setSignInMethod] = React.useState<
 		"google" | "credential" | null
@@ -62,18 +63,26 @@ export default function SignIn() {
 
 	const onFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
+		const callbackUrl = searchParams.get("callbackUrl");
+
 		if (signInMethod === "google") {
 			console.log("Google sign in");
 			// TODO: Implement google sign in
 		} else if (signInMethod === "credential") {
 			const userData = await signInWithCredential(
 				e.currentTarget.email.value,
-				e.currentTarget.password.value
+				e.currentTarget.password.value,
+				!!callbackUrl
 			);
 
 			if (!error) {
-				setUser(userData);
-				router.replace("/home");
+				if (callbackUrl) {
+					// if callbackUrl then redirect back to it
+					window.location.href = `${callbackUrl}?refreshToken=${userData.refreshToken}`;
+				} else {
+					setUser(userData);
+					router.replace("/home");
+				}
 			}
 		}
 	};

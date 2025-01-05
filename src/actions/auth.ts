@@ -13,7 +13,8 @@ export const checkUserExists = async ({ email }: { email: string }) => {
 
 export const signInWithCredential = async (
 	email: string,
-	password: string
+	password: string,
+	isDeskTop: boolean = false,
 ): Promise<
 	| {
 			accessToken: string;
@@ -29,6 +30,10 @@ export const signInWithCredential = async (
 		const response = await axiosInstance.post(`/api/user/auth/sign-in`, {
 			email,
 			password,
+		}, {
+			params: {
+				isDeskTop,
+			}
 		});
 		return { ...response.data, error: false };
 	} catch (error) {
