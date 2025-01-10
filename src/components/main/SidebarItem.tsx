@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { SidebarItemProps } from "@/types";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 export const SidebarItem: React.FC<SidebarItemProps> = ({
 	icon,
@@ -12,13 +12,14 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
 	link,
 }) => {
 	const router = useRouter();
+	const pathName = usePathname();
 	const [isHovered, setIsHovered] = useState(false);
 
 	const extendedClass =
 		" text-indigo-500 bg-indigo-500 bg-opacity-10 max-w-[221px] rounded-[7992px]";
 	const baseClasses =
 		"font-bold py-1.5 pl-3 pr-2 text-black flex justify-between items-center text-sm leading-6 w-full";
-	const activeClasses = isActive ? extendedClass : "";
+	const activeClasses = isActive || pathName === link ? extendedClass : "";
 
 	const handleNavigation = () => {
 		router.push(link);
@@ -34,12 +35,13 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
 			onClick={handleNavigation}
 		>
 			<div className="flex gap-2 items-start">
-				<img
+				{/* <img
 					loading="lazy"
 					src={icon}
 					className="object-contain shrink-0 w-6 aspect-square"
 					alt=""
-				/>
+				/> */}
+				{icon}
 				<div className="overflow-hidden pr-1">{label}</div>
 			</div>
 			{notificationCount !== undefined && (

@@ -18,11 +18,6 @@ import { useWorkspaceStore } from "@/providers/WorkspaceStoreProvider";
 import { fetchWorkspaces } from "@/actions/workspace";
 import { toast } from "sonner";
 import { Badge } from "../ui/badge";
-import {
-	getDefaultWorkspace,
-	getLocalStorageWorkspace,
-	setLocalStorageWorkspace
-} from "@/components/InitializeWorkspaceStore";
 
 interface UserSidebarProps {
 	sidebarItems: {
@@ -41,11 +36,53 @@ interface UserSidebarProps {
 	activeWorkspaceId: string;
 }
 
+const DEFAULT_SIDEBAR_ITEMS = [
+	{
+		icon: "https://cdn.builder.io/api/v1/image/assets/TEMP/afd841629896993aa1ef8ad8803a88d7a1e863dbe16892a5f7b3904597b429b0?placeholderIfAbsent=true&apiKey=c5dccb8c30704e8b9e01b46fd4eecdec",
+		label: "Home",
+		isActive: true,
+		link: "/home",
+		notificationCount: 0,
+	},
+	{
+		icon: "https://cdn.builder.io/api/v1/image/assets/TEMP/9571762a9bf7ac5d07bffe1ec0f742b65b00cd802d319c665d6fcf30d3f0ad17?placeholderIfAbsent=true&apiKey=c5dccb8c30704e8b9e01b46fd4eecdec",
+		label: "My Library",
+		link: "/library",
+		notificationCount: 0,
+	},
+	{
+		icon: "https://cdn.builder.io/api/v1/image/assets/TEMP/6a4b73dde04536c390a8f798bd293bf0c76f17bc316967fb62a729cc18b8414c?placeholderIfAbsent=true&apiKey=c5dccb8c30704e8b9e01b46fd4eecdec",
+		label: "Notifications",
+		notificationCount: 3,
+		link: "/notifications",
+	},
+	{
+		icon: "https://cdn.builder.io/api/v1/image/assets/TEMP/5e9ea07e10407ca4d3dd6371d08103f0a5435f68a33a6729d537cb860bfd0c88?placeholderIfAbsent=true&apiKey=c5dccb8c30704e8b9e01b46fd4eecdec",
+		label: "Watch Later",
+		notificationCount: 1,
+		link: "/watchLater",
+	},
+	{
+		icon: "https://cdn.builder.io/api/v1/image/assets/TEMP/41aa75833ea1cbffbd2053da7335f5072c88bd22109fe785e1cb09c3ce30fc83?placeholderIfAbsent=true&apiKey=c5dccb8c30704e8b9e01b46fd4eecdec",
+		label: "History",
+		link: "/history",
+		notificationCount: 0,
+	},
+	{
+		icon: "https://cdn.builder.io/api/v1/image/assets/TEMP/d84310295ce5bed93aba9404f10bdc0e22ab172e690cc11a67fb153b1913f336?placeholderIfAbsent=true&apiKey=c5dccb8c30704e8b9e01b46fd4eecdec",
+		label: "Settings",
+		link: "/settings",
+		notificationCount: 0,
+	},
+];	
+
 const Sidebar: React.FC<UserSidebarProps> = ({ sidebarItems }) => {
 	const activeWorkspace = useWorkspaceStore((state) => state.selectedWorkspace);
 	const workspaces = useWorkspaceStore((state) => state.workspaces);
 	const setWorkspaces = useWorkspaceStore((state) => state.setWorkspaces);
-	const setSelectedWorkspace = useWorkspaceStore(store => store.setSelectedWorkspace)
+	const setSelectedWorkspace = useWorkspaceStore(
+		(store) => store.setSelectedWorkspace
+	);
 
 	useEffect(() => {
 		fetchWorkspaces()
@@ -104,30 +141,35 @@ const Sidebar: React.FC<UserSidebarProps> = ({ sidebarItems }) => {
 						<div className="flex overflow-hidden items-start py-2.5 pr-3.5 pl-4 w-full bg-white rounded-t-2xl border border-solid border-gray-500 border-opacity-20">
 							<div className="flex items-center justify-between w-full">
 								<div className="flex flex-col self-stretch my-auto w-full">
-									{activeWorkspace && workspaces.owned.length > 0 && <Select
-										defaultValue={activeWorkspace.id}
-										onValueChange={onChangeActiveWorkspace}
-									>
-										<SelectTrigger className="w-full text-neutral-400 bg-transparent">
-											<SelectValue placeholder="Select a workspace"></SelectValue>
-										</SelectTrigger>
-										<SelectContent className="backdrop-blur-xl">
-											<SelectGroup>
-												<SelectLabel>Workspaces</SelectLabel>
-												<SelectSeparator />
-												{workspaces.owned.map((workspace) => (
-													<SelectItem value={workspace.id} key={workspace.id}>
-														{workspace.name} <Badge className="ml-4" variant={'outline'}>owned</Badge>
-													</SelectItem>
-												))}
-												{workspaces.member.map((workspace) => (
-													<SelectItem value={workspace.id} key={workspace.id}>
-														{workspace.name}
-													</SelectItem>
-												))}
-											</SelectGroup>
-										</SelectContent>
-									</Select>}
+									{activeWorkspace && workspaces.owned.length > 0 && (
+										<Select
+											defaultValue={activeWorkspace.id}
+											onValueChange={onChangeActiveWorkspace}
+										>
+											<SelectTrigger className="w-full text-neutral-400 bg-transparent">
+												<SelectValue placeholder="Select a workspace"></SelectValue>
+											</SelectTrigger>
+											<SelectContent className="backdrop-blur-xl">
+												<SelectGroup>
+													<SelectLabel>Workspaces</SelectLabel>
+													<SelectSeparator />
+													{workspaces.owned.map((workspace) => (
+														<SelectItem value={workspace.id} key={workspace.id}>
+															{workspace.name}{" "}
+															<Badge className="ml-4" variant={"outline"}>
+																owned
+															</Badge>
+														</SelectItem>
+													))}
+													{workspaces.member.map((workspace) => (
+														<SelectItem value={workspace.id} key={workspace.id}>
+															{workspace.name}
+														</SelectItem>
+													))}
+												</SelectGroup>
+											</SelectContent>
+										</Select>
+									)}
 									<div className="text-xs tracking-normal leading-loose text-gray-500">
 										1 member
 									</div>

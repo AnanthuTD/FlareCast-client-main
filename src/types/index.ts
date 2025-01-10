@@ -132,6 +132,7 @@ export interface VideoCardProps {
   shares: number;
   thumbnailUrl: string;
   userAvatarUrl: string;
+  onClick: ()=>void;
 }
 
 export interface Video {

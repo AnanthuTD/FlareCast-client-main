@@ -52,7 +52,7 @@ axiosInstance.interceptors.response.use(
 					return axiosInstance(originalRequest); // Retry the original request
 				} catch (refreshError) {
 					userStore.getState().clearAccessToken(); // Clear token if refresh fails
-					if (!["/signin", "signup"].includes(window.location.pathname)) {
+					if (!["/signin", "/signup"].includes(window.location.pathname)) {
 						window.location.href = "/signin";
 					}
 					return Promise.reject(refreshError);

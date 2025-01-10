@@ -1,10 +1,6 @@
 import * as React from "react";
 import { VideoCardProps } from "@/types";
-import {
-	Card,
-	CardContent,
-	CardHeader,
-} from "../ui/card";
+import { Card, CardContent, CardHeader } from "../ui/card";
 
 export const VideoCard: React.FC<VideoCardProps> = ({
 	duration,
@@ -16,13 +12,21 @@ export const VideoCard: React.FC<VideoCardProps> = ({
 	shares,
 	thumbnailUrl,
 	userAvatarUrl,
+	onClick,
 }) => {
 	return (
 		<>
-			<Card className="w-[350px]">
+			<Card className="w-[350px]" onClick={onClick}>
 				<CardHeader>
 					<div className="flex overflow-hidden flex-col w-full rounded-2xl">
-						<div className="flex flex-row-reverse gap-2.5 items-start p-2.5 rounded-2xl bg-neutral-800">
+						<div
+							className="flex flex-row-reverse gap-2.5 items-start p-2.5 rounded-2xl bg-neutral-800"
+							style={{
+								backgroundImage: `url(${thumbnailUrl})`,
+								backgroundSize: "cover",
+								backgroundPosition: "center",
+							}}
+						>
 							<div className="flex flex-col items-end">
 								<div className="flex flex-col w-6">
 									<img
