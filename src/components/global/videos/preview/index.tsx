@@ -7,6 +7,7 @@ import videojs from "video.js";
 import { useQueryData } from "@/hooks/useQueryData";
 import { getPreviewVideo } from "@/actions/video";
 import { toast } from "sonner";
+import Player from "@/app/test/page";
 
 type Props = {
 	videoId: string;
@@ -74,7 +75,8 @@ const VideoPreview = ({ videoId }: Props) => {
 					</span>
 				</div>
 
-				<VideoJS options={videoJsOptions} onReady={handlePlayerReady} />
+				{/* <VideoJS options={videoJsOptions} onReady={handlePlayerReady} /> */}
+				<Player hslUrl={`/gcs/${videoId}/master.m3u8`} thumbnailsUrl={`/gcs/${videoId}/thumbnails/thumbnails.vtt`} posterUrl={`/gcs/${videoId}/thumbnails/thumb00001.jpg`}/>
 				<div className="flex flex-col text-2xl gap-y-4">
 					<div className="flex gap-x-5 items-center justify-between">
 						<p className="text-semibold">Description</p>
