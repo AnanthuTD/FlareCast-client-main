@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useGoogleLogin, TokenResponse } from "@react-oauth/google";
 import axiosInstance from "@/axios";
 import { toast, Toaster } from "sonner";
@@ -17,7 +17,7 @@ interface GoogleSignInResponse {
 	};
 }
 
-const GoogleSignIn: React.FC = () => {
+const GoogleSignIn: React.FC = ({ trigger = false, setTrigger = () => {} }) => {
 	const searchParams = useSearchParams();
 	const router = useRouter();
 	const [loading, setLoading] = useState(false);
@@ -26,7 +26,7 @@ const GoogleSignIn: React.FC = () => {
 	const handleGoogleLoginSuccess = (user: any) => {
 		const callbackUrl = searchParams.get("callbackUrl");
 		if (callbackUrl) {
-			console.log("Google login refresh: " + user.refreshToken)
+			console.log("Google login refresh: " + user.refreshToken);
 			// if callbackUrl then redirect back to it
 			window.location.href = `${callbackUrl}?refreshToken=${user.refreshToken}`;
 		} else {
@@ -71,6 +71,13 @@ const GoogleSignIn: React.FC = () => {
 			toast.error("Login failed. Please try again.");
 		},
 	});
+
+	useEffect(() => {
+		if (trigger) {
+			googleLogin();
+			setTrigger(false);
+		}
+	}, [trigger, googleLogin, setTrigger]);
 
 	return (
 		<div>

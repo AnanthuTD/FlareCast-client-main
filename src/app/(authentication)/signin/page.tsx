@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { checkUserExists, signInWithCredential } from "@/actions/auth";
 import { Button } from "@/components/signIn/Button";
 import { Divider } from "@/components/signIn/Divider";
@@ -30,6 +30,7 @@ function buttonText(
 }
 
 export default function SignIn() {
+	const [trigger, setTrigger] = useState(false);
 	const searchParams = useSearchParams();
 	const router = useRouter();
 	const [signInMethod, setSignInMethod] = React.useState<
@@ -67,7 +68,7 @@ export default function SignIn() {
 
 		if (signInMethod === "google") {
 			console.log("Google sign in");
-			// TODO: Implement google sign in
+			setTrigger(true);
 		} else if (signInMethod === "credential") {
 			const userData = await signInWithCredential(
 				e.currentTarget.email.value,
@@ -94,7 +95,7 @@ export default function SignIn() {
 					Sign in to FlareCast
 				</h1>
 
-				<GoogleSignIn />
+				<GoogleSignIn trigger={trigger} setTrigger={setTrigger} />
 
 				<Divider text="or" />
 
@@ -143,6 +144,11 @@ export default function SignIn() {
 								required
 								aria-label="Password"
 							/>
+							{errors.password && (
+								<p className="mt-1 text-sm text-red-500">
+									{errors.password.message?.toString()}
+								</p>
+							)}
 						</>
 					)}
 
