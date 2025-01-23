@@ -10,6 +10,7 @@ import { signUpSchema } from "./schema";
 import { useMutationData } from "@/hooks/useMutationData";
 import { toast } from "sonner";
 import Link from "next/link";
+import { PasswordInput } from "@/components/global/password-input";
 
 const SignUpForm: React.FC = () => {
 	const router = useRouter();
@@ -31,7 +32,7 @@ const SignUpForm: React.FC = () => {
 		{ id: "email", label: "Email address", type: "email" },
 		{ id: "firstName", label: "First Name" },
 		{ id: "lastName", label: "Last Name" },
-		{ id: "password", label: "Password", type: "password" },
+		// { id: "password", label: "Password", type: "password" },
 	];
 
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -65,7 +66,7 @@ const SignUpForm: React.FC = () => {
 				>
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-2 w-full">
 						{formFields.map((field, index) => (
-							<div key={index} className="flex">
+							<div key={index} className="">
 								<InputField
 									key={field.id}
 									id={field.id}
@@ -81,6 +82,20 @@ const SignUpForm: React.FC = () => {
 								)}
 							</div>
 						))}
+						<div className="">
+							<PasswordInput
+								id="password"
+								autoComplete="password"
+								label="password"
+								key={'password'}
+								{...register("password")}
+							/>
+							{errors["password"] && (
+								<p className="text-red-600 text-sm mt-1">
+									{errors["password"]?.message as string}
+								</p>
+							)}
+						</div>
 					</div>
 					<Button
 						type="submit"
