@@ -29,17 +29,21 @@ export const getDefaultWorkspace = (
 		: owned[0];
 };
 
-export const InitializeWorkspaceStore = ({children}) => {
+export const InitializeWorkspaceStore = ({ children }) => {
 	const setSelectedWorkspace = useWorkspaceStore(
 		(store) => store.setSelectedWorkspace
-    );
-    const [initializing, setInitializing] = useState(true)
+	);
+	const [initializing, setInitializing] = useState(true);
+	const [creatingWorkspace, setCreatingWorkspace] = useState(false);
 
 	const initializeWorkspaceStore = async () => {
 		try {
 			const { owned, member } = await fetchWorkspaces();
+
 			if (owned.length === 0) {
-				throw new Error("No workspaces found.");
+				// If no workspaces found, set the "creating workspace" state
+				setCreatingWorkspace(true);
+				return;
 			}
 
 			const localStorageWorkspace = getLocalStorageWorkspace();
@@ -50,23 +54,53 @@ export const InitializeWorkspaceStore = ({children}) => {
 			);
 
 			setLocalStorageWorkspace(selectedWorkspace);
-
 			setSelectedWorkspace(selectedWorkspace);
-            setInitializing(false);
+
+			// If we successfully set a workspace, mark initialization as complete
+			setInitializing(false);
+			setCreatingWorkspace(false);
 		} catch (error) {
 			console.error("Failed to initialize workspace store:", error);
-        } finally {
-        }
+		}
 	};
 
+	// Check periodically for new workspaces
 	useEffect(() => {
-		setInitializing(true)
+		setInitializing(true);
 		initializeWorkspaceStore();
-    }, []);
 
-    return <>
-        {initializing ?
-    null : children
-}
-    </>;
+		let interval: NodeJS.Timeout | null = null;
+
+		if (creatingWorkspace) {
+			interval = setInterval(async () => {
+				await initializeWorkspaceStore();
+			}, 5000); // Check every 5 seconds
+		}
+
+		return () => {
+			if (interval) {
+				clearInterval(interval);
+			}
+		};
+	}, [creatingWorkspace]);
+
+	return (
+		<>
+			{initializing ? (
+				<div>
+					{creatingWorkspace ? (
+						<div style={{ textAlign: "center", marginTop: "20px" }}>
+							<h2>Hang on tight, creating workspace...</h2>
+						</div>
+					) : (
+						<div style={{ textAlign: "center", marginTop: "20px" }}>
+							<h2>Loading workspaces...</h2>
+						</div>
+					)}
+				</div>
+			) : (
+				children
+			)}
+		</>
+	);
 };
