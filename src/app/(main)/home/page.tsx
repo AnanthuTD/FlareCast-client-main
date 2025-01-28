@@ -1,4 +1,5 @@
 import { VideoSection } from "@/components/main/VideoSection";
+import useRegisterFCMToken from "@/hooks/useRegisterFCMToken";
 import React from "react";
 
 const videoData = {

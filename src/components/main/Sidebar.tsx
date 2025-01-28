@@ -18,6 +18,9 @@ import { useWorkspaceStore } from "@/providers/WorkspaceStoreProvider";
 import { fetchWorkspaces } from "@/actions/workspace";
 import { toast } from "sonner";
 import { Badge } from "../ui/badge";
+import { Plus } from "lucide-react";
+import { Button } from "../ui/button";
+import { CreateWorkspace } from "../global/create-workspace";
 
 interface UserSidebarProps {
 	sidebarItems: {
@@ -74,7 +77,7 @@ const DEFAULT_SIDEBAR_ITEMS = [
 		link: "/settings",
 		notificationCount: 0,
 	},
-];	
+];
 
 const Sidebar: React.FC<UserSidebarProps> = ({ sidebarItems }) => {
 	const activeWorkspace = useWorkspaceStore((state) => state.selectedWorkspace);
@@ -207,12 +210,7 @@ const Sidebar: React.FC<UserSidebarProps> = ({ sidebarItems }) => {
 
 							<div className="flex gap-5 justify-between py-px pr-2 mt-6 w-full text-sm leading-6 text-gray-500 whitespace-nowrap">
 								<div>Workspaces</div>
-								<img
-									loading="lazy"
-									src="https://cdn.builder.io/api/v1/image/assets/TEMP/8a628cca0b149520d7c43e0a0fedd89fd3d0b983ec19b33d421b9bccb9feefc4?placeholderIfAbsent=true&apiKey=c5dccb8c30704e8b9e01b46fd4eecdec"
-									className="object-contain shrink-0 my-auto aspect-square w-[18px]"
-									alt=""
-								/>
+								<CreateWorkspace />
 							</div>
 
 							{[...workspaces.owned, ...workspaces.member].map(

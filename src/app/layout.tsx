@@ -6,6 +6,8 @@ import { ThemeProvider } from "@/providers/ThemeProvider";
 import CheckAuthentication from "@/components/auth/CheckAuthentication";
 import { UserStoreProvider } from "@/providers/UserStoreProvider";
 import { Suspense } from "react";
+import { Toaster } from "sonner";
+// import { AntdRegistry } from '@ant-design/nextjs-registry';
 
 const geistSans = Geist({
 	variable: "--font-geist-sans",
@@ -33,20 +35,23 @@ export default function RootLayout({
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
 			>
-				<ThemeProvider
-					attribute="class"
-					defaultTheme="light"
-					enableSystem
-					disableTransitionOnChange
-				>
-					<UserStoreProvider>
-						<ReactQueryProvider>
-							<Suspense>
-								<CheckAuthentication>{children}</CheckAuthentication>
-							</Suspense>
-						</ReactQueryProvider>
-					</UserStoreProvider>
-				</ThemeProvider>
+				{/* <AntdRegistry> */}
+					<ThemeProvider
+						attribute="class"
+						defaultTheme="light"
+						enableSystem
+						disableTransitionOnChange
+					>
+						<Toaster position="top-right" richColors />
+						<UserStoreProvider>
+							<ReactQueryProvider>
+								<Suspense>
+									<CheckAuthentication>{children}</CheckAuthentication>
+								</Suspense>
+							</ReactQueryProvider>
+						</UserStoreProvider>
+					</ThemeProvider>
+				{/* </AntdRegistry> */}
 			</body>
 		</html>
 	);

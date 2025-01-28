@@ -16,6 +16,10 @@ const nextConfig: NextConfig = {
         destination: process.env.NEXT_PUBLIC_VIDEO_SERVICE_URL + "/api/:path*", // Proxy to video-service
       },
       {
+        source: "/api/notification/:path*",
+        destination: process.env.NEXT_PUBLIC_NOTIFICATION_SERVICE_URL + "/api/:path*", // Proxy to video-service
+      },
+      {
         source: "/gcs/:path*",
         destination: process.env.NEXT_PUBLIC_GCS_URL + "/:path*", // Proxy to Google Cloud Storage
       }

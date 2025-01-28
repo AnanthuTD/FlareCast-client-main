@@ -83,7 +83,6 @@ const GoogleSignIn: React.FC = ({ trigger = false, setTrigger = () => {} }) => {
 		<div>
 			{loading && <div className="spinner">Loading...</div>}
 			<GoogleSignInButton onClick={googleLogin} disabled={loading} />
-			<Toaster position="top-right" richColors />
 		</div>
 	);
 };

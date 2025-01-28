@@ -47,7 +47,7 @@ const SignUpForm: React.FC = () => {
 
 	useEffect(() => {
 		if (data) {
-			router.replace("/home");
+			router.replace("/verification/email/notify");
 		}
 	}, [data, router]);
 
