@@ -29,7 +29,7 @@ const nextConfig: NextConfig = {
     domains: [
       "cdn.builder.io",
       "lh3.googleusercontent.com",
-      "https://storage.googleapis.com",
+      "https://d1j5jvhpjcqj6b.cloudfront.net"
     ],
   },
 	typescript:{
