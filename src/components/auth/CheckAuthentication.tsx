@@ -5,7 +5,13 @@ import { useUserStore } from "@/providers/UserStoreProvider";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import React, { useState, useEffect } from "react";
 
-const authPaths = ["/signin", "/signup"];
+const excludeFromAuth = [
+	"/signin",
+	"/signup",
+	"/verification/success",
+	"/failure",
+	"/notify",
+];
 
 function CheckAuthentication({ children }: { children: React.ReactNode }) {
 	const router = useRouter();
@@ -23,7 +29,7 @@ function CheckAuthentication({ children }: { children: React.ReactNode }) {
 
 				if (data.user) {
 					setUser(data.user);
-					if (authPaths.includes(pathName)) {
+					if (excludeFromAuth.includes(pathName)) {
 						if (!searchParams.get("callbackUrl")) {
 							router.replace("/home");
 						}
@@ -37,7 +43,7 @@ function CheckAuthentication({ children }: { children: React.ReactNode }) {
 		}
 
 		checkAuthorizedUser();
-	}, [setUser, router, pathName]);
+	}, [setUser, router, pathName, searchParams]);
 
 	if (isLoading) {
 		return (

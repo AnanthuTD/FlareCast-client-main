@@ -31,7 +31,9 @@ export function CreateWorkspace() {
 			});
 
 			toast.success(`Workspace "${res.data.name}" created successfully`, {
-				description: `Workspace "${res.data.name}" created with members ${res.data.members}`,
+				description: `Workspace "${
+					res.data.name
+				}" created with members ${res.data.members?.join(", ")}`,
 			});
 
 			nameRef.current.value = "";
@@ -58,7 +60,12 @@ export function CreateWorkspace() {
 				<div className="grid gap-4 py-4">
 					<div className="flex flex-col gap-4">
 						<Label htmlFor="name">Name</Label>
-						<Input id="name" placeholder="" className="col-span-3" ref={nameRef}/>
+						<Input
+							id="name"
+							placeholder=""
+							className="col-span-3"
+							ref={nameRef}
+						/>
 					</div>
 					<div className="flex flex-col gap-4">
 						<Label htmlFor="members">Members</Label>
@@ -66,7 +73,7 @@ export function CreateWorkspace() {
 							id="members"
 							placeholder="separate emails with a space"
 							className="col-span-3"
-              ref={membersRef}
+							ref={membersRef}
 						/>
 					</div>
 				</div>
