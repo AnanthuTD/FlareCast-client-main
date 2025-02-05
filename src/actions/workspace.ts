@@ -5,7 +5,6 @@ import zod from "zod";
 
 export const fetchWorkspaces = async (): Promise<
 	| {
-			owned: Workspaces;
 			member: Workspaces;
 	  }
 	| never

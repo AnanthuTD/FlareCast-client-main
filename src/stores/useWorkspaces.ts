@@ -10,12 +10,12 @@ export interface Workspace {
 	id: string;
 	memberCount: number;
 	type: WORKSPACE_TYPE;
+	owned: boolean;
 }
 
 export type Workspaces = Workspace[];
 
 export type CombinedWorkspaces = {
-	owned: Workspaces;
 	member: Workspaces,
 }
 
@@ -34,7 +34,6 @@ export type WorkspaceStore = WorkspaceState & WorkspaceActions;
 export const defaultInitState: WorkspaceState = {
 	workspaces: {
 		member: [],
-		owned: []
 	},
 };
 

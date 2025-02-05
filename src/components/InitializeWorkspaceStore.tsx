@@ -20,13 +20,13 @@ export const setLocalStorageWorkspace = (workspace: Workspace) => {
 };
 
 export const getDefaultWorkspace = (
-	owned: Workspace[],
 	member: Workspace[],
 	id?: string
 ): Workspace => {
 	return id
-		? [...owned, ...member].find((workspace) => workspace.id === id) ?? owned[0]
-		: owned[0];
+		? member.find((workspace) => workspace.id === id) ??
+				member.find((workspace) => workspace.owned)
+		: member.find((workspace) => workspace.owned);
 };
 
 export const InitializeWorkspaceStore = ({ children }) => {
@@ -38,9 +38,9 @@ export const InitializeWorkspaceStore = ({ children }) => {
 
 	const initializeWorkspaceStore = async () => {
 		try {
-			const { owned, member } = await fetchWorkspaces();
+			const {  member } = await fetchWorkspaces();
 
-			if (owned.length === 0) {
+			if (member.length === 0) {
 				// If no workspaces found, set the "creating workspace" state
 				setCreatingWorkspace(true);
 				return;
@@ -48,7 +48,6 @@ export const InitializeWorkspaceStore = ({ children }) => {
 
 			const localStorageWorkspace = getLocalStorageWorkspace();
 			const selectedWorkspace = getDefaultWorkspace(
-				owned,
 				member,
 				localStorageWorkspace?.id
 			);

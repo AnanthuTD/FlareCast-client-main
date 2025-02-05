@@ -144,7 +144,7 @@ const Sidebar: React.FC<UserSidebarProps> = ({ sidebarItems }) => {
 						<div className="flex overflow-hidden items-start py-2.5 pr-3.5 pl-4 w-full bg-white rounded-t-2xl border border-solid border-gray-500 border-opacity-20">
 							<div className="flex items-center justify-between w-full">
 								<div className="flex flex-col self-stretch my-auto w-full">
-									{activeWorkspace && workspaces.owned.length > 0 && (
+									{activeWorkspace && workspaces.member.length > 0 && (
 										<Select
 											defaultValue={activeWorkspace.id}
 											onValueChange={onChangeActiveWorkspace}
@@ -156,14 +156,15 @@ const Sidebar: React.FC<UserSidebarProps> = ({ sidebarItems }) => {
 												<SelectGroup>
 													<SelectLabel>Workspaces</SelectLabel>
 													<SelectSeparator />
-													{workspaces.owned.map((workspace) => (
+													{/* TODO: fix this. this will duplicate. filter it */}
+													{/* {workspaces.owned.map((workspace) => (
 														<SelectItem value={workspace.id} key={workspace.id}>
 															{workspace.name}{" "}
 															<Badge className="ml-4" variant={"outline"}>
 																owned
 															</Badge>
 														</SelectItem>
-													))}
+													))} */}
 													{workspaces.member.map((workspace) => (
 														<SelectItem value={workspace.id} key={workspace.id}>
 															{workspace.name}
@@ -213,7 +214,7 @@ const Sidebar: React.FC<UserSidebarProps> = ({ sidebarItems }) => {
 								<CreateWorkspace />
 							</div>
 
-							{[...workspaces.owned, ...workspaces.member].map(
+							{[ ...workspaces.member].map(
 								(workspace, index) => (
 									<Workspace
 										key={index}

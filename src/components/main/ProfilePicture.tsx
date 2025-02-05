@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import { useUserStore } from "@/providers/UserStoreProvider";
 import Image from "next/image";
@@ -10,15 +10,18 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import axiosInstance from "@/axios";
+import { useRouter } from "next/navigation";
 
 function ProfilePicture() {
 	const profilePicture = null; // Replace with actual profile picture logic if available
 	const firstName = useUserStore((state) => state.firstName);
+	const router = useRouter();
 
 	const handleLogout = async () => {
 		try {
-			await axiosInstance.post('/api/user/auth/logout')
+			await axiosInstance.post("/api/user/auth/logout");
 			console.log("User logged out");
+			router.push("/signin");
 		} catch (error) {
 			console.error("Logout failed", error);
 		}

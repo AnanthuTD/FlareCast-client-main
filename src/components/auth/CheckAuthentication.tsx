@@ -8,9 +8,10 @@ import React, { useState, useEffect } from "react";
 const excludeFromAuth = [
 	"/signin",
 	"/signup",
-	"/verification/success",
-	"/failure",
-	"/notify",
+	"/verification/email/success",
+	"/verification/email/failure",
+	"/verification/email/notify",
+	"/verification/verification",
 ];
 
 function CheckAuthentication({ children }: { children: React.ReactNode }) {
