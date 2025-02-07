@@ -1,4 +1,4 @@
-import { createFolder } from "@/actions/workspace";
+import { createFolder } from "@/actions/folder";
 import { useMutationData } from "./useMutationData";
 
 export const useCreateFolders = (workspaceId: string, folderId?: string) => {

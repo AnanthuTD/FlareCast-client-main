@@ -16,12 +16,16 @@ interface FCMMessagePayload {
 
 const useFCM = (role: FCMRoles) => {
 	const [message, setMessage] = useState();
+	const [notification, setNotification] = useState(null);
 
 	useEffect(() => {
-    const unsubscribe = onMessage(messaging, (payload) => {
-      // toast.info("hi");
+		const unsubscribe = onMessage(messaging, (payload) => {
+			// toast.info("hi");
 			console.log("Message received. hook ", payload);
 
+			if (payload.data && payload.data.notification) {
+				setNotification(JSON.parse(payload.data?.notification));
+			}
 
 			const {
 				title,
@@ -42,7 +46,7 @@ const useFCM = (role: FCMRoles) => {
 		};
 	}, [role]);
 
-	return message;
+	return { message, notification };
 };
 
 const handleForegroundMessage = (payload: FCMMessagePayload) => {

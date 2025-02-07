@@ -1,6 +1,6 @@
 import { useMutationDataState } from "@/hooks/useMutationData";
 import { useQueryData } from "@/hooks/useQueryData";
-import { fetchFolders } from "@/actions/workspace";
+import { fetchFolders } from "@/actions/folder";
 import { Folder } from "@/types";
 import { useWorkspaceStore } from "@/providers/WorkspaceStoreProvider";
 

@@ -10,7 +10,7 @@ import Dropdown from "../Dropdown";
 import { Folder as Props } from "@/types";
 import { usePathname, useRouter } from "next/navigation";
 import { useMutationData } from "@/hooks/useMutationData";
-import { renameFolder } from "@/actions/workspace";
+import { renameFolder } from "@/actions/folder";
 import { Input } from "../../ui/input";
 import { useWorkspaceStore } from "@/providers/WorkspaceStoreProvider";
 

@@ -1,4 +1,4 @@
-import { deleteFolder } from "@/actions/workspace";
+import { deleteFolder } from "@/actions/folder";
 import { useMutationData } from "./useMutationData";
 
 export const useCreateFolders = (workspaceId: string, folderId: string) => {

@@ -7,7 +7,7 @@ import ArchiveTab from "@/components/library/ArchiveTab";
 import ScreenshotTab from "@/components/library/ScreenshotTab";
 import Folder from "@/components/library/folder/Folder";
 import { Folder as FolderType } from "@/types";
-import { createFolder, deleteFolder, fetchFolders } from "@/actions/workspace";
+import { createFolder, deleteFolder, fetchFolders } from "@/actions/folder";
 import { useWorkspaceStore } from "@/providers/WorkspaceStoreProvider";
 import { toast } from "sonner";
 import { Separator } from "@/components/ui/separator";

@@ -5,7 +5,7 @@ import React, { useRef, useState } from "react";
 import Loader from "@/components/loader";
 import FolderDuotone from "@/components/icons/folder-duotone";
 import { useMutationData, useMutationDataState } from "@/hooks/useMutationData";
-import { renameFolder } from "@/actions/workspace";
+import { renameFolder } from "@/actions/folder";
 import { Input } from "@/components/ui/input";
 import { useWorkspaceStore } from "@/providers/WorkspaceStoreProvider";
 

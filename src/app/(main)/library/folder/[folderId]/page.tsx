@@ -1,5 +1,5 @@
 "use client";
-import { fetchFolders } from "@/actions/workspace";
+import { fetchFolders } from "@/actions/folder";
 import FolderPredecessors from "@/components/library/bread-crumb";
 import { FolderList } from "@/components/library/folder/new/FolderList";
 import { LibraryHeader } from "@/components/library/folder/new/LibraryHeader";

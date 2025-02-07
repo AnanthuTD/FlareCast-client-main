@@ -1,6 +1,5 @@
 import axiosInstance from "@/axios";
 import { Workspaces } from "@/stores/useWorkspaces";
-import { Folder, Video } from "@/types";
 import zod from "zod";
 
 export const fetchWorkspaces = async (): Promise<
@@ -13,102 +12,6 @@ export const fetchWorkspaces = async (): Promise<
 		const response = await axiosInstance.get(`/api/collaboration/workspace`);
 		return response.data;
 	} catch (error) {
-		throw error.response.data;
-	}
-};
-
-export const fetchFolders = async (
-	workspaceId: string,
-	folderId?: string
-): Promise<Folder[] | never> => {
-	try {
-		const response = await axiosInstance.get(
-			`/api/collaboration/workspace/${workspaceId}/folders`,
-			{ params: { folderId } }
-		);
-		return response.data;
-	} catch (error) {
-		throw error.response.data;
-	}
-};
-
-export const createFolder = async (
-	workspaceId: string,
-	folderId?: string
-): Promise<Folder | never> => {
-	try {
-		const response = await axiosInstance.post(
-			`/api/collaboration/workspace/${workspaceId}/folder`,
-			{ folderId }
-		);
-		return response.data;
-	} catch (error) {
-		throw error.response.data;
-	}
-};
-
-export const deleteFolder = async (
-	workspaceId: string,
-	folderId: string
-): Promise<Folder | never> => {
-	try {
-		const response = await axiosInstance.delete(
-			`/api/collaboration/workspace/${workspaceId}/folder/${folderId}`
-		);
-		return response.data;
-	} catch (error) {
-		throw error.response.data;
-	}
-};
-
-export const renameFolder = async ({
-	workspaceId,
-	folderName,
-	folderId,
-}: {
-	workspaceId: string;
-	folderName: string;
-	folderId: string;
-}): Promise<Folder | never> => {
-	try {
-		const response = await axiosInstance.patch(
-			`/api/collaboration/workspace/${workspaceId}/folder/${folderId}`,
-			{ name: folderName }
-		);
-		return response.data;
-	} catch (error) {
-		throw error.response.data;
-	}
-};
-
-export const fetchVideosInFolder = async (
-	workspaceId: string,
-	folderId: string
-): Promise<Video> => {
-	try {
-		const response = await axiosInstance.get(
-			`/api/collaboration/workspace/${workspaceId}/folder/${folderId}/videos`
-		);
-		return response.data;
-	} catch (error) {
-		throw error.response.data;
-	}
-};
-
-export interface FetchParentFolderRes extends Folder {
-	parentFolders: Folder[];
-}
-export const fetchParentFolders = async (
-	workspaceId: string,
-	folderId: string
-): Promise<FetchParentFolderRes> | never => {
-	try {
-		const response = await axiosInstance.get(
-			`/api/collaboration/workspace/${workspaceId}/folder/${folderId}/parents`
-		);
-		return response.data;
-	} catch (error) {
-		console.error(error);
 		throw error.response.data;
 	}
 };
@@ -137,4 +40,43 @@ export const createWorkspace = async (data: CreateWorkspaceProps) => {
 		name: data.name,
 		members: emails,
 	});
+};
+
+export const getMembers = async (workspaceId: string) => {
+	if (!workspaceId) throw new Error("Workspace ID required");
+
+	return await axiosInstance.get(
+		`/api/collaboration/workspace/${workspaceId}/members`
+	);
+};
+
+export const updateRole = async (
+	workspaceId: string,
+	memberId: string,
+	role: string
+) => {
+	if (!workspaceId || !memberId || !role)
+		throw new Error("All fields are required");
+
+	return await axiosInstance.patch(
+		`/api/collaboration/workspace/${workspaceId}/member/${memberId}`,
+		{ role }
+	);
+};
+
+export const removeMember = async (workspaceId: string, memberId: string) => {
+	if (!workspaceId || !memberId) throw new Error("All fields are required");
+
+	return await axiosInstance.delete(
+		`/api/collaboration/workspace/${workspaceId}/member/${memberId}`
+	);
+};
+
+export const renameWorkspace = async (workspaceId: string, name: string) => {
+	if (!workspaceId || !name) throw new Error("All fields are required");
+
+	return await axiosInstance.patch(
+		`/api/collaboration/workspace/${workspaceId}`,
+		{ name }
+	);
 };

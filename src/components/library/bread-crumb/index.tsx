@@ -8,7 +8,7 @@ import {
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { fetchParentFolders } from '@/actions/workspace'
+import { fetchParentFolders } from '@/actions/folder'
 import { useWorkspaceStore } from '@/providers/WorkspaceStoreProvider'
 import { Folder } from '@/types'
 import Link from 'next/link'
