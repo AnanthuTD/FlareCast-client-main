@@ -21,6 +21,11 @@ import { Badge } from "../ui/badge";
 import { Plus } from "lucide-react";
 import { Button } from "../ui/button";
 import { CreateWorkspace } from "../global/create-workspace";
+import {
+	getDefaultWorkspace,
+	getLocalStorageWorkspace,
+	setLocalStorageWorkspace,
+} from "../InitializeWorkspaceStore";
 
 interface UserSidebarProps {
 	sidebarItems: {
@@ -39,46 +44,6 @@ interface UserSidebarProps {
 	activeWorkspaceId: string;
 }
 
-const DEFAULT_SIDEBAR_ITEMS = [
-	{
-		icon: "https://cdn.builder.io/api/v1/image/assets/TEMP/afd841629896993aa1ef8ad8803a88d7a1e863dbe16892a5f7b3904597b429b0?placeholderIfAbsent=true&apiKey=c5dccb8c30704e8b9e01b46fd4eecdec",
-		label: "Home",
-		isActive: true,
-		link: "/home",
-		notificationCount: 0,
-	},
-	{
-		icon: "https://cdn.builder.io/api/v1/image/assets/TEMP/9571762a9bf7ac5d07bffe1ec0f742b65b00cd802d319c665d6fcf30d3f0ad17?placeholderIfAbsent=true&apiKey=c5dccb8c30704e8b9e01b46fd4eecdec",
-		label: "My Library",
-		link: "/library",
-		notificationCount: 0,
-	},
-	{
-		icon: "https://cdn.builder.io/api/v1/image/assets/TEMP/6a4b73dde04536c390a8f798bd293bf0c76f17bc316967fb62a729cc18b8414c?placeholderIfAbsent=true&apiKey=c5dccb8c30704e8b9e01b46fd4eecdec",
-		label: "Notifications",
-		notificationCount: 3,
-		link: "/notifications",
-	},
-	{
-		icon: "https://cdn.builder.io/api/v1/image/assets/TEMP/5e9ea07e10407ca4d3dd6371d08103f0a5435f68a33a6729d537cb860bfd0c88?placeholderIfAbsent=true&apiKey=c5dccb8c30704e8b9e01b46fd4eecdec",
-		label: "Watch Later",
-		notificationCount: 1,
-		link: "/watchLater",
-	},
-	{
-		icon: "https://cdn.builder.io/api/v1/image/assets/TEMP/41aa75833ea1cbffbd2053da7335f5072c88bd22109fe785e1cb09c3ce30fc83?placeholderIfAbsent=true&apiKey=c5dccb8c30704e8b9e01b46fd4eecdec",
-		label: "History",
-		link: "/history",
-		notificationCount: 0,
-	},
-	{
-		icon: "https://cdn.builder.io/api/v1/image/assets/TEMP/d84310295ce5bed93aba9404f10bdc0e22ab172e690cc11a67fb153b1913f336?placeholderIfAbsent=true&apiKey=c5dccb8c30704e8b9e01b46fd4eecdec",
-		label: "Settings",
-		link: "/settings",
-		notificationCount: 0,
-	},
-];
-
 const Sidebar: React.FC<UserSidebarProps> = ({ sidebarItems }) => {
 	const activeWorkspace = useWorkspaceStore((state) => state.selectedWorkspace);
 	const workspaces = useWorkspaceStore((state) => state.workspaces);
@@ -90,11 +55,10 @@ const Sidebar: React.FC<UserSidebarProps> = ({ sidebarItems }) => {
 	useEffect(() => {
 		fetchWorkspaces()
 			.then((workspaces) => {
-				/* const { owned, member } = workspaces;
+				const { member } = workspaces;
 
 				const localStorageWorkspace = getLocalStorageWorkspace();
 				const selectedWorkspace = getDefaultWorkspace(
-					owned,
 					member,
 					localStorageWorkspace?.id
 				);
@@ -103,16 +67,16 @@ const Sidebar: React.FC<UserSidebarProps> = ({ sidebarItems }) => {
 
 				setSelectedWorkspace(selectedWorkspace);
 
-				console.log(selectedWorkspace)
+				console.log(selectedWorkspace);
 
-				console.log("Fetched workspaces:", workspaces); */
+				console.log("Fetched workspaces:", workspaces);
 				setWorkspaces(workspaces);
 			})
 			.catch((error) => {
 				console.error("Failed to fetch workspaces:", error);
 				toast.error(`Fetching workspaces failed`);
 			});
-	}, [setWorkspaces]);
+	}, [setSelectedWorkspace, setWorkspaces]);
 
 	console.log(activeWorkspace, workspaces);
 
@@ -120,6 +84,15 @@ const Sidebar: React.FC<UserSidebarProps> = ({ sidebarItems }) => {
 		console.log("==========================================");
 		console.log("Workspace changed to ", value);
 		console.log("==========================================");
+
+		const selectedWorkspace = workspaces.member.find(
+			(workspace) => workspace.id === value
+		);
+
+		if (selectedWorkspace) {
+			setLocalStorageWorkspace(selectedWorkspace);
+			setSelectedWorkspace(selectedWorkspace);
+		}
 	};
 
 	return (
@@ -214,15 +187,13 @@ const Sidebar: React.FC<UserSidebarProps> = ({ sidebarItems }) => {
 								<CreateWorkspace />
 							</div>
 
-							{[ ...workspaces.member].map(
-								(workspace, index) => (
-									<Workspace
-										key={index}
-										{...workspace}
-										avatarLabel={workspace.name[0]}
-									/>
-								)
-							)}
+							{[...workspaces.member].map((workspace, index) => (
+								<Workspace
+									key={index}
+									{...workspace}
+									avatarLabel={workspace.name[0]}
+								/>
+							))}
 
 							<div className="flex mt-6 w-full border-b border-gray-500 border-opacity-20 min-h-[1px]" />
 						</div>
