@@ -19,3 +19,15 @@ export const deleteNotification = (ids: string[]) => {
 		data: { ids },
 	});
 };
+
+export const fetchNotificationCount = async () => {
+	try {
+		const { data } = (await axiosInstance.get<{ count: number }>(
+			"/api/notification/count"
+		)) ?? { count: 0 };
+
+		return data.count;
+	} catch {
+		return 0;
+	}
+};

@@ -1,7 +1,10 @@
+'use client'
+
 import * as React from "react";
 import { ModeToggle } from "../ModeToggle";
 import Sidebar from "./Sidebar";
 import ProfilePicture from "./ProfilePicture";
+import { useNotificationCount } from "@/hooks/useNotificationCount"; // Import the custom hook
 import {
 	Bell,
 	Bookmark,
@@ -11,58 +14,64 @@ import {
 	Settings,
 } from "lucide-react";
 
-const sidebarItems = [
-	{
-		icon: <House />,
-		label: "Home",
-		isActive: false,
-		link: "/home",
-		notificationCount: 0,
-	},
-	{
-		icon: <Library />,
-		label: "My Library",
-		link: "/library",
-		notificationCount: 0,
-	},
-	{
-		icon: <Bell />,
-		label: "Notifications",
-		notificationCount: 3,
-		link: "/notifications",
-	},
-	{
-		icon: <Bookmark />,
-		label: "Watch Later",
-		notificationCount: 1,
-		link: "/watchLater",
-	},
-	{
-		icon: <History />,
-		label: "History",
-		link: "/history",
-		notificationCount: 0,
-	},
-	{
-		icon: <Settings />,
-		label: "Settings",
-		link: "/settings",
-		notificationCount: 0,
-	},
-];
-
 const workspaces = [
-	{
+	/* {
 		name: "All Moksh's Workspace",
 		memberCount: 1,
 		avatarLabel: "A",
 		id: "workspace_id",
-	},
+	}, */
 ];
 
 export const UserLayout: React.FC<{ children: React.ReactNode }> = ({
 	children,
 }) => {
+	const { count: notificationCount } = useNotificationCount(0); // Fetch notification count with polling every 5 sec
+
+	// Dynamically update sidebar items with the latest notification count
+	const sidebarItems = React.useMemo(
+		() => [
+			{
+				icon: <House />,
+				label: "Home",
+				isActive: false,
+				link: "/home",
+				notificationCount: 0,
+			},
+			{
+				icon: <Library />,
+				label: "My Library",
+				link: "/library",
+				notificationCount: 0,
+			},
+			{
+				icon: <Bell />,
+				label: "Notifications",
+				notificationCount, // Update notification count here
+				link: "/notifications",
+			},
+			{
+				icon: <Bookmark />,
+				label: "Watch Later",
+				notificationCount: 1,
+				link: "/watchLater",
+			},
+			{
+				icon: <History />,
+				label: "History",
+				notificationCount: 0,
+				link: "/history",
+			},
+			{
+				icon: <Settings />,
+				label: "Settings",
+				notificationCount: 0,
+				link: "/settings",
+			},
+		],
+		[notificationCount]
+	);
+
 	return (
 		<div className="flex overflow-hidden flex-col bg-white">
 			<div className="flex flex-wrap items-start w-full max-md:max-w-full">
