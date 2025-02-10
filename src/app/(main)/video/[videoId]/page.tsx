@@ -13,7 +13,8 @@ type Props = {
 	};
 };
 
-const VideoPage = async ({ params: { videoId } }: Props) => {
+const VideoPage = async ({ params }: Props) => {
+	const { videoId } = await params;
 	const query = new QueryClient();
 
 	/* await query.prefetchQuery({
@@ -21,7 +22,7 @@ const VideoPage = async ({ params: { videoId } }: Props) => {
 		queryFn: () => getPreviewVideo(videoId),
 	});
 	 */
-/* 
+	/* 
 	await query.prefetchQuery({
 		queryKey: ["user-profile"],
 		queryFn: getUserProfile,

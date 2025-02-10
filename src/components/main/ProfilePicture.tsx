@@ -15,11 +15,13 @@ import { useRouter } from "next/navigation";
 function ProfilePicture() {
 	const profilePicture = null; // Replace with actual profile picture logic if available
 	const firstName = useUserStore((state) => state.firstName);
+	const clearAccessToken = useUserStore((state) => state.clearAccessToken);
 	const router = useRouter();
 
 	const handleLogout = async () => {
 		try {
 			await axiosInstance.post("/api/user/auth/logout");
+			clearAccessToken();
 			console.log("User logged out");
 			router.push("/signin");
 		} catch (error) {
