@@ -33,7 +33,7 @@ export function CreateWorkspace() {
 			toast.success(`Workspace "${res.data.name}" created successfully`, {
 				description: `Workspace "${
 					res.data.name
-				}" created with members ${res.data.members?.join(", ")}`,
+				}"`,
 			});
 
 			nameRef.current.value = "";

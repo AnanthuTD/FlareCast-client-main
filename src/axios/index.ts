@@ -30,7 +30,6 @@ const addRefreshSubscriber = (callback: (token: string) => void) => {
 axiosInstance.interceptors.request.use(
 	(config) => {
 		const accessToken = userStore.getState().accessToken;
-		console.log(accessToken);
 
 		if (accessToken) {
 			config.headers.Authorization = `Bearer ${accessToken}`;

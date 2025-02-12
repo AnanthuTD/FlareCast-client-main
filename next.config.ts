@@ -13,7 +13,7 @@ const nextConfig: NextConfig = {
 					process.env.NEXT_PUBLIC_COLLABORATION_SERVICE_URL + "/:path*", // Proxy to collaboration-service
 			},
 			{
-				source: "/api/video-service/:path*",
+				source: "/api/video/:path*",
 				destination: process.env.NEXT_PUBLIC_VIDEO_SERVICE_URL + "/api/:path*", // Proxy to video-service
 			},
 			{

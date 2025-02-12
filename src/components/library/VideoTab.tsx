@@ -1,21 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { VideoCard } from "../main/VideoCard";
-import { VideoCardProps } from "@/types";
-import axiosInstance from "@/axios";
 import { useRouter } from "next/navigation";
+import { getMyVideos } from "@/actions/video";
+import { useWorkspaceStore } from "@/providers/WorkspaceStoreProvider";
 
 function VideoTab() {
 	const [videos, setVideos] = useState([]);
 	const router = useRouter();
+	const selectedWorkspace = useWorkspaceStore(
+		(state) => state.selectedWorkspace
+	);
 
 	useEffect(() => {
 		async function fetchVideos() {
-			const response = await axiosInstance.get("/api/video-service/videos", {
-				params: {
-					limit: 10,
-					skip: 0,
-				},
-			});
+			const response = await getMyVideos(selectedWorkspace.id);
 
 			const { videos, totalCount, remainingCount } = response.data;
 
@@ -23,7 +21,7 @@ function VideoTab() {
 		}
 
 		fetchVideos();
-	}, []);
+	}, [selectedWorkspace.id]);
 
 	const handleOnClick = (videoId: string) => {
 		console.log("Video clicked!");

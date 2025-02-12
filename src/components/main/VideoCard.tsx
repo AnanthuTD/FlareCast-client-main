@@ -1,6 +1,7 @@
 import * as React from "react";
 import { VideoCardProps } from "@/types";
 import { Card, CardContent, CardHeader } from "../ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 export const VideoCard: React.FC<VideoCardProps> = ({
 	duration,
@@ -60,12 +61,14 @@ export const VideoCard: React.FC<VideoCardProps> = ({
 				<CardContent>
 					<div className="flex flex-col w-full tracking-normal">
 						<div className="flex gap-2 items-start w-full">
-							<img
-								loading="lazy"
-								src={userAvatarUrl}
-								className="object-contain shrink-0 w-8 aspect-square rounded-[7992px]"
-								alt={`${userName}'s avatar`}
-							/>
+						<Avatar className=" w-8 h-8">
+								<AvatarImage src={userAvatarUrl} />
+								<AvatarFallback>
+									<div className="flex justify-center items-center w-[36px] aspect-square text-sm leading-relaxed text-orange-800 whitespace-nowrap bg-red-200 rounded-full cursor-pointer">
+										{userName?.[0]}
+									</div>
+								</AvatarFallback>
+							</Avatar>
 							<div className="flex overflow-hidden flex-col w-full">
 								<div className="flex w-full">
 									<div className="flex overflow-hidden items-start text-xs font-medium leading-loose text-neutral-800">

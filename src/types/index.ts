@@ -160,10 +160,10 @@ export interface SidebarItemProps {
 	link: string;
 }
 
-export interface WorkspaceProps {
+export interface SpaceProps {
 	name: string;
-	memberCount: number;
-	avatarLabel: string;
+	id: string;
+	avatar: string;
 }
 
 export interface VideoStats {

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
 	Select,
 	SelectLabel,
@@ -12,20 +12,19 @@ import {
 	SelectItem,
 } from "../ui/select";
 import { SidebarItem } from "./SidebarItem";
-import { Workspace } from "./Workspace";
+import { SpaceCard } from "./SpaceCard";
 import Image from "next/image";
 import { useWorkspaceStore } from "@/providers/WorkspaceStoreProvider";
 import { fetchWorkspaces } from "@/actions/workspace";
+import { getSpaces } from "@/actions/space";
 import { toast } from "sonner";
-import { Badge } from "../ui/badge";
-import { Plus } from "lucide-react";
-import { Button } from "../ui/button";
-import { CreateWorkspace } from "../global/create-workspace";
 import {
 	getDefaultWorkspace,
 	getLocalStorageWorkspace,
 	setLocalStorageWorkspace,
 } from "../InitializeWorkspaceStore";
+import { CreateSpace } from "../global/create-space";
+import { CreateWorkspace } from "../global/create-workspace";
 
 interface UserSidebarProps {
 	sidebarItems: {
@@ -51,6 +50,7 @@ const Sidebar: React.FC<UserSidebarProps> = ({ sidebarItems }) => {
 	const setSelectedWorkspace = useWorkspaceStore(
 		(store) => store.setSelectedWorkspace
 	);
+	const [spaces, setSpaces] = useState([]);
 
 	useEffect(() => {
 		fetchWorkspaces()
@@ -77,6 +77,18 @@ const Sidebar: React.FC<UserSidebarProps> = ({ sidebarItems }) => {
 				toast.error(`Fetching workspaces failed`);
 			});
 	}, [setSelectedWorkspace, setWorkspaces]);
+
+	useEffect(() => {
+		getSpaces(activeWorkspace.id)
+			.then((spaces) => {
+				console.log("Fetched spaces:", spaces);
+				setSpaces(spaces);
+			})
+			.catch((error) => {
+				console.error("Failed to fetch workspaces:", error);
+				toast.error(`Fetching workspaces failed`);
+			});
+	}, [setSpaces, activeWorkspace.id]);
 
 	console.log(activeWorkspace, workspaces);
 
@@ -127,7 +139,7 @@ const Sidebar: React.FC<UserSidebarProps> = ({ sidebarItems }) => {
 											</SelectTrigger>
 											<SelectContent className="backdrop-blur-xl">
 												<SelectGroup>
-													<SelectLabel>Workspaces</SelectLabel>
+													<SelectLabel className="flex justify-between items-center">Workspaces <CreateWorkspace/> </SelectLabel>
 													<SelectSeparator />
 													{/* TODO: fix this. this will duplicate. filter it */}
 													{/* {workspaces.owned.map((workspace) => (
@@ -184,15 +196,12 @@ const Sidebar: React.FC<UserSidebarProps> = ({ sidebarItems }) => {
 
 							<div className="flex gap-5 justify-between py-px pr-2 mt-6 w-full text-sm leading-6 text-gray-500 whitespace-nowrap">
 								<div>Workspaces</div>
-								<CreateWorkspace />
+								{/* <CreateWorkspace /> */}
+								<CreateSpace />
 							</div>
 
-							{[...workspaces.member].map((workspace, index) => (
-								<Workspace
-									key={index}
-									{...workspace}
-									avatarLabel={workspace.name[0]}
-								/>
+							{spaces.map(({ id, name, image = '' }) => (
+								<SpaceCard key={id} name={name} avatar={image} id={id} />
 							))}
 
 							<div className="flex mt-6 w-full border-b border-gray-500 border-opacity-20 min-h-[1px]" />
