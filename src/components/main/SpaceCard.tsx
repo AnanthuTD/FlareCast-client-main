@@ -1,17 +1,23 @@
-import * as React from "react";
+import React, { useEffect } from "react";
 import { SpaceProps } from "@/types";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 export const SpaceCard: React.FC<SpaceProps> = ({ name, id, avatar }) => {
 	const router = useRouter();
+	const pathName = usePathname();
 
 	function handleOnclick() {
 		router.push(`/space/${id}`);
 	}
 
 	return (
-		<div className="flex gap-2 items-center pr-5 mt-6 hover:cursor-pointer hover:bg-slate-200 rounded" onClick={handleOnclick}>
+		<div
+			className={`flex gap-2 items-center pr-5 mt-6 hover:cursor-pointer hover:bg-slate-200 rounded ${
+				pathName.includes(id) ? "bg-slate-200" : ""
+			}`}
+			onClick={handleOnclick}
+		>
 			<Avatar className=" w-8 h-8">
 				<AvatarImage src={avatar as string} />
 				<AvatarFallback>

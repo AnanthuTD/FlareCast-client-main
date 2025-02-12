@@ -3,12 +3,14 @@ import { Folder, Video } from "@/types";
 
 export const fetchFolders = async (
 	workspaceId: string,
-	folderId?: string
+	folderId?: string,
+	spaceId?: string
 ): Promise<Folder[] | never> => {
 	try {
+		console.log(folderId, spaceId);
 		const response = await axiosInstance.get(
 			`/api/collaboration/folder/${workspaceId}`,
-			{ params: { folderId } }
+			{ params: { folderId, spaceId } }
 		);
 		return response.data;
 	} catch (error) {
@@ -18,12 +20,13 @@ export const fetchFolders = async (
 
 export const createFolder = async (
 	workspaceId: string,
-	folderId?: string
+	folderId?: string,
+	spaceId?: string
 ): Promise<Folder | never> => {
 	try {
 		const response = await axiosInstance.post(
 			`/api/collaboration/folder/${workspaceId}`,
-			{ folderId }
+			{ folderId, spaceId }
 		);
 		return response.data;
 	} catch (error) {

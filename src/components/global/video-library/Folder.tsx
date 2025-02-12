@@ -6,18 +6,16 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import Image from "next/image";
-import Dropdown from "../Dropdown";
 import { Folder as Props } from "@/types";
 import { usePathname, useRouter } from "next/navigation";
 import { useMutationData } from "@/hooks/useMutationData";
 import { renameFolder } from "@/actions/folder";
 import { Input } from "../../ui/input";
 import { useWorkspaceStore } from "@/providers/WorkspaceStoreProvider";
+import Dropdown from "./Dropdown";
 
 interface FolderProps extends Props {
 	optimistic?: boolean;
-	handleDelete: (folderId: string) => void;
-	triggerRefetchFolders: () => void;
 }
 
 function Folder({
@@ -25,8 +23,6 @@ function Folder({
 	name,
 	videoCount = 0,
 	optimistic = false,
-	handleDelete,
-	triggerRefetchFolders,
 }: FolderProps) {
 	const pathName = usePathname();
 	const router = useRouter();
@@ -42,13 +38,17 @@ function Folder({
 
 	// Function to complete renaming and trigger refetch
 	const completeRename = () => {
-		triggerRefetchFolders();
 		setOnRename(false);
 	};
 
 	const { mutate, isPending } = useMutationData(
 		["rename-folders"],
-		renameFolder,
+		(data: { name: string }) =>
+			renameFolder({
+				workspaceId: activeWorkspaceId,
+				folderName: data.name,
+				folderId: id,
+			}),
 		"workspace-folders",
 		completeRename
 	);
@@ -126,7 +126,7 @@ function Folder({
 						</div>
 
 						{/* Dropdown */}
-						<Dropdown handleDelete={() => handleDelete(id)} />
+						<Dropdown folderId={id} />
 					</div>
 				</div>
 			</CardHeader>

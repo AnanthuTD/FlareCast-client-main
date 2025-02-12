@@ -4,12 +4,17 @@ import { useWorkspaceStore } from "@/providers/WorkspaceStoreProvider";
 import React from "react";
 
 type Props = {
-  folderId?: string;
+	folderId?: string;
+	spaceId?: string;
 };
 
-const CreateForlders = ({folderId}:Props) => {
-  const workspaceId = useWorkspaceStore((state) => state.selectedWorkspace.id);
-	const { onCreateNewFolder } = useCreateFolders(workspaceId, folderId);
+const CreateFolders = ({ folderId, spaceId }: Props) => {
+	const workspaceId = useWorkspaceStore((state) => state.selectedWorkspace.id);
+	const { onCreateNewFolder } = useCreateFolders(
+		workspaceId,
+		folderId,
+		spaceId
+	);
 	return (
 		<button
 			onClick={onCreateNewFolder}
@@ -21,4 +26,4 @@ const CreateForlders = ({folderId}:Props) => {
 	);
 };
 
-export default CreateForlders;
+export default CreateFolders;
