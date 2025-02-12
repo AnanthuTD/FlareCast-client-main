@@ -13,7 +13,7 @@ import { useWorkspaceStore } from '@/providers/WorkspaceStoreProvider'
 import { Folder } from '@/types'
 import Link from 'next/link'
 
-function FolderPredecessors({ folderId }: { folderId: string }) {
+function FolderPredecessors({ folderId }: { folderId?: string }) {
     const [parentFolders, setParentFolders] = useState<Folder[]>([]);
     const activeWorkspaceId = useWorkspaceStore(state => state.selectedWorkspace.id);
     const [currentFolder, setCurrentFolder] = useState<null | Folder>(null);

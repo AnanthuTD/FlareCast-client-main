@@ -18,12 +18,7 @@ interface FolderProps extends Props {
 	optimistic?: boolean;
 }
 
-function Folder({
-	id,
-	name,
-	videoCount = 0,
-	optimistic = false,
-}: FolderProps) {
+function Folder({ id, name, videoCount = 0, optimistic = false }: FolderProps) {
 	const pathName = usePathname();
 	const router = useRouter();
 	const inputRef = useRef<HTMLInputElement | null>(null);
@@ -78,8 +73,19 @@ function Folder({
 
 	// Handle folder click for navigation
 	const handleFolderClick = (e: React.MouseEvent<HTMLDivElement>) => {
+		/* 
+			if the folder is created, then check if its already inside a folder. 
+			if it is, then only replace the folderId in the path with the new folderId.
+			else, just go to the folder page.
+		*/
 		if (!optimistic) {
-			router.push(`${pathName}/folder/${id}`);
+			if (pathName.includes("folder")) {
+				const paths = pathName.split("/");
+				const folderIndex = paths.indexOf("folder") + 1;
+				const newPath = paths.slice(0, folderIndex).join("/");
+
+				router.push(`${newPath}/${id}?title=${name}`);
+			} else router.push(`${pathName}/folder/${id}?title=${name}`);
 		}
 	};
 

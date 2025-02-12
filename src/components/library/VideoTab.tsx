@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { getMyVideos } from "@/actions/video";
 import { useWorkspaceStore } from "@/providers/WorkspaceStoreProvider";
 
-function VideoTab() {
+function VideoTab({ folderId }: { folderId?: string }) {
 	const [videos, setVideos] = useState([]);
 	const router = useRouter();
 	const selectedWorkspace = useWorkspaceStore(
@@ -13,7 +13,7 @@ function VideoTab() {
 
 	useEffect(() => {
 		async function fetchVideos() {
-			const response = await getMyVideos(selectedWorkspace.id);
+			const response = await getMyVideos(selectedWorkspace.id, folderId);
 
 			const { videos, totalCount, remainingCount } = response.data;
 
