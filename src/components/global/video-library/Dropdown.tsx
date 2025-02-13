@@ -9,15 +9,17 @@ import Image from "next/image";
 import DeleteFolderPop from "./DeleteFolderPop";
 import { useWorkspaceStore } from "@/providers/WorkspaceStoreProvider";
 import { useDeleteFolder } from "@/hooks/useDeleteFolder";
+import MovePopover from "../move-tree";
 
 interface Props {
-	folderId: string;
+	sourceId: string;
+	type: "folder" | "video" | "screenshot";
 }
 
-function Dropdown({ folderId }: Props) {
+function Dropdown({ sourceId, type }: Props) {
 	const activeWorkspace = useWorkspaceStore((state) => state.selectedWorkspace);
 
-	const { onDeleteFolder } = useDeleteFolder(activeWorkspace.id, folderId);
+	const { onDeleteFolder } = useDeleteFolder(activeWorkspace.id, sourceId);
 
 	return (
 		<DropdownMenu>
@@ -31,7 +33,9 @@ function Dropdown({ folderId }: Props) {
 				/>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent onClick={(e) => e.stopPropagation()}>
-				{/* <DropdownMenuItem>Rename</DropdownMenuItem> */}
+				<DropdownMenuItem>
+					<MovePopover type={type}  sourceId={sourceId}/>
+				</DropdownMenuItem>
 				<DropdownMenuItem>
 					<DeleteFolderPop
 						onClick={onDeleteFolder}

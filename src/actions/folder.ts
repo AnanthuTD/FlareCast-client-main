@@ -40,7 +40,7 @@ export const deleteFolder = async (
 ): Promise<Folder | never> => {
 	try {
 		const response = await axiosInstance.delete(
-			`/api/collaboration/folder/${workspaceId}/${folderId}`
+			`/api/collaboration/folder/${folderId}`
 		);
 		return response.data;
 	} catch (error) {
@@ -49,17 +49,15 @@ export const deleteFolder = async (
 };
 
 export const renameFolder = async ({
-	workspaceId,
 	folderName,
 	folderId,
 }: {
-	workspaceId: string;
 	folderName: string;
 	folderId: string;
 }): Promise<Folder | never> => {
 	try {
 		const response = await axiosInstance.patch(
-			`/api/collaboration/folder/${workspaceId}/${folderId}`,
+			`/api/collaboration/folder/${folderId}/rename`,
 			{ name: folderName }
 		);
 		return response.data;
@@ -98,4 +96,17 @@ export const fetchParentFolders = async (
 		console.error(error);
 		throw error.response.data;
 	}
+};
+
+export const moveFolder = ({
+	folderId,
+	destination,
+}: {
+	folderId: string;
+	destination: { type: "folder" | "workspace", id: "workspace" };
+}) => {
+	return axiosInstance.patch(
+		`/api/collaboration/folder/${folderId}/move`,
+		destination
+	);
 };
