@@ -38,12 +38,7 @@ function Folder({ id, name, videoCount = 0, optimistic = false }: FolderProps) {
 
 	const { mutate, isPending } = useMutationData(
 		["rename-folders"],
-		(data: { name: string }) =>
-			renameFolder({
-				workspaceId: activeWorkspaceId,
-				folderName: data.name,
-				folderId: id,
-			}),
+		(data: { folderName: string; folderId: string }) => renameFolder(data),
 		"workspace-folders",
 		completeRename
 	);
@@ -61,7 +56,6 @@ function Folder({ id, name, videoCount = 0, optimistic = false }: FolderProps) {
 
 			if (newName && newName !== name) {
 				mutate({
-					workspaceId: activeWorkspaceId,
 					folderName: newName,
 					folderId: id,
 				});
@@ -132,7 +126,7 @@ function Folder({ id, name, videoCount = 0, optimistic = false }: FolderProps) {
 						</div>
 
 						{/* Dropdown */}
-						<Dropdown folderId={id} />
+						<Dropdown sourceId={id} type={"folder"} />
 					</div>
 				</div>
 			</CardHeader>

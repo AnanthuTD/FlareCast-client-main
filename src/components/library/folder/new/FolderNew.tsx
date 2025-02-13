@@ -1,13 +1,12 @@
 "use client";
 import { cn } from "@/lib/utils";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import React, { useRef, useState } from "react";
 import Loader from "@/components/loader";
 import FolderDuotone from "@/components/icons/folder-duotone";
 import { useMutationData, useMutationDataState } from "@/hooks/useMutationData";
 import { renameFolder } from "@/actions/folder";
 import { Input } from "@/components/ui/input";
-import { useWorkspaceStore } from "@/providers/WorkspaceStoreProvider";
 
 type Props = {
 	name: string;
@@ -19,12 +18,8 @@ type Props = {
 const Folder = ({ id, name, optimistic, count }: Props) => {
 	const inputRef = useRef<HTMLInputElement | null>(null);
 	const folderCardRef = useRef<HTMLDivElement | null>(null);
-	const pathName = usePathname();
 	const router = useRouter();
 	const [onRename, setOnRename] = useState(false);
-	const activeWorkspaceId = useWorkspaceStore(
-		(state) => state.selectedWorkspace.id
-	);
 
 	const Rename = () => setOnRename(true);
 	const Renamed = () => setOnRename(false);
@@ -34,7 +29,6 @@ const Folder = ({ id, name, optimistic, count }: Props) => {
 		["rename-folders"],
 		(data: { name: string }) =>
 			renameFolder({
-				workspaceId: activeWorkspaceId,
 				folderName: data.name,
 				folderId: id,
 			}),

@@ -20,7 +20,8 @@ export async function postView(videoId: string) {
 	}
 }
 
-export async function getMyVideos(workspaceId: string, folderId?: string) {
+// TODO: re-implement this route on the video service to handle video requests with spaceId
+export async function getMyVideos(workspaceId: string, folderId?: string, spaceId?: string) {
 	return await axiosInstance.get(`/api/video/${workspaceId}`, {
 		params: {
 			limit: 10,
