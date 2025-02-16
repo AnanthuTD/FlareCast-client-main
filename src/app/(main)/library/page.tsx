@@ -1,6 +1,11 @@
 "use client";
 
-import React, { useEffect, useOptimistic, useState, useTransition } from "react";
+import React, {
+	useEffect,
+	useOptimistic,
+	useState,
+	useTransition,
+} from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import VideoTab from "@/components/library/VideoTab";
 import ArchiveTab from "@/components/library/ArchiveTab";
@@ -11,6 +16,9 @@ import { createFolder, deleteFolder, fetchFolders } from "@/actions/folder";
 import { useWorkspaceStore } from "@/providers/WorkspaceStoreProvider";
 import { toast } from "sonner";
 import { Separator } from "@/components/ui/separator";
+import axiosInstance from "@/axios";
+// import { EventSource } from "eventsource";
+import { useUserStore } from "@/providers/UserStoreProvider";
 
 interface OptimisticFolder extends FolderType {
 	optimistic: boolean;
@@ -29,7 +37,11 @@ export default function VideoLibrary() {
 	const activeWorkspace = useWorkspaceStore((state) => state.selectedWorkspace);
 	const [optimisticFolders, setOptimisticFolders] = useOptimistic(folders);
 	const [isPending, startTransition] = useTransition();
-	const [refetchFolders, setRefetchFolders] = useState(false)
+	const [refetchFolders, setRefetchFolders] = useState(false);
+
+	function handleOnTest() {
+		axiosInstance.get("/api/video/test/events");
+	}
 
 	useEffect(() => {
 		async function handleFetchFolders() {
@@ -46,7 +58,7 @@ export default function VideoLibrary() {
 		handleFetchFolders();
 	}, [activeWorkspace, refetchFolders]);
 
-	const triggerRefetchFolders = () => setRefetchFolders(prev=>!prev)
+	const triggerRefetchFolders = () => setRefetchFolders((prev) => !prev);
 
 	async function handleCreateFolder() {
 		startTransition(async () => {
@@ -103,7 +115,10 @@ export default function VideoLibrary() {
 					>
 						New folder
 					</button>
-					<button className="self-stretch px-5 pt-1.5 pb-2 my-auto text-white bg-indigo-500 rounded-[7992px]">
+					<button
+						onClick={handleOnTest}
+						className="self-stretch px-5 pt-1.5 pb-2 my-auto text-white bg-indigo-500 rounded-[7992px]"
+					>
 						New video
 					</button>
 				</div>

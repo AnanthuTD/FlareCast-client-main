@@ -133,18 +133,7 @@ export interface VideoCardProps {
 	thumbnailUrl: string;
 	userAvatarUrl: string;
 	onClick: () => void;
-}
-
-export interface Video {
-	duration: string;
-	userName: string;
-	timeAgo: string;
-	title: string;
-	views: number;
-	comments: number;
-	shares: number;
-	thumbnailUrl: string;
-	userAvatarUrl: string;
+	transcodeStatus: boolean;
 }
 
 export interface SectionProps {
@@ -217,3 +206,36 @@ export enum NotifStatus {
 	READ = "READ",
 	DISMISSED = "DISMISSED",
 }
+
+export interface Video {
+	id: string;
+	title?: string;
+	description?: string;
+	createdAt: Date;
+	userId: string;
+	totalViews: number;
+	uniqueViews: number;
+	transcription?: string;
+	duration: string;
+	folderId?: string;
+	workspaceId: string;
+	spaceId?: string;
+
+	processing: VideoStatus;
+	transcodeStatus: VideoStatus;
+	uploaded: VideoStatus;
+	thumbnailStatus: VideoStatus;
+	transcriptionStatus: VideoStatus;
+	titleStatus: VideoStatus;
+	descriptionStatus: VideoStatus;
+
+	userName: string;
+	comments: number;
+	views: number;
+	shares: number;
+	timeAgo: string;
+	thumbnailUrl: string;
+	userAvatarUrl: string;
+}
+
+type VideoStatus = "SUCCESS" | "FAILED" | "PENDING";

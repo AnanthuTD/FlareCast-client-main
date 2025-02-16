@@ -21,7 +21,11 @@ export async function postView(videoId: string) {
 }
 
 // TODO: re-implement this route on the video service to handle video requests with spaceId
-export async function getMyVideos(workspaceId: string, folderId?: string, spaceId?: string) {
+export async function getMyVideos(
+	workspaceId: string,
+	folderId?: string,
+	spaceId?: string
+) {
 	return await axiosInstance.get(`/api/video/${workspaceId}`, {
 		params: {
 			limit: 10,
@@ -36,11 +40,26 @@ export async function getVideosForSpace(
 	spaceId: string,
 	folderId: string
 ) {
-	return await axiosInstance.get(`/api/video/workspace/${workspaceId}/space/${spaceId}`, {
-		params: {
-			limit: 10,
-			skip: 0,
-			folderId,
-		},
+	return await axiosInstance.get(
+		`/api/video/workspace/${workspaceId}/space/${spaceId}`,
+		{
+			params: {
+				limit: 10,
+				skip: 0,
+				folderId,
+			},
+		}
+	);
+}
+
+export async function updateTitle(videoId: string, title: string) {
+	return await axiosInstance.put(`/api/video/${videoId}/update/title`, {
+		title,
+	});
+}
+
+export async function updateDescription(videoId: string, description: string) {
+	return await axiosInstance.put(`/api/video/${videoId}/update/description`, {
+		description,
 	});
 }

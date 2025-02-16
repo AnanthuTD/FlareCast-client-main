@@ -1,108 +1,188 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import TabMenu from "../../tabs";
 import VideoTranscript from "../../video-transcript";
-import VideoJS from "../VideoJS";
-import videojs from "video.js";
-import { useQueryData } from "@/hooks/useQueryData";
-import { getPreviewVideo } from "@/actions/video";
 import { toast } from "sonner";
 import Player from "@/components/global/videos/Player";
+import { useWorkspaceStore } from "@/providers/WorkspaceStoreProvider";
+import { useUserStore } from "@/providers/UserStoreProvider";
+import { useSSE } from "@/hooks/useVideoSSE";
+import { Video } from "@/types";
+import {
+	getPreviewVideo,
+	updateTitle,
+	updateDescription,
+} from "@/actions/video";
+import { Pencil } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 type Props = {
 	videoId: string;
 };
 
 const VideoPreview = ({ videoId }: Props) => {
-	const playerRef = React.useRef(null);
-	const [video, setVideo] = React.useState<Video | null>(null);
+	const [video, setVideo] = useState<Video | null>(null);
+	const activeWorkspaceId = useWorkspaceStore(
+		(state) => state.selectedWorkspace.id
+	);
+	const userId = useUserStore((state) => state.id);
+	const [isEditingTitle, setEditTitle] = useState(false);
+	const [isEditingDescription, setEditDescription] = useState(false);
+	const [title, setTitle] = useState("");
+	const [description, setDescription] = useState("");
 
-	const videoJsOptions = {
-		autoplay: false,
-		controls: true,
-		responsive: true,
-		fluid: true,
-		sources: [
-			{
-				// src: "http://localhost:4003/video_id/master.m3u8",
-				src: `/gcs/${videoId}/master.m3u8`,
-				type: "application/x-mpegURL",
-			},
-		],
-	};
-
-	const handlePlayerReady = (player) => {
-		playerRef.current = player;
-
-		player.on("waiting", () => {
-			videojs.log("player is waiting");
-		});
-
-		player.on("dispose", () => {
-			videojs.log("player will dispose");
-		});
-	};
-
-	useEffect(() => {
-		getPreviewVideo(videoId)
-			.then(({ video }) => {
-				setVideo(video);
-			})
-			.catch(() => {
-				toast.error(`Failed to get preview video`);
-			});
-	}, [videoId]);
-
-	const daysAgo = Math.floor(
-		(new Date().getTime() - new Date(video?.createdAt).getTime()) /
-			(24 * 60 * 60 * 1000)
+	const { messages, setMessages } = useSSE<Video>(
+		`/api/video/${activeWorkspaceId}/events?userId=${userId}`,
+		[activeWorkspaceId, userId]
 	);
 
-	return (
-		<div className="grid grid-cols-1 xl:grid-cols-3 overflow-y-auto gap-5 w-full">
-			<div className="flex flex-col lg:col-span-2 gap-y-10">
-				<div>
-					<div className="flex gap-x-5 items-start justify-between">
-						<h2 className="text-4xl font-bold">{video?.title}</h2>
-					</div>
-					<span className="flex gap-x-3 mt-2">
-						<p className="text-[#9D9D9D] capitalize">
-							{/* {video.User?.firstname} {video.User?.lastname} */}
-						</p>
-						<p className="text-[#707070]">
-							{daysAgo === 0 ? "Today" : `${daysAgo}d ago`}
-						</p>
-					</span>
-				</div>
+	const fetchPreviewVideo = useCallback(async () => {
+		try {
+			const { video } = await getPreviewVideo(videoId);
+			setVideo(video);
+			setTitle(video.title);
+			setDescription(video.description);
+		} catch (error) {
+			toast.error("Failed to get preview video");
+		}
+	}, [videoId]);
 
-				{/* <VideoJS options={videoJsOptions} onReady={handlePlayerReady} /> */}
-				<Player
-					hslUrl={`/gcs/${videoId}/master.m3u8`}
-					thumbnailsUrl={`/gcs/${videoId}/thumbnails/thumbnails.vtt`}
-					posterUrl={`/gcs/${videoId}/thumbnails/thumb00001.jpg`}
-					videoId={videoId}
-				/>
-				<div className="flex flex-col text-2xl gap-y-4">
-					<div className="flex gap-x-5 items-center justify-between">
-						<p className="text-semibold">Description</p>
-					</div>
-					<p className="text-lg text-medium">{video?.description}</p>
-				</div>
-			</div>
-			<div className="lg:col-span-1 flex flex-col gap-y-16">
-				<div className="flex justify-end gap-x-3 items-center">
-					{/* links to copy and download */}
-				</div>
-				<div>
-					<TabMenu
-						defaultValue="Transcript"
-						triggers={["Ai tools", "Transcript", "Activity"]}
-					>
-						<VideoTranscript
-							transcript={video?.transcription || "Transcript"}
+	useEffect(() => {
+		fetchPreviewVideo();
+	}, [fetchPreviewVideo]);
+
+	useEffect(() => {
+		if (!messages.length) return;
+		const newMessage = messages[messages.length - 1];
+		setMessages([]);
+
+		setVideo((prevVideo) => {
+			if (!prevVideo) return prevVideo;
+			return {
+				...prevVideo,
+				transcodeStatus:
+					newMessage.transcriptionStatus === "SUCCESS"
+						? "success"
+						: prevVideo.transcodeStatus,
+				transcription:
+					newMessage.transcriptionStatus === "SUCCESS"
+						? newMessage.transcription
+						: prevVideo.transcription,
+			};
+		});
+	}, [messages, setMessages]);
+
+	const daysAgo = useMemo(() => {
+		if (!video?.createdAt) return "";
+		const days = Math.floor(
+			(Date.now() - new Date(video.createdAt).getTime()) / (24 * 60 * 60 * 1000)
+		);
+		return days === 0 ? "Today" : `${days}d ago`;
+	}, [video?.createdAt]);
+
+	const handleTitleSave = async () => {
+		setEditTitle(false);
+		if (video?.title !== title) {
+			try {
+				await updateTitle(videoId, title);
+				setVideo((prev) => prev && { ...prev, title });
+				toast.success("Title updated successfully");
+			} catch {
+				toast.error("Failed to update title");
+			}
+		}
+	};
+
+	const handleDescriptionSave = async () => {
+		setEditDescription(false);
+		if (video?.description !== description) {
+			try {
+				await updateDescription(videoId, description);
+				setVideo((prev) => prev && { ...prev, description });
+				toast.success("Description updated successfully");
+			} catch {
+				toast.error("Failed to update description");
+			}
+		}
+	};
+
+	return (
+		<div className="grid grid-cols-1 xl:grid-cols-3 gap-5 w-full">
+			<div className="flex flex-col lg:col-span-2 gap-y-6">
+				<Card>
+					<CardHeader>
+						<div className="flex justify-between items-center">
+							{isEditingTitle ? (
+								<Input
+									value={title}
+									onChange={(e) => setTitle(e.target.value)}
+									onBlur={handleTitleSave}
+									autoFocus
+								/>
+							) : (
+								<h2 className="text-2xl font-bold">{video?.title}</h2>
+							)}
+							<Button
+								variant="ghost"
+								size="icon"
+								onClick={() => setEditTitle(!isEditingTitle)}
+							>
+								<Pencil className="w-4 h-4" />
+							</Button>
+						</div>
+						<p className="text-sm text-gray-500">{daysAgo}</p>
+					</CardHeader>
+					<CardContent>
+						<Player
+							hslUrl={`/gcs/${videoId}/master.m3u8`}
+							thumbnailsUrl={`/gcs/${videoId}/thumbnails/thumbnails.vtt`}
+							posterUrl={`/gcs/${videoId}/thumbnails/thumb00001.jpg`}
+							videoId={videoId}
 						/>
-					</TabMenu>
-				</div>
+					</CardContent>
+				</Card>
+
+				<Card>
+					<CardHeader>
+						<div className="flex justify-between items-center">
+							<p className="text-lg font-semibold">Description</p>
+							<Button
+								variant="ghost"
+								size="icon"
+								onClick={() => setEditDescription(!isEditingDescription)}
+							>
+								<Pencil className="w-4 h-4" />
+							</Button>
+						</div>
+					</CardHeader>
+					<CardContent>
+						{isEditingDescription ? (
+							<Textarea
+								value={description}
+								onChange={(e) => setDescription(e.target.value)}
+								onBlur={handleDescriptionSave}
+								autoFocus
+							/>
+						) : (
+							<p className="text-md text-gray-700">
+								{video?.description || "No description available"}
+							</p>
+						)}
+					</CardContent>
+				</Card>
+			</div>
+			<div className="lg:col-span-1">
+				<TabMenu
+					defaultValue="Transcript"
+					triggers={["AI Tools", "Transcript", "Activity"]}
+				>
+					<VideoTranscript
+						transcript={video?.transcription || "Transcript not available"}
+					/>
+				</TabMenu>
 			</div>
 		</div>
 	);

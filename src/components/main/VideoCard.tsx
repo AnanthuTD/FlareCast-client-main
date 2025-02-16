@@ -1,7 +1,11 @@
+"use client";
+
 import * as React from "react";
+import Image from "next/image";
 import { VideoCardProps } from "@/types";
 import { Card, CardContent, CardHeader } from "../ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ExternalLink, Eye, MessageCircle } from "lucide-react";
 
 export const VideoCard: React.FC<VideoCardProps> = ({
 	duration,
@@ -14,118 +18,83 @@ export const VideoCard: React.FC<VideoCardProps> = ({
 	thumbnailUrl,
 	userAvatarUrl,
 	onClick,
+	transcodeStatus = true,
 }) => {
+	const isClickable = transcodeStatus;
+
 	return (
-		<>
-			<Card className="w-[350px]" onClick={onClick}>
-				<CardHeader>
-					<div className="flex overflow-hidden flex-col w-full rounded-2xl">
-						<div
-							className="flex flex-row-reverse gap-2.5 items-start p-2.5 rounded-2xl bg-neutral-800"
-							style={{
-								backgroundImage: `url(${thumbnailUrl})`,
-								backgroundSize: "cover",
-								backgroundPosition: "center",
-							}}
-						>
-							<div className="flex flex-col items-end">
-								<div className="flex flex-col w-6">
-									<img
-										loading="lazy"
-										src={thumbnailUrl}
-										className="object-contain w-6 aspect-square rounded-[7992px]"
-										alt=""
-									/>
-									<img
-										loading="lazy"
-										src={thumbnailUrl}
-										className="object-contain mt-2 w-6 aspect-square rounded-[7992px]"
-										alt=""
-									/>
-									<div className="flex items-center p-1 mt-2 w-6 h-6 bg-white rounded-[7992px]">
-										<img
-											loading="lazy"
-											src={thumbnailUrl}
-											className="object-contain flex-1 shrink aspect-square basis-0 w-[18px]"
-											alt=""
-										/>
-									</div>
-								</div>
-								<div className="py-1 pr-3.5 pl-3 text-xs font-medium tracking-normal leading-loose text-white bg-neutral-800 rounded-[7992px]">
-									{duration}
-								</div>
-							</div>
-						</div>
+		<Card
+			className={`w-[350px] rounded-xl overflow-hidden transition-opacity ${
+				isClickable ? "opacity-100" : "opacity-50"
+			}`}
+			onClick={isClickable ? onClick : undefined}
+			style={{ cursor: isClickable ? "pointer" : "not-allowed" }}
+		>
+			<CardHeader>
+				<div
+					className={`relative w-full h-48 rounded-2xl overflow-hidden ${
+						thumbnailUrl ? "" : "bg-black"
+					}`}
+				>
+					{/* Video Thumbnail */}
+					{thumbnailUrl && (
+						<Image
+							src={thumbnailUrl}
+							alt="Video thumbnail"
+							fill
+							className="object-cover"
+						/>
+					)}
+
+					{/* Duration Badge */}
+					<div className="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded">
+						{duration}
 					</div>
-				</CardHeader>
-				<CardContent>
-					<div className="flex flex-col w-full tracking-normal">
-						<div className="flex gap-2 items-start w-full">
-						<Avatar className=" w-8 h-8">
-								<AvatarImage src={userAvatarUrl} />
-								<AvatarFallback>
-									<div className="flex justify-center items-center w-[36px] aspect-square text-sm leading-relaxed text-orange-800 whitespace-nowrap bg-red-200 rounded-full cursor-pointer">
-										{userName?.[0]}
-									</div>
-								</AvatarFallback>
-							</Avatar>
-							<div className="flex overflow-hidden flex-col w-full">
-								<div className="flex w-full">
-									<div className="flex overflow-hidden items-start text-xs font-medium leading-loose text-neutral-800">
-										<div className="overflow-hidden pr-1">{userName}</div>
-									</div>
-									<div className="my-auto text-xs text-gray-500">
-										・{timeAgo}
-									</div>
-								</div>
-								<div className="flex gap-1 items-center self-start text-xs leading-loose text-center text-gray-500">
-									<div className="overflow-hidden self-stretch pr-px my-auto">
-										Not shared
-									</div>
-									<img
-										loading="lazy"
-										src="https://cdn.builder.io/api/v1/image/assets/TEMP/1ed193512394a0109c8b790a224ab8b1610c818d7318b350a2430757e88d1cc4?placeholderIfAbsent=true&apiKey=c5dccb8c30704e8b9e01b46fd4eecdec"
-										className="object-contain shrink-0 self-stretch my-auto w-3 aspect-square"
-										alt=""
-									/>
-								</div>
+				</div>
+			</CardHeader>
+
+			<CardContent>
+				<div className="flex gap-2 items-start">
+					{/* Avatar */}
+					<Avatar className="w-8 h-8">
+						<AvatarImage src={userAvatarUrl} />
+						<AvatarFallback>
+							<div className="w-8 h-8 flex items-center justify-center bg-gray-200 text-gray-800 rounded-full">
+								{userName?.[0]}
 							</div>
+						</AvatarFallback>
+					</Avatar>
+
+					{/* Video Info */}
+					<div className="flex flex-col w-full">
+						<div className="flex justify-between text-xs text-gray-500">
+							<span className="font-medium text-neutral-800">{userName}</span>
+							<span>・{timeAgo}</span>
 						</div>
-						<div className="overflow-hidden gap-2.5 self-stretch py-0.5 mt-5 w-full text-sm font-medium tracking-normal leading-loose text-neutral-800">
+
+						{/* Video Title */}
+						<div className="mt-2 text-sm font-medium text-neutral-800 line-clamp-2">
 							{title}
 						</div>
-						<div className="flex gap-4 items-center self-start mt-5 text-xs text-gray-500 whitespace-nowrap">
-							<div className="flex gap-1 items-center self-stretch my-auto">
-								<img
-									loading="lazy"
-									src="https://cdn.builder.io/api/v1/image/assets/TEMP/73c306ec77ad507cd9766dd10253a746416e38a1abea1a00717c41ce3bb10909?placeholderIfAbsent=true&apiKey=c5dccb8c30704e8b9e01b46fd4eecdec"
-									className="object-contain shrink-0 self-stretch my-auto w-4 aspect-square"
-									alt=""
-								/>
-								<div className="self-stretch my-auto">{views}</div>
+
+						{/* Video Stats */}
+						<div className="flex gap-4 mt-3 text-xs text-gray-500">
+							<div className="flex items-center gap-1">
+								<Eye />
+								<span>{views}</span>
 							</div>
-							<div className="flex gap-1 items-center self-stretch my-auto">
-								<img
-									loading="lazy"
-									src="https://cdn.builder.io/api/v1/image/assets/TEMP/51bc53865accec9cdd5d7806eb83557e22b4f2b40691c190530f106bab2050f7?placeholderIfAbsent=true&apiKey=c5dccb8c30704e8b9e01b46fd4eecdec"
-									className="object-contain shrink-0 self-stretch my-auto w-4 aspect-square"
-									alt=""
-								/>
-								<div className="self-stretch my-auto">{comments}</div>
+							<div className="flex items-center gap-1">
+								<MessageCircle />
+								<span>{comments}</span>
 							</div>
-							<div className="flex gap-1 items-center self-stretch my-auto">
-								<img
-									loading="lazy"
-									src="https://cdn.builder.io/api/v1/image/assets/TEMP/66faaf5e6f2ed6af507204f5b4d9907fee27f69f79324f86916132880cac0cfc?placeholderIfAbsent=true&apiKey=c5dccb8c30704e8b9e01b46fd4eecdec"
-									className="object-contain shrink-0 self-stretch my-auto w-4 aspect-square"
-									alt=""
-								/>
-								<div className="self-stretch my-auto">{shares}</div>
+							<div className="flex items-center gap-1">
+								<ExternalLink />
+								<span>{shares}</span>
 							</div>
 						</div>
 					</div>
-				</CardContent>
-			</Card>
-		</>
+				</div>
+			</CardContent>
+		</Card>
 	);
 };

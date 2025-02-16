@@ -31,7 +31,7 @@ const nextConfig: NextConfig = {
 		domains: [
 			"cdn.builder.io",
 			"lh3.googleusercontent.com",
-			"https://d1j5jvhpjcqj6b.cloudfront.net",
+			"d1j5jvhpjcqj6b.cloudfront.net",
 		],
 	},
 	typescript: {
@@ -40,7 +40,7 @@ const nextConfig: NextConfig = {
 	eslint: {
 		ignoreDuringBuilds: true,
 	},
-	// reactStrictMode: false,
+	reactStrictMode: false,
 };
 
 export default nextConfig;
