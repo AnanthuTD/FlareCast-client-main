@@ -90,30 +90,41 @@ body {
 }
 
 @layer utilities {
-  @keyframes infinite-progress {
-    0% { transform: translateX(0%); }
-    100% { transform: translateX(-50%); }
-  }
+	@keyframes infinite-progress {
+		0% {
+			transform: translateX(0%);
+		}
+		100% {
+			transform: translateX(-50%);
+		}
+	}
 
-  .animate-infinite-progress {
-    @apply relative overflow-hidden h-1 w-full bg-gray-200 rounded-full;
-  }
+	.animate-infinite-progress {
+		@apply relative overflow-hidden h-1 w-full bg-gray-200 rounded-full;
+	}
 
-  .animate-infinite-progress::before {
-    content: "";
-    @apply absolute top-0 left-0 w-[200%] h-full;
-    background: linear-gradient(
-      to right,
-      #818cf8 0%,
-      #c7d2fe 25%,
-      #818cf8 50%,
-      #c7d2fe 75%,
-      #818cf8 100%
-    );
-    background-size: 50% 100%;
-    animation: infinite-progress 2s linear infinite;
-    will-change: transform;
-  }
+	.animate-infinite-progress::before {
+		content: "";
+		@apply absolute top-0 left-0 w-[200%] h-full;
+		background: linear-gradient(
+			to right,
+			#818cf8 0%,
+			#c7d2fe 25%,
+			#818cf8 50%,
+			#c7d2fe 75%,
+			#818cf8 100%
+		);
+		background-size: 50% 100%;
+		animation: infinite-progress 2s linear infinite;
+		will-change: transform;
+	}
 }
 
-
+@layer base {
+	* {
+		@apply border-border outline-ring/50;
+	}
+	body {
+		@apply bg-background text-foreground;
+	}
+}
