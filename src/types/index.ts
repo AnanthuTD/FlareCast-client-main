@@ -239,3 +239,11 @@ export interface Video {
 }
 
 type VideoStatus = "SUCCESS" | "FAILED" | "PENDING";
+
+export interface IChat {
+	id: string;
+	name: string;
+	image?: string;
+	message: string;
+	replies: IChat[];
+}

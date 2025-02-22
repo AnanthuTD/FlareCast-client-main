@@ -18,6 +18,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import ChatBox from "../../chat-box";
 
 type Props = {
 	videoId: string;
@@ -176,12 +177,14 @@ const VideoPreview = ({ videoId }: Props) => {
 			</div>
 			<div className="lg:col-span-1">
 				<TabMenu
-					defaultValue="Transcript"
+					defaultValue="Activity"
 					triggers={["AI Tools", "Transcript", "Activity"]}
 				>
 					<VideoTranscript
 						transcript={video?.transcription || "Transcript not available"}
 					/>
+
+					<ChatBox />
 				</TabMenu>
 			</div>
 		</div>

@@ -9,13 +9,12 @@ import React from "react";
 import Head from "next/head";
 
 type Props = {
-	params: {
-		videoId: string;
-	};
+	params: Promise<{ videoId: string }>;
 };
 
 const VideoPage = async ({ params }: Props) => {
-	const { videoId } = params;
+	const { videoId } = await params;
+	
 	const query = new QueryClient();
 
 	// const videoDetails = await getPreviewVideoServer(videoId);
@@ -30,7 +29,7 @@ const VideoPage = async ({ params }: Props) => {
 
 	return (
 		<>
-		{/* 	<Head>
+			{/* 	<Head>
 				<title>{videoDetails.title}</title>
 				<meta property="og:title" content={videoDetails.title} />
 				<meta property="og:description" content={videoDetails.description} />
