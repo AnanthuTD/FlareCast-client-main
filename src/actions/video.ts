@@ -7,7 +7,20 @@ export async function getPreviewVideo(id: string) {
 		return response.data;
 	} catch (error) {
 		console.error(error);
-		throw error.response.data;
+		throw error.response?.data || "failed to get video";
+	}
+}
+
+export async function getPreviewVideoServer(id: string) {
+	console.log(id);
+	try {
+		const response = await axiosInstance.get(
+			`${process.env.NEXT_PUBLIC_VIDEO_SERVICE_URL}/api/${id}/video`
+		);
+		console.log("response: ", response);
+		return response.data;
+	} catch (error) {
+		console.error(error);
 	}
 }
 

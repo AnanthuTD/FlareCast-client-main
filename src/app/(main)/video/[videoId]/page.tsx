@@ -1,4 +1,4 @@
-import { getPreviewVideo } from "@/actions/video";
+import { getPreviewVideoServer } from "@/actions/video";
 import VideoPreview from "@/components/global/videos/preview";
 import {
 	dehydrate,
@@ -6,6 +6,7 @@ import {
 	QueryClient,
 } from "@tanstack/react-query";
 import React from "react";
+import Head from "next/head";
 
 type Props = {
 	params: {
@@ -14,29 +15,33 @@ type Props = {
 };
 
 const VideoPage = async ({ params }: Props) => {
-	const { videoId } = await params;
+	const { videoId } = params;
 	const query = new QueryClient();
+
+	// const videoDetails = await getPreviewVideoServer(videoId);
+
+	// console.log(videoDetails)
 
 	/* await query.prefetchQuery({
 		queryKey: ["preview-video"],
 		queryFn: () => getPreviewVideo(videoId),
 	});
-	 */
-	/* 
-	await query.prefetchQuery({
-		queryKey: ["user-profile"],
-		queryFn: getUserProfile,
-	});
-
-	await query.prefetchQuery({
-		queryKey: ["video-comments"],
-		queryFn: () => getVideoComments(videoId),
-	}); */
+	*/
 
 	return (
-		<HydrationBoundary state={dehydrate(query)}>
-			<VideoPreview videoId={videoId} />
-		</HydrationBoundary>
+		<>
+		{/* 	<Head>
+				<title>{videoDetails.title}</title>
+				<meta property="og:title" content={videoDetails.title} />
+				<meta property="og:description" content={videoDetails.description} />
+				<meta property="og:image" content={videoDetails.thumbnailUrl} />
+				<meta property="og:video" content={videoDetails.videoUrl} />
+				<meta property="og:type" content="video.webm" />
+			</Head> */}
+			<HydrationBoundary state={dehydrate(query)}>
+				<VideoPreview videoId={videoId} />
+			</HydrationBoundary>
+		</>
 	);
 };
 

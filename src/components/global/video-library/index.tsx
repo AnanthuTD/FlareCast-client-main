@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { VideoLibraryTabs } from "./videoLibraryTabs";
 import { Separator } from "@/components/ui/separator";
 import { LibraryHeader } from "./LibraryHeader";
@@ -7,6 +7,8 @@ import { Folder } from "@/types";
 import { useWorkspaceStore } from "@/providers/WorkspaceStoreProvider";
 import { useQueryData } from "@/hooks/useQueryData";
 import FolderPredecessors from "@/components/library/bread-crumb";
+import { useSocket } from "@/hooks/useSocket";
+import { SocketEvents } from "@/lib/socket/socketEvents";
 
 interface VideoLibraryProps {
 	spaceId: string;
@@ -28,10 +30,32 @@ export const VideoLibrary: React.FC<VideoLibraryProps> = ({
 	const activeWorkspaceId = useWorkspaceStore(
 		(state) => state.selectedWorkspace.id
 	);
-
-	const { data: folders = [] } = useQueryData(["workspace-folders"], () =>
-		fetchFolders(activeWorkspaceId, folderId, spaceId)
+	const { onEvent, emitEvent } = useSocket(
+		"/api/collaboration/folder" as string,
+		"/collaboration/socket.io"
 	);
+
+	const { data: folders = [], refetch } = useQueryData(
+		["workspace-folders"],
+		() => fetchFolders(activeWorkspaceId, folderId, spaceId)
+	);
+
+	useEffect(() => {
+		onEvent(SocketEvents.FOLDER_CREATED, () => {
+			refetch();
+		});
+		onEvent(SocketEvents.FOLDER_RENAMED, () => {
+			refetch();
+		});
+		onEvent(SocketEvents.FOLDER_DELETED, () => {
+			refetch();
+		});
+		emitEvent(SocketEvents.FOLDER_UPDATES, {
+			folderId,
+			activeWorkspaceId,
+			spaceId,
+		});
+	}, [refetch, onEvent, emitEvent, folderId, activeWorkspaceId, spaceId]);
 
 	return (
 		<div className="flex flex-col px-10 py-6 max-md:px-5 w-full">
