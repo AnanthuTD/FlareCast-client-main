@@ -5,15 +5,12 @@ import {
 	createContext,
 	useRef,
 	useContext,
-	useEffect,
 } from "react";
 import {
 	createWorkspaceStore,
-	Workspace,
 	WorkspaceStore,
 } from "@/stores/useWorkspaces";
 import { useStore } from "zustand";
-import { fetchWorkspaces } from "@/actions/workspace";
 import { InitializeWorkspaceStore } from "@/components/InitializeWorkspaceStore";
 
 export type WorkspaceStoreApi = ReturnType<typeof createWorkspaceStore>;
@@ -29,7 +26,7 @@ export interface WorkspaceStoreProviderProps {
 export const WorkspaceStoreProvider = ({
 	children,
 }: WorkspaceStoreProviderProps) => {
-	const storeRef = useRef<WorkspaceStoreApi>();
+	const storeRef = useRef<WorkspaceStoreApi | null>(null);
 
 	if (!storeRef.current) {
 		storeRef.current = createWorkspaceStore();
