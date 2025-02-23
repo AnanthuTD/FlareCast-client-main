@@ -52,8 +52,6 @@ const ChatBox = ({ videoId }: Props) => {
 			getNextPageParam: (lastPage) => lastPage.nextCursor || undefined,
 			initialPageParam: null,
 			select: (data) => {
-				console.log(data);
-
 				return {
 					...data,
 					pages: [...data.pages].reverse(),
@@ -63,7 +61,6 @@ const ChatBox = ({ videoId }: Props) => {
 
 	useEffect(() => {
 		const chats = data?.pages.flatMap((page) => page.chats) ?? [];
-		console.log("chats: ", chats);
 		setChats(chats);
 	}, [data]);
 
@@ -96,6 +93,8 @@ const ChatBox = ({ videoId }: Props) => {
 
 	useEffect(() => {
 		const unsubscribe = onEvent("newMessage", (newMessage: IChatFlat) => {
+			console.log("newMessage: ", newMessage);
+
 			queryClient.setQueryData(["chats", videoId], (old: any) => {
 				if (!old || !old.pages?.length) return old;
 
@@ -109,7 +108,6 @@ const ChatBox = ({ videoId }: Props) => {
 							return true;
 						}
 					});
-					console.log(findIndex);
 					if (findIndex !== -1) {
 						const updatedChats = [...chats];
 						updatedChats[findIndex] = newMessage;
@@ -132,7 +130,7 @@ const ChatBox = ({ videoId }: Props) => {
 					pages: [
 						{
 							...firstPage,
-							chats: [newMessage, ...chats],
+							chats: [...chats, newMessage],
 						},
 						...old.pages.slice(1),
 					],
@@ -146,6 +144,42 @@ const ChatBox = ({ videoId }: Props) => {
 						chatContainerRef.current!.scrollHeight;
 				});
 			}
+		});
+
+		onEvent("removedChat", (data) => {
+			queryClient.setQueryData(["chats", videoId], (old: any) => {
+				if (!old || !old.pages?.length) return old;
+
+				const updatedPages = old.pages.map((page: any) => {
+					if (!page.chats) return page;
+
+					const updatedChats = page.chats.filter(
+						(chat: IChatFlat) => chat.id !== data.id
+					);
+
+					return { ...page, chats: updatedChats };
+				});
+
+				return { ...old, pages: updatedPages };
+			});
+		});
+
+		onEvent("updatedChat", (data) => {
+			queryClient.setQueryData(["chats", videoId], (old: any) => {
+				if (!old || !old.pages?.length) return old;
+
+				const updatedPages = old.pages.map((page: any) => {
+					if (!page.chats) return page;
+
+					const updatedChats = page.chats.map((chat: IChatFlat) =>
+						chat.id === data.id ? data : chat
+					);
+
+					return { ...page, chats: updatedChats };
+				});
+
+				return { ...old, pages: updatedPages };
+			});
 		});
 
 		return () => unsubscribe();
