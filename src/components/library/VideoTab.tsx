@@ -14,7 +14,7 @@ interface NewVideo extends Video {
 	event: string;
 }
 
-function VideoTab({ folderId }: { folderId?: string }) {
+function VideoTab({ folderId, spaceId }: { folderId?: string, spaceId?: string}) {
 	const [videos, setVideos] = useState<Video[]>([]);
 	const router = useRouter();
 	const selectedWorkspace = useWorkspaceStore(
@@ -65,7 +65,7 @@ function VideoTab({ folderId }: { folderId?: string }) {
 	// Fetch existing videos
 	useEffect(() => {
 		async function fetchVideos() {
-			const response = await getMyVideos(selectedWorkspace.id, folderId);
+			const response = await getMyVideos(selectedWorkspace.id, folderId, spaceId);
 			const { videos } = response.data;
 			setVideos(videos);
 		}
