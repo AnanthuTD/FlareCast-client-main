@@ -3,7 +3,7 @@ import ChatContextMenu from "./ChatContextMenu";
 import AvatarPlaceHolder from "../avatar-placeholder";
 import { Badge } from "@/components/ui/badge";
 import { IChatFlat } from "@/types";
-import { SendHorizontal } from "lucide-react";
+import { CircleXIcon, SendHorizontal } from "lucide-react";
 import { useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -24,7 +24,14 @@ const ChatFlat = ({
 	const [isEditing, setIsEditing] = useState(false);
 	const inputRef = useRef<HTMLInputElement | null>(null);
 
-	const toggleEditing = () => setIsEditing(true);
+	const toggleEditing = () => {
+		setIsEditing(true);
+	};
+
+	const cancelEditing = () => {
+		setIsEditing(false);
+		inputRef.current?.blur();
+	}
 
 	/* TODO: onclick navigate to the replied message */
 	// const navigateToChat = () => {};
@@ -110,6 +117,17 @@ const ChatFlat = ({
 								{isEditing ? (
 									<div className="flex w-full gap-1">
 										<Input ref={inputRef} defaultValue={chat.message} />
+										<Button
+											onClick={() => cancelEditing()}
+											variant="destructive"
+											size={"icon"}
+											className="place-self-end aspect-square"
+										>
+											<CircleXIcon
+												size={16}
+												className=""
+											/>
+										</Button>
 										<Button
 											onClick={handleUpdateMessage}
 											variant="default"

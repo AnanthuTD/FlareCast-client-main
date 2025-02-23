@@ -1,12 +1,12 @@
 "use client";
 
 import { TabsContent } from "@/components/ui/tabs";
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useUserStore } from "@/providers/UserStoreProvider";
 import { IChatFlat } from "@/types";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { SendHorizontal } from "lucide-react";
+import { CircleXIcon, SendHorizontal } from "lucide-react";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "@/axios";
 import Chat from "./ChatFlat";
@@ -69,7 +69,30 @@ const ChatBox = ({ videoId }: Props) => {
 
 	useEffect(() => {
 		emitEvent("joinSpace", { videoId });
-	}, [emitEvent, videoId]);
+		const handleCreateChatFailure = (tempId: string) => {
+			queryClient.setQueryData(["chats", videoId], (old: any) => {
+				if (!old || !old.pages?.length) return old;
+
+				const updatedPages = old.pages.map((page: any) => {
+					if (!page.chats) return page;
+
+					const updatedChats = page.chats.map((chat: IChatFlat) =>
+						chat.id === tempId ? { ...chat, error: true } : chat
+					);
+
+					return { ...page, chats: updatedChats };
+				});
+
+				return { ...old, pages: updatedPages };
+			});
+		};
+
+		onEvent("createChatFailure", handleCreateChatFailure);
+
+		return () => {
+			emitEvent("leaveSpace", { videoId });
+		};
+	}, [emitEvent, onEvent, queryClient, videoId]);
 
 	useEffect(() => {
 		const unsubscribe = onEvent("newMessage", (newMessage: IChatFlat) => {
@@ -277,11 +300,17 @@ const ChatBox = ({ videoId }: Props) => {
 			<div className="flex gap-1">
 				<div className="w-full">
 					{replyTo?.message && (
-						<div className="bg-gray-200 rounded-b-none rounded-md flex overflow-hidden max-h-[50px]">
+						<div className="items-center bg-gray-200 rounded-b-none rounded-md flex overflow-hidden max-h-[50px] w-full">
 							<div className="bg-indigo-400 w-[3px] rounded-s-md rounded-b-none mr-1"></div>
 							<p className="text-xs p-1 overflow-hidden text-ellipsis whitespace-nowrap">
 								{replyTo?.message}
 							</p>
+							<CircleXIcon
+								color="#ba2121"
+								size={16}
+								className="ml-auto mr-1"
+								onClick={() => setReplyTo(null)}
+							/>
 						</div>
 					)}
 					<Textarea
