@@ -11,18 +11,17 @@ const ChatContextMenu = ({
 	handleEditing,
 	canDelete = false,
 	canEdit = false,
-	handleReply
+	handleReply,
+	handleDelete,
 }: {
 	children: React.ReactNode;
 	chat: { id: string };
 	handleEditing: () => void;
 	handleReply: () => void;
+	handleDelete: () => void;
 	canDelete: boolean;
 	canEdit: boolean;
 }) => {
-
-	const handleDelete = () => {};
-
 	return (
 		<ContextMenu>
 			<ContextMenuTrigger>{children}</ContextMenuTrigger>

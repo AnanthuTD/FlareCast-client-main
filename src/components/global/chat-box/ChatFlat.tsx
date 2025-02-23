@@ -4,7 +4,7 @@ import AvatarPlaceHolder from "../avatar-placeholder";
 import { Badge } from "@/components/ui/badge";
 import { IChatFlat } from "@/types";
 import { SendHorizontal } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
@@ -12,12 +12,17 @@ const ChatFlat = ({
 	chat,
 	own = false,
 	onReply,
+	onDelete,
+	onEdit,
 }: {
 	chat: IChatFlat;
 	own?: boolean;
 	onReply: (chat: IChatFlat) => void;
+	onDelete: (id: string) => void;
+	onEdit: (id: string, message: string) => void;
 }) => {
 	const [isEditing, setIsEditing] = useState(false);
+	const inputRef = useRef<HTMLInputElement | null>(null);
 
 	const toggleEditing = () => setIsEditing(true);
 
@@ -25,6 +30,17 @@ const ChatFlat = ({
 	// const navigateToChat = () => {};
 
 	const handleUpdateMessage = () => {
+		if (!inputRef.current) return;
+		if (inputRef.current.value === chat.message) {
+			setIsEditing(false);
+			return;
+		}
+		if (!inputRef.current.value) {
+			setIsEditing(false);
+			return;
+		}
+
+		onEdit(chat.id, inputRef.current.value);
 		setIsEditing(false);
 	};
 
@@ -61,6 +77,7 @@ const ChatFlat = ({
 					canEdit={own}
 					handleEditing={toggleEditing}
 					handleReply={() => onReply(chat)}
+					handleDelete={() => onDelete(chat.id)}
 				>
 					<div className="flex flex-col gap-1">
 						<p
@@ -92,7 +109,7 @@ const ChatFlat = ({
 							<div className="w-full">
 								{isEditing ? (
 									<div className="flex w-full gap-1">
-										<Input defaultValue={chat.message} />
+										<Input ref={inputRef} defaultValue={chat.message} />
 										<Button
 											onClick={handleUpdateMessage}
 											variant="default"

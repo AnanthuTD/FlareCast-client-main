@@ -216,6 +216,40 @@ const ChatBox = ({ videoId }: Props) => {
 		lastScrollHeight.current = newScrollHeight;
 	}, [chats, isAtBottom]);
 
+	const handleDelete = (chatId: string) => {
+		emitEvent("removeChat", chatId);
+
+		queryClient.setQueryData(["chats", videoId], (old: any) => {
+			if (!old || !old.pages) return old;
+
+			return {
+				...old,
+				pages: old.pages.map((page: any) => ({
+					...page,
+					chats: page.chats.filter((chat: IChatFlat) => chat.id !== chatId),
+				})),
+			};
+		});
+	};
+
+	const handleEditMessage = (id: string, message: string) => {
+		emitEvent("updateChat", { id, message });
+
+		queryClient.setQueryData(["chats", videoId], (old: any) => {
+			if (!old || !old.pages) return old;
+
+			return {
+				...old,
+				pages: old.pages.map((page: any) => ({
+					...page,
+					chats: page.chats.map((chat: IChatFlat) =>
+						chat.id === id ? { ...chat, message } : chat
+					),
+				})),
+			};
+		});
+	};
+
 	return (
 		<TabsContent
 			value="Activity"
@@ -234,6 +268,8 @@ const ChatBox = ({ videoId }: Props) => {
 							key={chat.id}
 							own={chat.user.id === userId}
 							onReply={handleReplyTo}
+							onDelete={handleDelete}
+							onEdit={handleEditMessage}
 						/>
 					);
 				})}
