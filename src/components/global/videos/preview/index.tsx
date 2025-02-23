@@ -29,6 +29,8 @@ const VideoPreview = ({ videoId }: Props) => {
 	const activeWorkspaceId = useWorkspaceStore(
 		(state) => state.selectedWorkspace.id
 	);
+	const selectedSpaceId = useWorkspaceStore((state) => state.selectedSpace);
+
 	const userId = useUserStore((state) => state.id);
 	const [isEditingTitle, setEditTitle] = useState(false);
 	const [isEditingDescription, setEditDescription] = useState(false);
@@ -184,7 +186,7 @@ const VideoPreview = ({ videoId }: Props) => {
 						transcript={video?.transcription || "Transcript not available"}
 					/>
 
-					<ChatBox />
+					{video?.id && <ChatBox videoId={video.id} />}
 				</TabMenu>
 			</div>
 		</div>

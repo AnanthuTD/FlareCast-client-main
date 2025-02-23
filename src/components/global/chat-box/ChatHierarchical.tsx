@@ -2,14 +2,20 @@ import Image from "next/image";
 import ChatContextMenu from "./ChatContextMenu";
 import AvatarPlaceHolder from "../avatar-placeholder";
 import { Badge } from "@/components/ui/badge";
-import { IChat } from "@/types";
+import { IChatHierarchical } from "@/types";
 import { Reply, SendHorizontal } from "lucide-react";
 import Divider from "../divider";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-const Chat = ({ chat, own = false }: { chat: IChat; own?: boolean }) => {
+const ChatHierarchical = ({
+	chat,
+	own = false,
+}: {
+	chat: IChatHierarchical;
+	own?: boolean;
+}) => {
 	const [expandReplies, setExpandReplies] = useState(false);
 	const [isEditing, setIsEditing] = useState(false);
 
@@ -23,7 +29,13 @@ const Chat = ({ chat, own = false }: { chat: IChat; own?: boolean }) => {
 
 	return (
 		<div className="p-1 bg-white rounded-lg shadow-sm w-full">
-			<ChatContextMenu chat={chat} canDelete={own} canEdit={own} handleEditing={toggleEditing}>
+			<ChatContextMenu
+				chat={chat}
+				canDelete={own}
+				canEdit={own}
+				handleEditing={toggleEditing}
+				handleReply={() => {}}
+			>
 				<div
 					className={`flex ${
 						own ? "flex-row-reverse" : ""
@@ -89,7 +101,7 @@ const Chat = ({ chat, own = false }: { chat: IChat; own?: boolean }) => {
 					chat.replies.map((reply) => (
 						<div key={reply.id} className="flex items-center w-full">
 							<Reply className="-rotate-180 text-muted-foreground" size={18} />
-							<Chat chat={reply} key={reply.id} />
+							<ChatHierarchical chat={reply} key={reply.id} />
 						</div>
 					))}
 			</div>
@@ -97,4 +109,4 @@ const Chat = ({ chat, own = false }: { chat: IChat; own?: boolean }) => {
 	);
 };
 
-export default Chat;
+export default ChatHierarchical;

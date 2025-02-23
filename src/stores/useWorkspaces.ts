@@ -16,17 +16,19 @@ export interface Workspace {
 export type Workspaces = Workspace[];
 
 export type CombinedWorkspaces = {
-	member: Workspaces,
-}
+	member: Workspaces;
+};
 
 export type WorkspaceState = {
 	workspaces: CombinedWorkspaces;
 	selectedWorkspace: Workspace;
+	selectedSpace?: string;
 };
 
 export type WorkspaceActions = {
 	setWorkspaces: (workspaces: CombinedWorkspaces) => void;
 	setSelectedWorkspace: (workspace: Workspace) => void;
+	setSelectedSpace: (spaceId: string) => void;
 };
 
 export type WorkspaceStore = WorkspaceState & WorkspaceActions;
@@ -45,6 +47,9 @@ export const createWorkspaceStore = (
 		setWorkspaces: (workspaces) => set({ workspaces }),
 		setSelectedWorkspace(workspace) {
 			set({ selectedWorkspace: workspace });
+		},
+		setSelectedSpace(spaceId) {
+			set({ selectedSpace: spaceId });
 		},
 	}));
 };

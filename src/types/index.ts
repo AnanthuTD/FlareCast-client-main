@@ -240,10 +240,22 @@ export interface Video {
 
 type VideoStatus = "SUCCESS" | "FAILED" | "PENDING";
 
-export interface IChat {
+export interface IChatHierarchical {
 	id: string;
 	name: string;
 	image?: string;
 	message: string;
-	replies: IChat[];
+	replies: IChatHierarchical[];
+}
+
+export interface IChatFlat {
+	id: string;
+	user: {
+		name: string;
+		id: string;
+	};
+	image?: string;
+	message: string;
+	repliedTo: IChatFlat | null;
+	videoId?: string;
 }

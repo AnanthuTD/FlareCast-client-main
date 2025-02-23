@@ -8,18 +8,18 @@ import { Trash2 } from "lucide-react";
 
 const ChatContextMenu = ({
 	children,
-	chat,
 	handleEditing,
 	canDelete = false,
 	canEdit = false,
+	handleReply
 }: {
 	children: React.ReactNode;
 	chat: { id: string };
 	handleEditing: () => void;
+	handleReply: () => void;
 	canDelete: boolean;
 	canEdit: boolean;
 }) => {
-	const handleReply = () => {};
 
 	const handleDelete = () => {};
 
