@@ -51,14 +51,19 @@ const ChatBox = ({ videoId }: Props) => {
 			},
 			getNextPageParam: (lastPage) => lastPage.nextCursor || undefined,
 			initialPageParam: null,
-			select: (data) => ({
-				...data,
-				pages: [...data.pages].reverse(), // Reverse pages so newer ones stay at the end
-			}),
+			select: (data) => {
+				console.log(data);
+
+				return {
+					...data,
+					pages: [...data.pages].reverse(),
+				};
+			},
 		});
 
 	useEffect(() => {
 		const chats = data?.pages.flatMap((page) => page.chats) ?? [];
+		console.log("chats: ", chats);
 		setChats(chats);
 	}, [data]);
 
@@ -75,7 +80,13 @@ const ChatBox = ({ videoId }: Props) => {
 				const chats = firstPage.chats || [];
 
 				if (newMessage.user.id === userId && newMessage.tempId) {
-					const findIndex = chats.findIndex((p) => p.id === newMessage.tempId);
+					const findIndex = chats.findIndex((p) => {
+						if (p.id === newMessage.tempId) {
+							console.log(p, newMessage);
+							return true;
+						}
+					});
+					console.log(findIndex);
 					if (findIndex !== -1) {
 						const updatedChats = [...chats];
 						updatedChats[findIndex] = newMessage;
@@ -151,6 +162,7 @@ const ChatBox = ({ videoId }: Props) => {
 		emitEvent("createChat", tempMessage);
 		setMessage("");
 		setReplyTo(null);
+		setIsAtBottom(true);
 	};
 
 	const handleReplyTo = (chat: IChatFlat) => {
@@ -160,7 +172,7 @@ const ChatBox = ({ videoId }: Props) => {
 	const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
 		const target = e.currentTarget;
 
-		if (target.scrollTop === 0 && hasNextPage && !isFetching.current) {
+		if (target.scrollTop <= 10 && hasNextPage && !isFetching.current) {
 			isFetching.current = true;
 			fetchNextPage().finally(() => {
 				isFetching.current = false;
@@ -215,14 +227,16 @@ const ChatBox = ({ videoId }: Props) => {
 				className="flex flex-col gap-y-2 px-1 scrollbar-w-1 scrollbar-thumb-rounded-full scrollbar-track-rounded-full scrollbar scrollbar-thumb-indigo-300 scrollbar-track-indigo-100 overflow-y-scroll"
 			>
 				{isFetchingNextPage && <Loader state={true} />}
-				{chats.map((chat) => (
-					<Chat
-						chat={chat}
-						key={chat.id}
-						own={chat.user.id === userId}
-						onReply={handleReplyTo}
-					/>
-				))}
+				{chats.map((chat) => {
+					return (
+						<Chat
+							chat={chat}
+							key={chat.id}
+							own={chat.user.id === userId}
+							onReply={handleReplyTo}
+						/>
+					);
+				})}
 			</div>
 			<div className="flex gap-1">
 				<div className="w-full">

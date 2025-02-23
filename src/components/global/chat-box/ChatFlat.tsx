@@ -17,7 +17,6 @@ const ChatFlat = ({
 	own?: boolean;
 	onReply: (chat: IChatFlat) => void;
 }) => {
-	console.log("chat: ", chat);
 	const [isEditing, setIsEditing] = useState(false);
 
 	const toggleEditing = () => setIsEditing(true);
