@@ -1,7 +1,7 @@
 "use client";
 
 import { TabsContent } from "@/components/ui/tabs";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useUserStore } from "@/providers/UserStoreProvider";
 import { IChatFlat } from "@/types";
 import { Textarea } from "@/components/ui/textarea";
@@ -20,22 +20,24 @@ interface Props {
 const ChatBox = ({ videoId }: Props) => {
 	const userId = useUserStore((state) => state.id);
 	const [chats, setChats] = useState<IChatFlat[]>([]);
-	const [message, setMessage] = React.useState("");
-	const [replyTo, setReplyTo] = React.useState<IChatFlat | null>(null);
+	const [message, setMessage] = useState("");
+	const [replyTo, setReplyTo] = useState<IChatFlat | null>(null);
 	const { emitEvent, onEvent } = useSocket(
 		`${process.env.NEXT_PUBLIC_BACKEND_URL}/chats`,
 		`/collaboration/socket.io`
 	);
-	const [scrolling, setScrolling] = useState(false);
-	const [isAtBottom, setIsAtBottom] = React.useState(true);
+	const [isAtBottom, setIsAtBottom] = useState(true);
 
 	const queryClient = useQueryClient();
+	const chatContainerRef = useRef<HTMLDivElement>(null);
+	const lastScrollHeight = useRef<number>(0);
+	const isProgrammaticScroll = useRef(false);
+	const isFetching = useRef(false);
 
 	const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
 		useInfiniteQuery({
 			queryKey: ["chats", videoId],
 			queryFn: async ({ pageParam = null }: { pageParam: Date | null }) => {
-				console.log("pageParam", pageParam);
 				const res = await axiosInstance.get(
 					`/api/collaboration/chats/${videoId}`,
 					{
@@ -49,30 +51,22 @@ const ChatBox = ({ videoId }: Props) => {
 			},
 			getNextPageParam: (lastPage) => lastPage.nextCursor || undefined,
 			initialPageParam: null,
-			// This part makes sure older data goes to the front
 			select: (data) => ({
 				...data,
 				pages: [...data.pages].reverse(), // Reverse pages so newer ones stay at the end
 			}),
 		});
 
-	console.log(data);
-
 	useEffect(() => {
 		const chats = data?.pages.flatMap((page) => page.chats) ?? [];
 		setChats(chats);
-		console.log("chats", chats);
 	}, [data]);
 
-	console.log(chats);
-
-	React.useEffect(() => {
+	useEffect(() => {
 		emitEvent("joinSpace", { videoId });
 	}, [emitEvent, videoId]);
 
-	const chatContainerRef = React.useRef<HTMLDivElement>(null);
-
-	React.useEffect(() => {
+	useEffect(() => {
 		const unsubscribe = onEvent("newMessage", (newMessage: IChatFlat) => {
 			queryClient.setQueryData(["chats", videoId], (old: any) => {
 				if (!old || !old.pages?.length) return old;
@@ -80,7 +74,6 @@ const ChatBox = ({ videoId }: Props) => {
 				const firstPage = old.pages[0];
 				const chats = firstPage.chats || [];
 
-				// If the message is an update of an existing temp message
 				if (newMessage.user.id === userId && newMessage.tempId) {
 					const findIndex = chats.findIndex((p) => p.id === newMessage.tempId);
 					if (findIndex !== -1) {
@@ -100,29 +93,29 @@ const ChatBox = ({ videoId }: Props) => {
 					}
 				}
 
-				setTimeout(() => {
-					if (chatContainerRef.current) {
-						chatContainerRef.current.scrollTop =
-							chatContainerRef.current.scrollHeight;
-					}
-				}, 100);
-
-				// Otherwise, add new message to the top (or however your order is)
 				return {
 					...old,
 					pages: [
 						{
 							...firstPage,
-							chats: [newMessage, ...chats], // Assuming newest messages should come first
+							chats: [newMessage, ...chats],
 						},
 						...old.pages.slice(1),
 					],
 				};
 			});
+
+			// Auto-scroll to bottom only if the user is near the bottom
+			if (isAtBottom && chatContainerRef.current) {
+				requestAnimationFrame(() => {
+					chatContainerRef.current!.scrollTop =
+						chatContainerRef.current!.scrollHeight;
+				});
+			}
 		});
 
 		return () => unsubscribe();
-	}, [onEvent, queryClient, userId, videoId]);
+	}, [onEvent, queryClient, userId, videoId, isAtBottom]);
 
 	const handleSendMessage = () => {
 		if (!message.trim()) return;
@@ -140,8 +133,6 @@ const ChatBox = ({ videoId }: Props) => {
 			videoId,
 			tempId,
 		};
-
-		console.log(tempMessage);
 
 		queryClient.setQueryData(["chats", videoId], (old: any) => {
 			if (!old) return old;
@@ -166,61 +157,52 @@ const ChatBox = ({ videoId }: Props) => {
 		setReplyTo(chat);
 	};
 
-	// Track scroll position
 	const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
 		const target = e.currentTarget;
 
-		// Check if user scrolled to the top -> Fetch older messages
-		if (target.scrollTop === 0 && hasNextPage && !isFetchingNextPage) {
-			fetchNextPage();
+		if (target.scrollTop === 0 && hasNextPage && !isFetching.current) {
+			isFetching.current = true;
+			fetchNextPage().finally(() => {
+				isFetching.current = false;
+			});
 		}
 
-		// Check if user is near the bottom
 		const nearBottom =
 			target.scrollHeight - target.scrollTop <= target.clientHeight + 5;
 		setIsAtBottom(nearBottom);
-
-		// Track if user is actively scrolling
-		setScrolling(!nearBottom);
 	};
 
-	const lastScrollHeight = React.useRef<number>(0);
-
 	useEffect(() => {
-		if (chatContainerRef.current) {
-			const container = chatContainerRef.current;
+		if (!chatContainerRef.current) return;
 
-			// If we're fetching older messages and the user is near the top
-			if (lastScrollHeight.current && chats.length > 0) {
-				const newScrollHeight = container.scrollHeight;
-				const scrollDifference = newScrollHeight - lastScrollHeight.current;
+		const container = chatContainerRef.current;
+		const newScrollHeight = container.scrollHeight;
 
-				// Adjust only if user was near the top when older messages loaded
-				if (scrollDifference > 0 && container.scrollTop < 50) {
-					container.scrollTop += scrollDifference;
-				}
+		if (isProgrammaticScroll.current) {
+			isProgrammaticScroll.current = false;
+			return;
+		}
+
+		if (lastScrollHeight.current && chats.length > 0) {
+			const scrollDifference = newScrollHeight - lastScrollHeight.current;
+
+			// Adjust scroll position only if new messages are added at the top
+			if (scrollDifference > 0 && container.scrollTop < 50) {
+				isProgrammaticScroll.current = true;
+				container.scrollTop += scrollDifference;
 			}
-
-			// Always store the current scroll height after updates
-			lastScrollHeight.current = container.scrollHeight;
 		}
-	}, [chats]);
 
-	// Auto-scroll only if the user is already at the bottom and not scrolling
-	React.useEffect(() => {
-		if (chatContainerRef.current && isAtBottom) {
-			chatContainerRef.current.scrollTop =
-				chatContainerRef.current.scrollHeight;
+		// Scroll to bottom if the user is already at the bottom
+		if (isAtBottom) {
+			isProgrammaticScroll.current = true;
+			requestAnimationFrame(() => {
+				container.scrollTop = newScrollHeight;
+			});
 		}
+
+		lastScrollHeight.current = newScrollHeight;
 	}, [chats, isAtBottom]);
-
-	// Auto-scroll on initial load or when the user sends a message
-	React.useEffect(() => {
-		if (chatContainerRef.current && !scrolling) {
-			chatContainerRef.current.scrollTop =
-				chatContainerRef.current.scrollHeight;
-		}
-	}, [chats]);
 
 	return (
 		<TabsContent
@@ -233,29 +215,23 @@ const ChatBox = ({ videoId }: Props) => {
 				className="flex flex-col gap-y-2 px-1 scrollbar-w-1 scrollbar-thumb-rounded-full scrollbar-track-rounded-full scrollbar scrollbar-thumb-indigo-300 scrollbar-track-indigo-100 overflow-y-scroll"
 			>
 				{isFetchingNextPage && <Loader state={true} />}
-				{chats.map((chat) => {
-					console.log("chat in map", chat);
-					if (!chat.id || !chat.user.name) return;
-
-					return (
-						<Chat
-							chat={chat}
-							key={chat.id}
-							own={chat.user.id === userId}
-							onReply={handleReplyTo}
-						/>
-					);
-				})}
+				{chats.map((chat) => (
+					<Chat
+						chat={chat}
+						key={chat.id}
+						own={chat.user.id === userId}
+						onReply={handleReplyTo}
+					/>
+				))}
 			</div>
-
 			<div className="flex gap-1">
 				<div className="w-full">
 					{replyTo?.message && (
-						<div>
-							<div className="bg-gray-200 rounded-b-none rounded-md flex overflow-hidden">
-								<div className="bg-indigo-400 w-[3px] rounded-s-md rounded-b-none mr-1"></div>
-								<p className="text-xs p-1">{replyTo?.message}</p>
-							</div>
+						<div className="bg-gray-200 rounded-b-none rounded-md flex overflow-hidden max-h-[50px]">
+							<div className="bg-indigo-400 w-[3px] rounded-s-md rounded-b-none mr-1"></div>
+							<p className="text-xs p-1 overflow-hidden text-ellipsis whitespace-nowrap">
+								{replyTo?.message}
+							</p>
 						</div>
 					)}
 					<Textarea
