@@ -32,7 +32,7 @@ export const getDefaultWorkspace = (
 
 export const InitializeWorkspaceStore = ({ children }) => {
 	const { isConnected, onEvent } = useSocket(
-		"ws://api.flarecast.com/workspace" as string,
+		`${process.env.NEXT_PUBLIC_BACKEND_URL}/workspace` as string, 
 		"/collaboration/socket.io"
 	);
 
