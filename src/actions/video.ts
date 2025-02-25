@@ -43,7 +43,7 @@ export async function getMyVideos(
 			limit: 10,
 			skip: 0,
 			folderId,
-			spaceId
+			spaceId,
 		},
 	});
 }
@@ -75,4 +75,54 @@ export async function updateDescription(videoId: string, description: string) {
 	return await axiosInstance.put(`/api/video/${videoId}/update/description`, {
 		description,
 	});
+}
+
+export async function searchVideo({
+	limit = 5,
+	query,
+	workspaceId,
+}: {
+	query: string;
+	workspaceId: string;
+	limit: number;
+}) {
+	try {
+		const { data } = await axiosInstance.get(`/api/video/search`, {
+			params: {
+				query,
+				workspaceId,
+				limit,
+			},
+		});
+
+		return data?.results || [];
+	} catch (e) {
+		console.error(e);
+		return [];
+	}
+}
+
+export async function suggestVideo({
+	query,
+	workspaceId,
+	limit = 1,
+}: {
+	query: string;
+	workspaceId: string;
+	limit: number;
+}) {
+	try {
+		const { data } = await axiosInstance.get(`/api/video/search/autocomplete`, {
+			params: {
+				query,
+				workspaceId,
+				limit,
+			},
+		});
+
+		return data?.results || [];
+	} catch (e) {
+		console.error(e);
+		return [];
+	}
 }

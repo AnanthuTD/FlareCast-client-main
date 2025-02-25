@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import * as React from "react";
 import { ModeToggle } from "../ModeToggle";
@@ -11,8 +11,11 @@ import {
 	History,
 	House,
 	Library,
+	SearchIcon,
 	Settings,
 } from "lucide-react";
+import { VideoSearchUI } from "../global/video-search";
+import { useWorkspaceStore } from "@/providers/WorkspaceStoreProvider";
 
 const workspaces = [
 	/* {
@@ -26,6 +29,9 @@ const workspaces = [
 export const UserLayout: React.FC<{ children: React.ReactNode }> = ({
 	children,
 }) => {
+	const activeWorkspaceId = useWorkspaceStore(
+		(state) => state.selectedWorkspace.id
+	);
 	const { count: notificationCount } = useNotificationCount(0); // Fetch notification count with polling every 5 sec
 
 	// Dynamically update sidebar items with the latest notification count
@@ -73,36 +79,22 @@ export const UserLayout: React.FC<{ children: React.ReactNode }> = ({
 	);
 
 	return (
-		<div className="flex overflow-hidden flex-col bg-white">
+		<div className="flex flex-col bg-white">
 			<div className="flex flex-wrap items-start w-full max-md:max-w-full">
 				{/* sidebar */}
 				<Sidebar
-					workspaces={workspaces}
+					workspaces={[]}
 					sidebarItems={sidebarItems}
-					activeWorkspaceId=""
+					activeWorkspaceId={activeWorkspaceId}
 				/>
 
 				<main className="flex flex-col flex-1 shrink bg-white basis-0 min-w-[240px] max-md:max-w-full">
-					<header className="flex overflow-hidden gap-10 justify-between items-center px-4 py-3.5 w-full max-md:max-w-full">
+					<header className="flex gap-10 justify-between items-center px-4 py-3.5 w-full max-md:max-w-full">
 						<form className="flex flex-wrap gap-5 self-stretch px-11 py-4 my-auto tracking-normal min-w-[240px] w-[1120px] max-md:px-5 max-md:max-w-full">
-							<div className="flex overflow-hidden flex-auto gap-2 px-3 py-1.5 text-sm leading-relaxed bg-white rounded-2xl text-neutral-800">
-								<img
-									loading="lazy"
-									src="https://cdn.builder.io/api/v1/image/assets/TEMP/f2d9385bb5df7f5aadb776322cbe0dde2f790cab694baf7fe9fdf4cc49364436?placeholderIfAbsent=true&apiKey=c5dccb8c30704e8b9e01b46fd4eecdec"
-									className="object-contain shrink-0 w-6 aspect-square"
-									alt="Search icon"
-								/>
-								<label htmlFor="search" className="sr-only">
-									Search
-								</label>
-								<input
-									id="search"
-									type="search"
-									className="flex-auto my-auto max-md:max-w-full border-none bg-transparent focus:outline-none"
-									placeholder="Search for people, tags, folders, Spaces, and Looms"
-								/>
+							<div className="grow">
+								<VideoSearchUI workspaceId={activeWorkspaceId} />
 							</div>
-							<div className="flex gap-2.5 text-sm text-center">
+							<div className="flex gap-2.5 text-sm text-center items-center">
 								<div className="grow my-auto leading-loose text-gray-500">
 									1/25 videos
 								</div>
