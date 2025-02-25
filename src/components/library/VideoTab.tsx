@@ -14,7 +14,13 @@ interface NewVideo extends Video {
 	event: string;
 }
 
-function VideoTab({ folderId, spaceId }: { folderId?: string, spaceId?: string}) {
+function VideoTab({
+	folderId,
+	spaceId,
+}: {
+	folderId?: string;
+	spaceId?: string;
+}) {
 	const [videos, setVideos] = useState<Video[]>([]);
 	const router = useRouter();
 	const selectedWorkspace = useWorkspaceStore(
@@ -36,11 +42,11 @@ function VideoTab({ folderId, spaceId }: { folderId?: string, spaceId?: string})
 			setMessages([]);
 
 			// If transcoding is done, remove it from pending list and refetch
-			if (newMessage.transcodeStatus !== 'PENDING') {
+			if (newMessage.transcodeStatus !== "PENDING") {
 				console.log("Video transcoded successfully");
 				setNewVideoStatus((prev) => {
 					const data = prev.filter((m) => m.id !== newMessage.id);
-					console.log("update video: ", data)
+					console.log("update video: ", data);
 					return data;
 				});
 				setRefetch((prev) => !prev);
@@ -65,12 +71,16 @@ function VideoTab({ folderId, spaceId }: { folderId?: string, spaceId?: string})
 	// Fetch existing videos
 	useEffect(() => {
 		async function fetchVideos() {
-			const response = await getMyVideos(selectedWorkspace.id, folderId, spaceId);
+			const response = await getMyVideos(
+				selectedWorkspace.id,
+				folderId,
+				spaceId
+			);
 			const { videos } = response.data;
 			setVideos(videos);
 		}
 		fetchVideos();
-	}, [folderId, selectedWorkspace.id, refetch]);
+	}, [folderId, selectedWorkspace.id, refetch, spaceId]);
 
 	const handleOnClick = (videoId: string) => {
 		router.push("/video/" + videoId);
