@@ -20,7 +20,7 @@ export const VideoLibraryTabs: React.FC<{
 
 			<TabsContent value="video">
 				<div className="flex flex-col gap-4">
-					<div className="text-lg font-medium tracking-tight leading-loose text-neutral-800">
+					<div className="text-xl font-bold tracking-tight leading-loose text-neutral-800">
 						Videos
 					</div>
 					<VideoTab folderId={folderId} spaceId={selectedSpaceId} />
@@ -28,14 +28,14 @@ export const VideoLibraryTabs: React.FC<{
 			</TabsContent>
 
 			<TabsContent value="archive">
-				<div className="text-lg font-medium tracking-tight leading-loose text-neutral-800">
+				<div className="text-xl font-bold tracking-tight leading-loose text-neutral-800">
 					Archive
 				</div>
 				<ArchiveTab />
 			</TabsContent>
 
 			<TabsContent value="screenshot">
-				<div className="text-lg font-medium tracking-tight leading-loose text-neutral-800">
+				<div className="text-xl font-bold tracking-tight leading-loose text-neutral-800">
 					Screenshots
 				</div>
 				<ScreenshotTab />

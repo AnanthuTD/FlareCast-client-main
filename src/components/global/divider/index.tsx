@@ -1,11 +1,11 @@
 import React from "react";
 
 function Divider({
-	children,
-	onClick,
+	children = <></>,
+	onClick = () => {},
 }: {
-	children: React.ReactNode;
-	onClick: () => void;
+	children?: React.ReactNode;
+	onClick?: () => void;
 }) {
 	return (
 		<div

@@ -39,7 +39,10 @@ export function CreateSpace() {
 		debounce(async (query: string) => {
 			if (query.length < 2) return;
 			try {
-				const results = await searchMembers(activeWorkspaceId, query);
+				const results = await searchMembers({
+					workspaceId: activeWorkspaceId,
+					query,
+				});
 				setSearchResults(results);
 			} catch (error) {
 				console.error("Error fetching members", error);

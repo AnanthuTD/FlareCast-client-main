@@ -81,13 +81,22 @@ export const renameWorkspace = async (workspaceId: string, name: string) => {
 	);
 };
 
-export const searchMembers = async (workspaceId: string, query = "") => {
+export const searchMembers = async ({
+	workspaceId,
+	query = "",
+	spaceId,
+}: {
+	workspaceId: string;
+	query: string;
+	spaceId?: string;
+}) => {
 	try {
 		const res = await axiosInstance.get(
 			`/api/collaboration/workspace/${workspaceId}/search`,
 			{
 				params: {
 					q: query,
+					spaceId,
 				},
 			}
 		);

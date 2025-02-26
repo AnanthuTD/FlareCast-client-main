@@ -9,6 +9,8 @@ import { useQueryData } from "@/hooks/useQueryData";
 import FolderPredecessors from "@/components/library/bread-crumb";
 import { useSocket } from "@/hooks/useSocket";
 import { SocketEvents } from "@/lib/socket/socketEvents";
+import Divider from "../divider";
+import AddMembers from "../add-member";
 
 interface VideoLibraryProps {
 	spaceId: string;
@@ -61,11 +63,22 @@ export const VideoLibrary: React.FC<VideoLibraryProps> = ({
 		<div className="flex flex-col px-10 py-6 max-md:px-5 w-full">
 			<LibraryHeader title={title} spaceId={spaceId} folderId={folderId} />
 
+			<div className="flex my-4 mt-10 justify-between text-sm">
+				<div>{spaceId && <AddMembers spaceId={spaceId} />}</div>
+				<div>
+					<p className="text-slate-500">{"2"} video</p>
+				</div>
+			</div>
+
+			<Divider />
+
 			{/* Optional FolderPredecessors if needed */}
 			<FolderPredecessors folderId={folderId} />
 
-			<div className="flex flex-col mt-8 w-full tracking-normal text-gray-500 max-md:max-w-full">
+			<div className="flex flex-col mt-8 w-full tracking-normal max-md:max-w-full">
 				{/* Folder List */}
+
+				<h2 className="text-xl font-bold">Folders</h2>
 
 				<FolderList folders={folders as Folder[]} />
 			</div>
