@@ -106,10 +106,12 @@ export async function suggestVideo({
 	query,
 	workspaceId,
 	limit = 1,
+	paginationToken = "",
 }: {
 	query: string;
 	workspaceId: string;
 	limit: number;
+	paginationToken?: string;
 }) {
 	try {
 		const { data } = await axiosInstance.get(`/api/video/search/autocomplete`, {
@@ -117,12 +119,59 @@ export async function suggestVideo({
 				query,
 				workspaceId,
 				limit,
+				paginationToken,
 			},
 		});
 
-		return data?.results || [];
+		return (
+			data || {
+				results: [],
+				paginationToken: "",
+			}
+		);
 	} catch (e) {
 		console.error(e);
-		return [];
+		return {
+			results: [],
+			paginationToken: "",
+		};
+	}
+}
+
+export async function suggestFolders({
+	query,
+	workspaceId,
+	limit = 1,
+	paginationToken = "",
+}: {
+	query: string;
+	workspaceId: string;
+	limit: number;
+	paginationToken?: string;
+}) {
+	try {
+		const { data } = await axiosInstance.get(
+			`/api/collaboration/folder/${workspaceId}/search`,
+			{
+				params: {
+					query,
+					limit,
+					paginationToken,
+				},
+			}
+		);
+
+		return (
+			data || {
+				results: [],
+				paginationToken: "",
+			}
+		);
+	} catch (e) {
+		console.error(e);
+		return {
+			results: [],
+			paginationToken: "",
+		};
 	}
 }
