@@ -60,7 +60,7 @@ export const UserLayout: React.FC<{ children: React.ReactNode }> = ({
 				icon: <Bookmark />,
 				label: "Watch Later",
 				notificationCount: 1,
-				link: "/watchLater",
+				link: "/watchlater",
 			},
 			{
 				icon: <History />,

@@ -12,8 +12,16 @@ import {
 	getPreviewVideo,
 	updateTitle,
 	updateDescription,
+	removeWatchLaterVideo,
+	addWatchLaterVideo,
 } from "@/actions/video";
-import { Pencil } from "lucide-react";
+import {
+	Bookmark,
+	BookmarkCheck,
+	BookmarkCheckIcon,
+	BookmarkIcon,
+	Pencil,
+} from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -112,7 +120,11 @@ const VideoPreview = ({ videoId }: Props) => {
 		}
 	};
 
-	return (
+	return !video ? (
+		<div>
+			<p>Loading video...</p>
+		</div>
+	) : (
 		<div className="grid grid-cols-1 xl:grid-cols-3 gap-5 w-full">
 			<div className="flex flex-col lg:col-span-2 gap-y-6">
 				<Card>
@@ -145,6 +157,47 @@ const VideoPreview = ({ videoId }: Props) => {
 							posterUrl={`/gcs/${videoId}/thumbnails/thumb00001.jpg`}
 							videoId={videoId}
 						/>
+					</CardContent>
+				</Card>
+
+				<Card>
+					<CardContent className="flex items-center py-2 justify-end">
+						{video?.watchLater && video.watchLater.id ? (
+							<BookmarkCheckIcon
+								onClick={async () => {
+									const watchLater = video.watchLater;
+
+									setVideo((prev) => ({
+										...prev,
+										watchLater: null,
+									}));
+
+									const { success } = await removeWatchLaterVideo({
+										videoId: video.id,
+										workspaceId: video.workspaceId,
+									});
+
+									setVideo((prev) => ({
+										...prev,
+										watchLater: success ? null : watchLater,
+									}));
+								}}
+							/>
+						) : (
+							<BookmarkIcon
+								onClick={async () => {
+									setVideo((prev) => ({
+										...prev,
+										watchLater: { id: "temp-id" },
+									}));
+									const { watchLater } = await addWatchLaterVideo({
+										videoId: video.id,
+										workspaceId: video.workspaceId,
+									});
+									setVideo((prev) => ({ ...prev, watchLater }));
+								}}
+							/>
+						)}
 					</CardContent>
 				</Card>
 

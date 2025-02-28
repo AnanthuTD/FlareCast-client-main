@@ -236,6 +236,13 @@ export interface Video {
 	timeAgo: string;
 	thumbnailUrl: string;
 	userAvatarUrl: string;
+
+	User?: {
+		fullName?: string | null;
+		image?: string | null;
+	};
+
+	watchLater: { id: string } | null;
 }
 
 type VideoStatus = "SUCCESS" | "FAILED" | "PENDING";

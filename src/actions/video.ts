@@ -175,3 +175,130 @@ export async function suggestFolders({
 		};
 	}
 }
+
+export interface WatchLater {
+	videoIds: string[]; // Changed from 'videos: string' to match controller response
+	count: number;
+	total: number;
+	page: number;
+	pageSize: number;
+	totalPages: number;
+	hasNext: boolean;
+	hasPrev: boolean;
+}
+
+// Get watch later videos with pagination
+interface Video {
+	id: string;
+	thumbnailUrl: string;
+	views: number;
+	uniqueViews: number;
+	comments: number;
+	duration: string;
+	shares: number;
+	userName: string;
+	timeAgo: string;
+	userAvatarUrl: string | null;
+	createdAt: string;
+	User?: {
+		fullName?: string | null;
+		image?: string | null;
+	};
+	// Add other video fields as needed
+}
+
+// Updated WatchLater interface to match backend response
+export interface WatchLater {
+	videos: Video[];
+	totalCount: number;
+	page: number;
+	pageSize: number;
+	totalPages: number;
+	hasNext: boolean;
+	hasPrev: boolean;
+}
+
+// Fetch watch later videos with pagination
+export async function getWatchLaterVideos({
+	limit,
+	page,
+	workspaceId,
+}: {
+	workspaceId: string;
+	page: number;
+	limit: number;
+}): Promise<Video[]> {
+	try {
+		const { data } = await axiosInstance.get<WatchLater>(
+			"/api/video/watch-later",
+			{
+				params: {
+					limit,
+					page,
+					workspaceId,
+				},
+			}
+		);
+
+		return data.videos || []; // Return enriched video array, fallback to empty array
+	} catch (e) {
+		console.error("Failed to fetch watch later videos:", e);
+		return [];
+	}
+}
+
+// Add a video to watch later
+export async function addWatchLaterVideo({
+	videoId,
+	workspaceId,
+}: {
+	videoId: string;
+	workspaceId: string;
+}) {
+	try {
+		const { data } = await axiosInstance.post<{
+			message: string;
+			watchLater: { id: string };
+		}>(
+			"/api/video/watch-later",
+			{ videoId },
+			{ params: { workspaceId } } // Pass workspaceId as query param if required by your API
+		);
+
+		return {
+			success: true,
+			message: data.message,
+			watchLater: data.watchLater,
+		};
+	} catch (e) {
+		console.error("Failed to add video to watch later:", e);
+		return { success: false, message: "Failed to add video to watch later" };
+	}
+}
+
+// Remove a video from watch later
+export async function removeWatchLaterVideo({
+	videoId,
+	workspaceId,
+}: {
+	videoId: string;
+	workspaceId: string;
+}) {
+	try {
+		const { data } = await axiosInstance.delete<{
+			message: string;
+			watchLater: null;
+		}>(
+			`/api/video/${videoId}/watch-later`,
+			{ params: { workspaceId } } // Pass workspaceId as query param if required by your API
+		);
+
+		return { success: true, message: data.message };
+	} catch (e) {
+		console.error("Failed to remove video from watch later:", e);
+		return {
+			success: false,
+			message: "Failed to remove video from watch later",
+		};
+	}
+}
