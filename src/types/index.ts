@@ -266,3 +266,38 @@ export interface IChatFlat {
 	repliedTo: IChatFlat | null;
 	videoId?: string;
 }
+
+export interface SubscriptionPlan {
+	planId: string;
+	name: string;
+	price: number;
+	interval: number;
+	period: string;
+	description?: string;
+	videoPerMonth: number;
+	duration: number;
+	workspace: number;
+	aiFeature: boolean;
+	active: boolean;
+}
+
+export interface SubscriptionData {
+	status: string;
+	shortUrl: string;
+	subscriptionType: string;
+	amount: number;
+}
+
+export interface ActivePlan extends SubscriptionPlan {
+	startDate: Date;
+	endDate: Date;
+	chargeAt: Date;
+	remainingCount: number;
+	totalCount: number;
+	cancelledAt?: Date | null;
+	amount: number;
+	shortUrl: string;
+	status: string;
+	currentEnd: Date;
+	currentStart: Date;
+}

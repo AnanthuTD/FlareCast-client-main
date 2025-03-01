@@ -1,52 +1,121 @@
-import * as React from 'react';
-import { PricingPlanProps } from '../../types';
+"use client";
 
-export const PricingPlan: React.FC<PricingPlanProps> = ({
-  name,
-  price,
-  features,
-  icon
-}) => {
-  return (
-    <div className="flex flex-col flex-1 shrink justify-between p-8 border border-black border-solid basis-0 min-w-[240px] max-md:px-5">
-      <div className="flex flex-col w-full text-black">
-        <div className="flex flex-col items-end w-full font-bold">
-          <img
-            loading="lazy"
-            src={icon}
-            alt={`${name} plan icon`}
-            className="object-contain w-12 aspect-square"
-          />
-          <div className="flex flex-col mt-4 max-w-full w-[352px]">
-            <div className="text-xl leading-snug">{name}</div>
-            <div className="mt-2 text-6xl leading-tight max-md:text-4xl">
-              {price}
-            </div>
-          </div>
-        </div>
-        <div className="mt-8 w-full border border-black border-solid min-h-[1px]" />
-        <div className="flex flex-col mt-8 w-full text-base">
-          <div>Includes:</div>
-          <div className="flex flex-col py-2 mt-4 w-full">
-            {features.map((feature, index) => (
-              <div key={index} className="flex gap-4 items-start mt-4 first:mt-0 w-full">
-                <img
-                  loading="lazy"
-                  src="https://cdn.builder.io/api/v1/image/assets/TEMP/201470adac0e69cd5685bdcdebfd8125374c196f3e7c85aefdf7acf955c4ad47?placeholderIfAbsent=true&apiKey=c5dccb8c30704e8b9e01b46fd4eecdec"
-                  alt=""
-                  className="object-contain shrink-0 w-6 aspect-square"
-                />
-                <div>{feature}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-      <div className="flex flex-col mt-10 w-full text-base text-white">
-        <button className="gap-2 self-stretch px-6 py-3 w-full bg-black border border-black border-solid max-md:px-5">
-          Get started
-        </button>
-      </div>
-    </div>
-  );
+import * as React from "react";
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+	Card,
+	CardContent,
+	CardFooter,
+	CardHeader,
+	CardTitle,
+} from "@/components/ui/card";
+import { Check } from "lucide-react";
+import { getSubscriptionPlans } from "@/actions/subscriptions";
+import { SubscriptionPlan } from "@/types";
+
+const PricingPlan: React.FC = () => {
+	const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState<string | null>(null);
+
+	useEffect(() => {
+		const fetchPlans = async () => {
+			try {
+				const { plans } = await getSubscriptionPlans();
+				setPlans(plans);
+				setLoading(false);
+			} catch (err) {
+				setError(err?.message);
+				setLoading(false);
+			}
+		};
+		fetchPlans();
+	}, []);
+
+	if (loading) {
+		return (
+			<div className="flex items-center justify-center min-h-[400px]">
+				<div className="text-indigo-400 animate-pulse">Loading plans...</div>
+			</div>
+		);
+	}
+
+	if (error) {
+		return (
+			<div className="flex items-center justify-center min-h-[400px] text-red-500">
+				{error}
+			</div>
+		);
+	}
+
+	return (
+		<div className="w-full px-4 py-8 bg-white">
+			<h2 className="text-3xl font-bold text-center text-indigo-400 mb-8">
+				Choose Your Subscription Plan
+			</h2>
+			<div className="flex gap-6 overflow-x-auto snap-x snap-mandatory pb-4 lg:flex-wrap lg:overflow-x-visible lg:justify-center">
+				{plans.map((plan) => (
+					<Card
+						key={plan.planId}
+						className={`flex flex-col min-w-[300px] max-w-[350px] snap-center border-indigo-400 ${
+							plan.active ? "border-2 shadow-lg" : "border"
+						} bg-white text-gray-800 hover:shadow-xl transition-shadow duration-300`}
+					>
+						<CardHeader>
+							<CardTitle className="text-2xl font-semibold text-indigo-400">
+								{plan.name}
+							</CardTitle>
+							<div className="text-4xl font-bold mt-2">
+								${plan.price}
+								<span className="text-base font-normal text-gray-600">
+									/{plan.period}
+								</span>
+							</div>
+							{plan.description && (
+								<p className="text-sm text-gray-500 mt-2">{plan.description}</p>
+							)}
+						</CardHeader>
+						<CardContent className="flex-1">
+							<ul className="space-y-3">
+								<li className="flex items-center gap-2">
+									<Check className="h-5 w-5 text-indigo-400" />
+									<span>{plan.videoPerMonth} videos/month</span>
+								</li>
+								<li className="flex items-center gap-2">
+									<Check className="h-5 w-5 text-indigo-400" />
+									<span>{plan.duration} months duration</span>
+								</li>
+								<li className="flex items-center gap-2">
+									<Check className="h-5 w-5 text-indigo-400" />
+									<span>{plan.workspace} workspace(s)</span>
+								</li>
+								<li className="flex items-center gap-2">
+									<Check className="h-5 w-5 text-indigo-400" />
+									<span>
+										{plan.aiFeature ? "AI Features Included" : "Basic Features"}
+									</span>
+								</li>
+							</ul>
+						</CardContent>
+						<CardFooter>
+							<Button
+								className={`w-full ${
+									plan.active
+										? "bg-indigo-400 hover:bg-indigo-500"
+										: "bg-white text-indigo-400 border-indigo-400 border-2 hover:bg-indigo-100"
+								}`}
+								variant={plan.active ? "default" : "outline"}
+								disabled={plan.active}
+							>
+								{plan.active ? "Current Plan" : "Get Started"}
+							</Button>
+						</CardFooter>
+					</Card>
+				))}
+			</div>
+		</div>
+	);
 };
+
+export default PricingPlan;

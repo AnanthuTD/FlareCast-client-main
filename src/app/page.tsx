@@ -1,47 +1,11 @@
 import * as React from "react";
-import { PricingPlan } from "@/components/landingPage/PricingPlan";
+import PricingPlan from "@/components/landingPage/PricingPlan";
 import { FeatureCard } from "@/components/landingPage/FeatureCard";
 import { HeroSection } from "@/components/landingPage/HeroSection";
 import { Header } from "@/components/landingPage/Header";
 import { Footer } from "@/components/landingPage/Footer";
 import { Contact } from "@/components/landingPage/Contact";
 import Testimonial from "@/components/landingPage/testimonial";
-
-const pricingPlans = [
-	{
-		name: "Basic Plan",
-		price: "$19/mo",
-		features: [
-			"Real-time video recording",
-			"Instant video sharing",
-			"AI-powered transcription",
-		],
-		icon: "https://cdn.builder.io/api/v1/image/assets/TEMP/fa6119d5f81204fe6d3516d96540d57df07aacd17aae3a163ee6969b8454b114?placeholderIfAbsent=true&apiKey=c5dccb8c30704e8b9e01b46fd4eecdec",
-	},
-	{
-		name: "Business Plan",
-		price: "$29/mo",
-		features: [
-			"Customizable video settings",
-			"Cloud video storage",
-			"AI-generated titles",
-			"Team collaboration workspaces",
-		],
-		icon: "https://cdn.builder.io/api/v1/image/assets/TEMP/fa6119d5f81204fe6d3516d96540d57df07aacd17aae3a163ee6969b8454b114?placeholderIfAbsent=true&apiKey=c5dccb8c30704e8b9e01b46fd4eecdec",
-	},
-	{
-		name: "Enterprise Plan",
-		price: "$49/mo",
-		features: [
-			"Advanced analytics features",
-			"Priority customer support",
-			"Unlimited video storage",
-			"Enhanced security options",
-			"Dedicated account manager",
-		],
-		icon: "https://cdn.builder.io/api/v1/image/assets/TEMP/fa6119d5f81204fe6d3516d96540d57df07aacd17aae3a163ee6969b8454b114?placeholderIfAbsent=true&apiKey=c5dccb8c30704e8b9e01b46fd4eecdec",
-	},
-];
 
 const features = [
 	{
@@ -70,7 +34,7 @@ const features = [
 
 function page() {
 	return (
-		<div className="flex overflow-hidden flex-col">
+		<div className="flex flex-col overflow-auto h-full">
 			<Header />
 			<HeroSection />
 			<main>
@@ -99,9 +63,7 @@ function page() {
 				{/* Pricing Section */}
 				<section className="flex overflow-hidden flex-col px-16 py-28 w-full bg-white max-md:px-5 max-md:py-24 max-md:max-w-full">
 					<div className="flex flex-wrap gap-8 mt-12 w-full min-h-[583px] max-md:mt-10 max-md:max-w-full">
-						{pricingPlans.map((plan, index) => (
-							<PricingPlan key={index} {...plan} />
-						))}
+						<PricingPlan />
 					</div>
 				</section>
 
@@ -113,8 +75,7 @@ function page() {
 				</section>
 			</main>
 
-			<Footer
-			/>
+			<Footer />
 		</div>
 	);
 }
