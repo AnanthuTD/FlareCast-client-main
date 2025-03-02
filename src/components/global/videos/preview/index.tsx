@@ -237,17 +237,13 @@ const VideoPreview = ({ videoId }: Props) => {
 					defaultValue="AI Tool"
 					triggers={["AI Tool", "Transcript", "Activity", "asd"]}
 				>
-					{video.id && <AiTools videoId={video.id} trial={true} plan={"PRO"} />}
+					{video.id && <AiTools videoId={video.id} trial={false} plan={"PRO"} />}
 
 					<VideoTranscript
 						transcript={video?.transcription || "Transcript not available"}
 					/>
 
 					{video?.id && <ChatBox videoId={video.id} />}
-
-					<TabsContent value="asd">
-asdasdf
-					</TabsContent>
 				</TabMenu>
 			</div>
 		</div>

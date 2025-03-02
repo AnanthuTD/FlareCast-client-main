@@ -21,86 +21,71 @@ type Props = {
 };
 
 const AiTools = ({ plan, trial, videoId }: Props) => {
-	//Are they on a free plan?
-	//have they already tried the AI feature?
-	//if not? Try button
-
-	// useMutationData
-	//serveraction titles and description
-
-	//WIP: setup the ai hook
 	return (
-		<TabsContent value="AI Tool"  >
+		<TabsContent value="AI Tool">
 			{trial || plan === "PRO" ? (
 				<AiChatBox videoId={videoId} />
-        // <></>
 			) : (
-				<div className="p-5 bg-[#1D1D1D]  rounded-xl flex flex-col gap-y-6 ">
+				<div className="p-5 bg-white rounded-xl flex flex-col gap-y-6">
 					<div className="flex items-center gap-4">
 						<div className="w-full">
-							<h2 className="text-3xl font-bold"> Ai Tools</h2>
-							<p className="text-[#BDBDBD] ">
+							<h2 className="text-3xl font-bold text-gray-900">AI Tools</h2>
+							<p className="text-gray-600">
 								Taking your video to the next step with the power of AI!
 							</p>
 						</div>
 
 						<div className="flex gap-4 w-full justify-end">
-							<Button className=" mt-2 text-sm">
-								<Loader state={false} color="#000">
-									Try now
+							<Button className="mt-2 text-sm bg-indigo-400 text-white hover:bg-indigo-500">
+								<Loader state={false} color="#FFFFFF">
+									Try Now
 								</Loader>
 							</Button>
-							{/* WIP: Pay button  */}
-							<Button className="mt-2 text-sm" variant={"secondary"}>
-								<Loader state={false} color="#000">
+							<Button
+								className="mt-2 text-sm bg-white text-indigo-400 border border-indigo-400 hover:bg-indigo-50"
+								variant="secondary"
+							>
+								<Loader state={false} color="#818CF8">
 									Pay Now
 								</Loader>
 							</Button>
-							{/* <Button className=" mt-2 text-sm">
-            <Loader
-              state={false}
-              color="#000"
-            >
-              Generate Now
-            </Loader>
-          </Button> */}
 						</div>
 					</div>
-					<div className=" border-[1px] rounded-xl p-4 gap-4 flex flex-col bg-[#1b0f1b7f] ">
+					<div className="border-[1px] border-indigo-200 rounded-xl p-4 gap-4 flex flex-col bg-indigo-50">
 						<div className="flex items-center gap-2">
-							<h2 className="text-2xl font-bold text-[#a22fe0]"> Opal Ai</h2>
-							<StarsIcon color="#a22fe0" fill="#a22fe0" />
+							<h2 className="text-2xl font-bold text-indigo-400">Opal AI</h2>
+							<StarsIcon color="#818CF8" fill="#818CF8" />
 						</div>
 						<div className="flex gap-2 items-start">
-							<div className="p-2 rounded-full border-[#2d2d2d] border-[2px] bg-[#2b2b2b] ">
-								<Pencil color="#a22fe0" />
+							<div className="p-2 rounded-full border-indigo-300 border-[2px] bg-white">
+								<Pencil color="#818CF8" />
 							</div>
 							<div className="flex flex-col">
-								<h3 className="textmdg">Summary</h3>
-								<p className="text-muted-foreground text-sm">
+								<h3 className="text-md text-gray-900">Summary</h3>
+								<p className="text-gray-500 text-sm">
 									Generate a description for your video using AI.
 								</p>
 							</div>
 						</div>
 						<div className="flex gap-2 items-start">
-							<div className="p-2 rounded-full border-[#2d2d2d] border-[2px] bg-[#2b2b2b] ">
-								<FileTextIcon color="#a22fe0" />
+							<div className="p-2 rounded-full border-indigo-300 border-[2px] bg-white">
+								<FileTextIcon color="#818CF8" />
 							</div>
 							<div className="flex flex-col">
-								<h3 className="textmdg">Summary</h3>
-								<p className="text-muted-foreground text-sm">
+								<h3 className="text-md text-gray-900">Summary</h3>
+								<p className="text-gray-500 text-sm">
 									Generate a description for your video using AI.
 								</p>
 							</div>
 						</div>
 						<div className="flex gap-2 items-start">
-							<div className="p-2 rounded-full border-[#2d2d2d] border-[2px] bg-[#2b2b2b] ">
-								<Bot color="#a22fe0" />
+							<div className="p-2 rounded-full border-indigo-300 border-[2px] bg-white">
+								<Bot color="#818CF8" />
 							</div>
 							<div className="flex flex-col">
-								<h3 className="text-md">AI Agent</h3>
-								<p className="text-muted-foreground text-sm">
-									Viewers can ask questions on your video and our ai agent will
+								<h3 className="text-md text-gray-900">AI Agent</h3>
+								<p className="text-gray-500 text-sm">
+									Viewers can ask questions on your video and our AI agent will
 									respond.
 								</p>
 							</div>
