@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { Range, getTrackBackground } from "react-range";
 import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { fetchFile, toBlobURL } from "@ffmpeg/util";
@@ -7,6 +7,12 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Video } from "@/types";
 import Player from "./player";
+import {
+	Card,
+	CardHeader,
+	CardContent,
+	CardFooter,
+} from "@/components/ui/card";
 
 type Props = {
 	videoId: string;
@@ -14,28 +20,18 @@ type Props = {
 
 const VideoEditor = ({ videoId }: Props) => {
 	const [video, setVideo] = useState<Video | null>(null);
-	const [ffmpeg, setFfmpeg] = useState<FFmpeg | null>(null);
+	const [ffmpeg, setFmpeg] = useState<FFmpeg | null>(null);
 	const [videoSrc, setVideoSrc] = useState<string>("");
 	const [trimmedSrc, setTrimmedSrc] = useState<string>("");
-	const [cutPoints, setCutPoints] = useState<number[]>([]); // Points where to cut (sorted)
+	const [cutPoints, setCutPoints] = useState<number[]>([]); // Cumulative cut points (sorted)
+	const [currentCutPoints, setCurrentCutPoints] = useState<number[]>([]); // Temporary points for current cut
 	const [videoDuration, setVideoDuration] = useState<number>(1);
 	const [loading, setLoading] = useState<boolean>(false);
-
-	// Fetch video metadata (optional, if you want title/description)
-	const fetchVideo = useCallback(async () => {
-		try {
-			const response = await fetch(`/api/video/${videoId}`);
-			const data = await response.json();
-			setVideo(data.video);
-		} catch (error) {
-			console.error("Failed to fetch video details:", error);
-			toast.error("Failed to load video details");
-		}
-	}, [videoId]);
+	const [previewTime, setPreviewTime] = useState<number>(0); // For real-time preview
 
 	// Load FFmpeg
 	useEffect(() => {
-		const loadFfmpeg = async () => {
+		const loadFmpeg = async () => {
 			const ffmpegInstance = new FFmpeg();
 			await ffmpegInstance.load({
 				coreURL: await toBlobURL(
@@ -47,9 +43,9 @@ const VideoEditor = ({ videoId }: Props) => {
 					"application/wasm"
 				),
 			});
-			setFfmpeg(ffmpegInstance);
+			setFmpeg(ffmpegInstance);
 		};
-		loadFfmpeg();
+		loadFmpeg();
 	}, []);
 
 	// Set video source and get duration
@@ -69,8 +65,9 @@ const VideoEditor = ({ videoId }: Props) => {
 				const videoElement = document.createElement("video");
 				videoElement.src = webmUrl;
 				videoElement.onloadedmetadata = () => {
-					setVideoDuration(14);
-					setCutPoints([]); // Reset cut points
+					setVideoDuration(14); // Hardcoded for now, update to dynamic
+					setCutPoints([]); // Reset cumulative cut points
+					setCurrentCutPoints([]); // Reset current cut points
 				};
 			} catch (error) {
 				console.error("Failed to fetch video:", error);
@@ -79,23 +76,72 @@ const VideoEditor = ({ videoId }: Props) => {
 		};
 		checkFileSizeAndFetch();
 	}, [videoId]);
-
-	// Add a cut point where the user clicks on the track
 	const addCutPoint = (value: number) => {
-		const newPoints = [...cutPoints, value].sort((a, b) => a - b);
-		setCutPoints(
+		if (currentCutPoints.length >= 2) {
+			toast.error("Maximum 2 points per cut operation allowed");
+			return;
+		}
+		const newPoints = [...currentCutPoints, value].sort((a, b) => a - b);
+		setCurrentCutPoints(
 			newPoints.filter(
-				(point, index, self) => index === self.findIndex((p) => p === point) // Remove duplicates
+				(point, i, self) => i === self.findIndex((p) => p === point) // Remove duplicates
 			)
 		);
 	};
 
-	// Remove a cut point
-	const removeCutPoint = (index: number) => {
-		setCutPoints(cutPoints.filter((_, i) => i !== index));
+	const finalizeCut = () => {
+		if (currentCutPoints.length !== 2) {
+			toast.error("Please select exactly 2 points to cut");
+			return;
+		}
+
+		// Check if the new cut overlaps with any existing discarded portions
+		const newRange = { start: currentCutPoints[0], end: currentCutPoints[1] };
+		const existingRanges = cutPoints.reduce((acc, _, i, arr) => {
+			if (i % 2 === 0 && i < arr.length - 1) {
+				acc.push({ start: arr[i], end: arr[i + 1] });
+			}
+			return acc;
+		}, [] as { start: number; end: number }[]);
+
+		const hasOverlap = existingRanges.some(
+			(range) =>
+				(newRange.start >= range.start && newRange.start < range.end) ||
+				(newRange.end > range.start && newRange.end <= range.end) ||
+				(newRange.start <= range.start && newRange.end >= range.end)
+		);
+
+		if (hasOverlap) {
+			toast.error("This portion overlaps with an existing cut");
+			return;
+		}
+
+		const newCutPoints = [...cutPoints, ...currentCutPoints].sort(
+			(a, b) => a - b
+		);
+		setCutPoints(
+			newCutPoints.filter(
+				(point, i, self) => i === self.findIndex((p) => p === point) // Remove duplicates
+			)
+		);
+		setCurrentCutPoints([]); // Clear for next cut
 	};
 
-	// Trim and merge segments (keep portions outside cut points or between specific ones)
+	const removeCutRange = (start: number, end: number) => {
+    console.log(start, end);
+    console.log(cutPoints)
+		const sortedCuts = cutPoints.sort((a, b) => a - b);
+		const newCutPoints = sortedCuts.filter((point, i) => {
+			if (point !== start && point !== end) return true;
+		});
+		setCutPoints(newCutPoints);
+	};
+
+	const removeCutPoints = () => {
+		setCutPoints([]); 
+		setCurrentCutPoints([]);
+	};
+
 	const trimAndMergeVideo = async () => {
 		if (
 			!ffmpeg ||
@@ -112,16 +158,15 @@ const VideoEditor = ({ videoId }: Props) => {
 			const videoData = await fetchFile(videoSrc);
 			await ffmpeg.writeFile("input.webm", videoData);
 
-			// Create segments to keep, excluding the portions at cut points
+			// Create segments to keep, excluding the portions between pairs of cut points
 			const sortedCuts = cutPoints.sort((a, b) => a - b);
 			const segments = [];
 
-			// Start with the beginning of the video
+			// Keep the portion before the first cut, if any
 			if (sortedCuts[0] > 0) {
 				segments.push({ start: 0, duration: sortedCuts[0] });
 			}
 
-			// Add segments between cuts (if any)
 			for (let i = 1; i < sortedCuts.length - 1; i = i + 2) {
 				const gap = sortedCuts[i + 1] - sortedCuts[i];
 				if (gap > 0.1) {
@@ -130,7 +175,7 @@ const VideoEditor = ({ videoId }: Props) => {
 				}
 			}
 
-			// Add the end portion if there’s anything after the last cut
+			// Keep the portion after the last cut, if any
 			if (sortedCuts[sortedCuts.length - 1] < videoDuration) {
 				segments.push({
 					start: sortedCuts[sortedCuts.length - 1],
@@ -186,109 +231,217 @@ const VideoEditor = ({ videoId }: Props) => {
 		}
 	};
 
+	// Real-time preview logic
+	const handleDrag = (values: number[]) => {
+		const draggedPoint = values[0];
+		setPreviewTime(draggedPoint); // Update preview to show the dragged position
+	};
+
 	return (
-		<div className="min-h-screen bg-gray-900 text-white p-6">
-			<h1 className="text-3xl font-bold mb-6">
+		<div className="min-h-screen bg-white p-6">
+			<h1 className="text-3xl font-bold mb-6 text-indigo-900">
 				{video?.title || "Video Editor"}
 			</h1>
-			<div className="mb-6">
-				<Player
-					hslUrl={`/gcs/${videoId}/original.webm`}
-					thumbnailsUrl={`/gcs/${videoId}/thumbnails/thumbnails.vtt`}
-					posterUrl={`/gcs/${videoId}/thumbnails/thumb00001.jpg`}
-					videoId={videoId}
-					trimStart={cutPoints.length > 0 ? Math.min(...cutPoints) : 0} // Show first cut
-					trimEnd={
-						cutPoints.length > 0 ? Math.max(...cutPoints) : videoDuration
-					} // Show last cut
-				/>
-			</div>
-			<div className="bg-gray-800 p-4 rounded-lg shadow-lg">
-				<h2 className="text-xl font-semibold mb-4">Trim Video</h2>
-				<div className="mb-4">
-					<label className="block mb-2">
-						Click on the bar to add cut points:
-					</label>
-					<Range
-						values={[0]} // Dummy value, not used for cuts
-						step={0.1}
-						min={0}
-						max={videoDuration}
-						onChange={() => {}} // No-op for value changes
-						onFinalChange={() => {}} // No-op for final value
-						renderTrack={({ props, children }) => (
-							<div
-								{...props}
-								className="h-8 rounded-full cursor-pointer" // Wider bar (h-8)
-								onClick={(e) => {
-									const rect = e.currentTarget.getBoundingClientRect();
-									const clickPosition = e.clientX - rect.left;
-									const value = (clickPosition / rect.width) * videoDuration;
-									addCutPoint(value);
-								}}
-								style={{
-									background: getTrackBackground({
-										values: cutPoints,
-										colors: cutPoints.map(() => "#6366F1"), // Indigo cut points
-										min: 0,
-										max: videoDuration,
-									}),
-									position: "relative",
-								}}
-							>
-								{children}
-								{cutPoints.map((point, index) => (
-									<div
-										key={index}
-										className="absolute top-0 h-8 w-1 bg-red-500"
-										style={{
-											left: `${(point / videoDuration) * 100}%`,
-											transform: "translateX(-50%)",
-										}}
-									/>
-								))}
-							</div>
-						)}
-						renderThumb={() => null} // Hide thumbs since we use clicks
+			<Card className="mb-6 bg-white shadow-md">
+				<CardContent>
+					<Player
+						hslUrl={`/gcs/${videoId}/original.webm`}
+						thumbnailsUrl={`/gcs/${videoId}/thumbnails/thumbnails.vtt`}
+						posterUrl={`/gcs/${videoId}/thumbnails/thumb00001.jpg`}
+						videoId={videoId}
+						trimStart={
+							cutPoints.length > 0 && cutPoints.length % 2 === 0
+								? Math.min(...cutPoints.filter((_, i) => i % 2 === 0))
+								: 0
+						} // Show start of each discarded range
+						trimEnd={
+							cutPoints.length > 0 && cutPoints.length % 2 === 0
+								? Math.max(...cutPoints.filter((_, i) => i % 2 === 1))
+								: videoDuration
+						} // Show end of each discarded range
+						previewTime={previewTime} // Pass preview time for real-time update
 					/>
-					<div className="flex flex-wrap gap-2 mt-2 text-gray-300">
-						{cutPoints.map((point, index) => (
-							<span key={index} className="text-sm">
-								Cut {index + 1}: {point.toFixed(1)}s{" "}
-								<Button
-									variant="ghost"
-									size="sm"
-									onClick={() => removeCutPoint(index)}
-									className="text-red-500 hover:bg-red-900 p-1 h-auto"
+				</CardContent>
+			</Card>
+			<Card className="bg-white shadow-md">
+				<CardHeader className="flex justify-between items-center">
+					<h2 className="text-xl font-semibold text-indigo-900">Trim Video</h2>
+					<Button
+						onClick={finalizeCut}
+						className="bg-indigo-300 hover:bg-indigo-400 text-white"
+						size="sm"
+						disabled={currentCutPoints.length !== 2}
+					>
+						<span className="mr-2">✂️</span> Scissor
+					</Button>
+				</CardHeader>
+				<CardContent>
+					<div className="mb-4">
+						<label className="block mb-2 text-indigo-700">
+							Drag points to set cuts (discard between pairs):
+						</label>
+						<Range
+							values={
+								currentCutPoints.length > 0 ? currentCutPoints : cutPoints
+							}
+							step={0.1}
+							min={0}
+							max={videoDuration}
+							onChange={(values) =>
+								currentCutPoints.length > 0
+									? setCurrentCutPoints(values)
+									: setCutPoints(values)
+							}
+							onFinalChange={(values) => handleDrag(values)} // Update preview on drag
+							renderTrack={({ props, children }) => (
+								<div
+									{...props}
+									className="h-8 rounded-full cursor-pointer relative"
+									onClick={(e) => {
+										const rect = e.currentTarget.getBoundingClientRect();
+										const clickPosition = e.clientX - rect.left;
+										const value = (clickPosition / rect.width) * videoDuration;
+										addCutPoint(value);
+									}}
+									style={{
+										background: getTrackBackground({
+											values:
+												currentCutPoints.length > 0
+													? currentCutPoints
+													: cutPoints,
+											colors: (currentCutPoints.length > 0
+												? currentCutPoints
+												: cutPoints
+											).map(() => "#A5B4FC"), // Indigo-300 for cuts
+											min: 0,
+											max: videoDuration,
+										}),
+										position: "relative",
+									}}
 								>
-									×
+									{children}
+									{cutPoints.length > 0 &&
+										cutPoints
+											.reduce((acc, _, i, arr) => {
+												if (i % 2 === 0 && i < arr.length - 1) {
+													acc.push({
+														start: arr[i],
+														end: arr[i + 1],
+													});
+												}
+												return acc;
+											}, [])
+											.map((range, index) => (
+												<div
+													key={index}
+													className="absolute top-0 h-8 bg-red-500 opacity-30"
+													style={{
+														left: `${(range.start / videoDuration) * 100}%`,
+														width: `${
+															((range.end - range.start) / videoDuration) * 100
+														}%`,
+													}}
+													onMouseEnter={(e) => {
+														const hoverDiv = document.createElement("div");
+														hoverDiv.className =
+															"absolute -top-8 left-1/2 transform -translate-x-1/2 bg-red-100 text-red-700 text-xs px-2 py-1 rounded shadow-md";
+														hoverDiv.textContent = "🗑️ Remove Cut";
+														e.currentTarget.appendChild(hoverDiv);
+													}}
+													onMouseLeave={(e) => {
+														const hoverDiv =
+															e.currentTarget.querySelector("div");
+														if (hoverDiv) hoverDiv.remove();
+													}}
+													onClick={(e) => {
+														e.stopPropagation();
+														removeCutRange(range.start, range.end);
+													}}
+												/>
+											))}
+								</div>
+							)}
+							renderThumb={({ props, isDragged, index }) => (
+								<div
+									{...props}
+									className={`h-6 w-6 rounded-full bg-indigo-300 ${
+										isDragged ? "shadow-lg" : ""
+									}`}
+									style={{
+										...props.style,
+										border: "2px solid #FFFFFF", // White border for contrast
+									}}
+								/>
+							)}
+						/>
+						<div className="flex flex-wrap gap-2 mt-2 text-indigo-600">
+							{currentCutPoints.length > 0
+								? currentCutPoints.map((point, index) => (
+										<span key={index} className="text-sm">
+											Temp Cut {index + 1}: {point.toFixed(1)}s{" "}
+											<Button
+												variant="ghost"
+												size="sm"
+												onClick={() =>
+													setCurrentCutPoints(
+														currentCutPoints.filter((_, i) => i !== index)
+													)
+												}
+												className="text-red-500 hover:bg-red-100 p-1 h-auto"
+											>
+												×
+											</Button>
+										</span>
+								  ))
+								: cutPoints.map((point, index) => (
+										<span key={index} className="text-sm">
+											Cut {index + 1}: {point.toFixed(1)}s{" "}
+											<Button
+												variant="ghost"
+												size="sm"
+												onClick={() => removeCutPoints()}
+												className="text-red-500 hover:bg-red-100 p-1 h-auto"
+											>
+												×
+											</Button>
+										</span>
+								  ))}
+						</div>
+					</div>
+					<Button
+						onClick={removeCutPoints}
+						className="mt-4 w-full bg-white text-indigo-300 border border-indigo-300 hover:bg-indigo-50"
+						variant="outline"
+					>
+						Re-add All Discarded Portions
+					</Button>
+					<Button
+						onClick={trimAndMergeVideo}
+						disabled={
+							loading || cutPoints.length === 0 || cutPoints.length % 2 !== 0
+						}
+						className="mt-4 w-full bg-indigo-300 hover:bg-indigo-400 text-white"
+					>
+						{loading ? "Trimming..." : "Trim & Merge Video"}
+					</Button>
+					{trimmedSrc && (
+						<div className="mt-6">
+							<h3 className="text-lg font-semibold text-indigo-900 mb-2">
+								Trimmed Video:
+							</h3>
+							<video controls src={trimmedSrc} width="100%" className="mb-4" />
+							<a href={trimmedSrc} download={`trimmed-${videoId}.webm`}>
+								<Button
+									variant="outline"
+									className="w-full border-indigo-300 text-indigo-300 hover:bg-indigo-50"
+								>
+									Download Trimmed Video
 								</Button>
-							</span>
-						))}
-					</div>
-				</div>
-				<Button
-					onClick={trimAndMergeVideo}
-					disabled={loading || cutPoints.length === 0}
-					className="w-full bg-indigo-500 hover:bg-indigo-600 text-white"
-				>
-					{loading ? "Trimming..." : "Trim & Merge Video"}
-				</Button>
-				{trimmedSrc && (
-					<div className="mt-6">
-						<h3 className="text-lg font-semibold mb-2">Trimmed Video:</h3>
-						<video controls src={trimmedSrc} width="100%" className="mb-4" />
-						<a href={trimmedSrc} download={`trimmed-${videoId}.webm`}>
-							<Button
-								variant="outline"
-								className="w-full border-white text-white hover:bg-gray-700"
-							>
-								Download Trimmed Video
-							</Button>
-						</a>
-					</div>
-				)}
-			</div>
+							</a>
+						</div>
+					)}
+				</CardContent>
+			</Card>
 		</div>
 	);
 };
