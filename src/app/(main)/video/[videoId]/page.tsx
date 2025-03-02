@@ -20,8 +20,6 @@ export async function generateMetadata(
 	const { videoId } = await params;
 	const { video } = await getPreviewVideoServer(videoId);
 
-	console.log(video);
-
 	if (!video) {
 		return {
 			title: "Video Not Found",
