@@ -14,9 +14,8 @@ export async function getPreviewVideo(id: string) {
 export async function getPreviewVideoServer(id: string) {
 	try {
 		const response = await axiosInstance.get(
-			`${process.env.NEXT_PUBLIC_VIDEO_SERVICE_URL}/api/${id}/video`
+			`${process.env.NEXT_PUBLIC_VIDEO_SERVICE_URL}/api/${id}/preview`
 		);
-		console.log("response: ", response);
 		return response.data;
 	} catch (error) {
 		console.error(error);
