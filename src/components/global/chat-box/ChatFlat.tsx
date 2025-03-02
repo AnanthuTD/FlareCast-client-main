@@ -17,9 +17,9 @@ const ChatFlat = ({
 }: {
 	chat: IChatFlat;
 	own?: boolean;
-	onReply: (chat: IChatFlat) => void;
-	onDelete: (id: string) => void;
-	onEdit: (id: string, message: string) => void;
+	onReply?: (chat: IChatFlat) => void;
+	onDelete?: (id: string) => void;
+	onEdit?: (id: string, message: string) => void;
 }) => {
 	const [isEditing, setIsEditing] = useState(false);
 	const inputRef = useRef<HTMLInputElement | null>(null);
@@ -31,7 +31,7 @@ const ChatFlat = ({
 	const cancelEditing = () => {
 		setIsEditing(false);
 		inputRef.current?.blur();
-	}
+	};
 
 	/* TODO: onclick navigate to the replied message */
 	// const navigateToChat = () => {};
@@ -47,7 +47,7 @@ const ChatFlat = ({
 			return;
 		}
 
-		onEdit(chat.id, inputRef.current.value);
+		onEdit?.(chat.id, inputRef.current.value);
 		setIsEditing(false);
 	};
 
@@ -83,8 +83,8 @@ const ChatFlat = ({
 					canDelete={own}
 					canEdit={own}
 					handleEditing={toggleEditing}
-					handleReply={() => onReply(chat)}
-					handleDelete={() => onDelete(chat.id)}
+					handleReply={() => onReply?.(chat)}
+					handleDelete={() => onDelete?.(chat.id)}
 				>
 					<div className="flex flex-col gap-1">
 						<p
@@ -123,10 +123,7 @@ const ChatFlat = ({
 											size={"icon"}
 											className="place-self-end aspect-square"
 										>
-											<CircleXIcon
-												size={16}
-												className=""
-											/>
+											<CircleXIcon size={16} className="" />
 										</Button>
 										<Button
 											onClick={handleUpdateMessage}

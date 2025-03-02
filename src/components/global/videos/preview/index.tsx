@@ -27,6 +27,8 @@ import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import ChatBox from "../../chat-box";
+import AiTools from "../../ai-tools";
+import { TabsContent } from "@/components/ui/tabs";
 
 type Props = {
 	videoId: string;
@@ -232,14 +234,20 @@ const VideoPreview = ({ videoId }: Props) => {
 			</div>
 			<div className="lg:col-span-1">
 				<TabMenu
-					defaultValue="Activity"
-					triggers={["AI Tools", "Transcript", "Activity"]}
+					defaultValue="AI Tool"
+					triggers={["AI Tool", "Transcript", "Activity", "asd"]}
 				>
+					{video.id && <AiTools videoId={video.id} trial={true} plan={"PRO"} />}
+
 					<VideoTranscript
 						transcript={video?.transcription || "Transcript not available"}
 					/>
 
 					{video?.id && <ChatBox videoId={video.id} />}
+
+					<TabsContent value="asd">
+asdasdf
+					</TabsContent>
 				</TabMenu>
 			</div>
 		</div>

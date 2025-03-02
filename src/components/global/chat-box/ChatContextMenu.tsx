@@ -16,9 +16,9 @@ const ChatContextMenu = ({
 }: {
 	children: React.ReactNode;
 	chat: { id: string };
-	handleEditing: () => void;
-	handleReply: () => void;
-	handleDelete: () => void;
+	handleEditing?: () => void;
+	handleReply?: () => void;
+	handleDelete?: () => void;
 	canDelete: boolean;
 	canEdit: boolean;
 }) => {
@@ -26,11 +26,13 @@ const ChatContextMenu = ({
 		<ContextMenu>
 			<ContextMenuTrigger>{children}</ContextMenuTrigger>
 			<ContextMenuContent>
-				<ContextMenuItem onClick={handleReply}>reply</ContextMenuItem>
-				{canEdit && (
+				{handleReply && (
+					<ContextMenuItem onClick={handleReply}>reply</ContextMenuItem>
+				)}
+				{canEdit && handleEditing && (
 					<ContextMenuItem onClick={handleEditing}>edit</ContextMenuItem>
 				)}
-				{canDelete && (
+				{canDelete && handleDelete && (
 					<ContextMenuItem onClick={handleDelete} className="">
 						<div className="flex justify-between w-full">
 							delete
