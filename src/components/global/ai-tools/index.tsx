@@ -12,7 +12,7 @@ import {
 	StarsIcon,
 	VideoIcon,
 } from "lucide-react";
-import ChatBox from "./ChatBox";
+import AiChatBox from "./AiChatBox";
 
 type Props = {
 	plan: "PRO" | "FREE";
@@ -32,7 +32,7 @@ const AiTools = ({ plan, trial, videoId }: Props) => {
 	return (
 		<TabsContent value="AI Tool"  >
 			{trial || plan === "PRO" ? (
-				<ChatBox videoId={videoId} />
+				<AiChatBox videoId={videoId} />
         // <></>
 			) : (
 				<div className="p-5 bg-[#1D1D1D]  rounded-xl flex flex-col gap-y-6 ">
