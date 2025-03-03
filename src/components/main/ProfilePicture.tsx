@@ -13,7 +13,7 @@ import axiosInstance from "@/axios";
 import { useRouter } from "next/navigation";
 
 function ProfilePicture() {
-	const profilePicture = null; // Replace with actual profile picture logic if available
+	const profilePicture = useUserStore((state) => state.image); // Replace with actual profile picture logic if available
 	const firstName = useUserStore((state) => state.firstName);
 	const clearAccessToken = useUserStore((state) => state.clearAccessToken);
 	const router = useRouter();
@@ -36,7 +36,7 @@ function ProfilePicture() {
 					<Image
 						loading="lazy"
 						src={profilePicture}
-						className="object-contain flex-1 shrink self-stretch my-auto w-9 aspect-square basis-0 cursor-pointer"
+						className="object-contain flex-1 shrink self-stretch my-auto aspect-square basis-0 cursor-pointer rounded-full"
 						alt="User avatar"
 						width={36}
 						height={36}
