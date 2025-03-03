@@ -14,9 +14,18 @@ import MovePopover from "../move-tree";
 interface Props {
 	sourceId: string;
 	type: "folder" | "video" | "screenshot";
+	canShare?: boolean;
+	canDelete?: boolean;
+	canMove?: boolean;
 }
 
-function Dropdown({ sourceId, type }: Props) {
+function Dropdown({
+	sourceId,
+	type,
+	canShare = true,
+	canDelete = true,
+	canMove = true,
+}: Props) {
 	const activeWorkspace = useWorkspaceStore((state) => state.selectedWorkspace);
 
 	const { onDeleteFolder } = useDeleteFolder(activeWorkspace.id, sourceId);
@@ -33,15 +42,24 @@ function Dropdown({ sourceId, type }: Props) {
 				/>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent onClick={(e) => e.stopPropagation()}>
-				<DropdownMenuItem>
-					<MovePopover type={type}  sourceId={sourceId}/>
-				</DropdownMenuItem>
-				<DropdownMenuItem>
-					<DeleteFolderPop
-						onClick={onDeleteFolder}
-						// disabled={isPending} // Disable while deleting
-					/>
-				</DropdownMenuItem>
+				{canShare && (
+					<DropdownMenuItem>
+						<MovePopover
+							type={type}
+							sourceId={sourceId}
+							label="share"
+							showWorkspace={false}
+						/>
+					</DropdownMenuItem>
+				)}
+				{canDelete && (
+					<DropdownMenuItem>
+						<DeleteFolderPop
+							onClick={onDeleteFolder}
+							// disabled={isPending} // Disable while deleting
+						/>
+					</DropdownMenuItem>
+				)}
 			</DropdownMenuContent>
 		</DropdownMenu>
 	);

@@ -21,6 +21,7 @@ export const VideoCard: React.FC<VideoCardProps> = ({
 	onClick,
 	transcodeStatus = true,
 	id,
+	spaceId
 }) => {
 	const isClickable = transcodeStatus;
 
@@ -91,7 +92,7 @@ export const VideoCard: React.FC<VideoCardProps> = ({
 							</div>
 							<div className="flex items-center gap-1">
 								<ExternalLink />
-								<Dropdown sourceId={id} type={"video"} />
+								<Dropdown sourceId={id} type={"video"} canShare={!spaceId} />
 								<span>{shares}</span>
 							</div>
 						</div>

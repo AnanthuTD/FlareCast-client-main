@@ -314,11 +314,14 @@ export async function shareVideo({
 	videoId: string;
 	destination: { id: string; type: TreeData["type"] };
 }) {
+	console.log(destination);
 	if (destination.type === "space") {
 		return await axiosInstance.post(`/api/video/${videoId}/share`, {
 			spaceId: destination.id,
 		});
-	} else {
-		alert("Work in progress. currently only support space");
+	} else if (destination.type === "folder") {
+		return await axiosInstance.post(`/api/video/${videoId}/share`, {
+			folder: destination.id,
+		});
 	}
 }

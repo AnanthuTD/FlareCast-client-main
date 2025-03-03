@@ -27,9 +27,15 @@ export interface TreeData {
 export default function MovePopover({
 	type,
 	sourceId,
+	label = "move",
+	showWorkspace = true,
+	showSpaces = true,
 }: {
 	type: "folder" | "video" | "screenshot";
 	sourceId: string;
+	label: string;
+	showWorkspace?: boolean;
+	showSpaces?: boolean;
 }) {
 	const [selectedNode, setSelectedNode] = useState<{
 		id: string;
@@ -40,9 +46,15 @@ export default function MovePopover({
 
 	useEffect(() => {
 		async function createTreeData() {
-			const workspaceFolders = await fetchFolders(activeWorkspace.id);
+			let workspaceFolders = [];
+			if (showWorkspace) {
+				workspaceFolders = await fetchFolders(activeWorkspace.id);
+			}
 
-			const spaces = await getSpaces(activeWorkspace.id);
+			let spaces = [];
+			if (showSpaces) {
+				spaces = await getSpaces(activeWorkspace.id);
+			}
 
 			const data = [
 				{
@@ -158,7 +170,7 @@ export default function MovePopover({
 				onClick={(e) => e.stopPropagation()}
 				className="w-full flex justify-start"
 			>
-				Move
+				{label}
 			</DialogTrigger>
 			<DialogContent>
 				<DialogHeader>
