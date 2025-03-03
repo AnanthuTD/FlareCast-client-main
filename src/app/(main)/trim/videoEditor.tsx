@@ -258,7 +258,7 @@ const VideoEditor = ({ videoId }: Props) => {
 			const response = await axiosInstance(
 				`/api/video/upload-presigned-url?videoId=${videoId}`
 			);
-			const { signedUrl } = await response.data;
+			const { signedUrl, key, videoId: editedVideoId } = await response.data;
 
 			console.log(signedUrl);
 
@@ -286,9 +286,29 @@ const VideoEditor = ({ videoId }: Props) => {
 				const uploadResponse = await axios.put(signedUrl, new Blob(chunks), {
 					headers: { "Content-Type": "video/webm" },
 				});
+				console.log("Upload to s3 successful", uploadResponse.status);
 
-				console.log("Upload successful:", uploadResponse.status);
+				try {
+					await axiosInstance.post(`/api/video/${editedVideoId}/edit-success`, {
+						key,
+						status: "success",
+					});
+					console.log("Notifying server success");
+				} catch (error) {
+					console.log(
+						"Failed to notify server about successful video upload",
+						error
+					);
+					await axiosInstance.post(`/api/video/${editedVideoId}/edit-success`, {
+						key,
+						status: "failure",
+					});
+				}
 			} catch (e) {
+				await axiosInstance.post(`/api/video/${editedVideoId}/edit-success`, {
+					key,
+					status: "failure",
+				});
 				console.error("Error uploading to S3:", e);
 				throw new Error("Failed to upload video");
 			}
