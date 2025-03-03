@@ -12,7 +12,7 @@ import { useMutationData } from "@/hooks/useMutationData";
 import { renameFolder } from "@/actions/folder";
 import { Input } from "../../ui/input";
 import { useWorkspaceStore } from "@/providers/WorkspaceStoreProvider";
-import Dropdown from "./Dropdown";
+import Dropdown from "./DropdownFolder";
 
 interface FolderProps extends Props {
 	optimistic?: boolean;

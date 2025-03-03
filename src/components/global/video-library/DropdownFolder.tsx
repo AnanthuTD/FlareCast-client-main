@@ -69,7 +69,6 @@ function Dropdown({
 					<DropdownMenuItem>
 						<DeleteFolderPop
 							onClick={onDeleteFolder}
-							// disabled={isPending} // Disable while deleting
 						/>
 					</DropdownMenuItem>
 				)}

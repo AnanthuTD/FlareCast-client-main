@@ -6,7 +6,7 @@ import { VideoCardProps } from "@/types";
 import { Card, CardContent, CardHeader } from "../ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ExternalLink, Eye, MessageCircle } from "lucide-react";
-import Dropdown from "../global/video-library/Dropdown";
+import DropdownVideo from "../global/video-library/DropdownVideo";
 
 export const VideoCard: React.FC<VideoCardProps> = ({
 	duration,
@@ -21,7 +21,7 @@ export const VideoCard: React.FC<VideoCardProps> = ({
 	onClick,
 	transcodeStatus = true,
 	id,
-	spaceId
+	spaceId,
 }) => {
 	const isClickable = transcodeStatus;
 
@@ -92,7 +92,11 @@ export const VideoCard: React.FC<VideoCardProps> = ({
 							</div>
 							<div className="flex items-center gap-1">
 								<ExternalLink />
-								<Dropdown sourceId={id} type={"video"} canShare={!spaceId} />
+								<DropdownVideo
+									sourceId={id}
+									type={"video"}
+									canShare={!spaceId}
+								/>
 								<span>{shares}</span>
 							</div>
 						</div>

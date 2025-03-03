@@ -36,16 +36,20 @@ export async function postView(videoId: string) {
 export async function getMyVideos(
 	workspaceId: string,
 	folderId?: string,
-	spaceId?: string
+	spaceId?: string,
+	skip: number = 0,
+	limit: number = 10
 ) {
-	return await axiosInstance.get(`/api/video/${workspaceId}`, {
+	const { data } = await axiosInstance.get(`/api/video/${workspaceId}`, {
 		params: {
-			limit: 10,
-			skip: 0,
+			limit,
+			skip,
 			folderId,
 			spaceId,
 		},
 	});
+
+	return data;
 }
 
 export async function getVideosForSpace(
