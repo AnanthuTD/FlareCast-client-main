@@ -13,6 +13,17 @@ import {
 	CardContent,
 	CardFooter,
 } from "@/components/ui/card";
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+} from "@/components/ui/dialog";
+import { Progress } from "@/components/ui/progress";
+import axiosInstance from "@/axios";
+import axios from "axios";
+import Link from "next/link";
+import { Trash2Icon } from "lucide-react";
 
 type Props = {
 	videoId: string;
@@ -28,6 +39,8 @@ const VideoEditor = ({ videoId }: Props) => {
 	const [videoDuration, setVideoDuration] = useState<number>(1);
 	const [loading, setLoading] = useState<boolean>(false);
 	const [previewTime, setPreviewTime] = useState<number>(0); // For real-time preview
+	const [uploadProgress, setUploadProgress] = useState<number>(0); // Upload progress state
+	const [isUploading, setIsUploading] = useState<boolean>(false); // Upload modal state
 
 	// Load FFmpeg
 	useEffect(() => {
@@ -76,6 +89,7 @@ const VideoEditor = ({ videoId }: Props) => {
 		};
 		checkFileSizeAndFetch();
 	}, [videoId]);
+
 	const addCutPoint = (value: number) => {
 		if (currentCutPoints.length >= 2) {
 			toast.error("Maximum 2 points per cut operation allowed");
@@ -128,8 +142,8 @@ const VideoEditor = ({ videoId }: Props) => {
 	};
 
 	const removeCutRange = (start: number, end: number) => {
-    console.log(start, end);
-    console.log(cutPoints)
+		console.log(start, end);
+		console.log(cutPoints);
 		const sortedCuts = cutPoints.sort((a, b) => a - b);
 		const newCutPoints = sortedCuts.filter((point, i) => {
 			if (point !== start && point !== end) return true;
@@ -138,7 +152,7 @@ const VideoEditor = ({ videoId }: Props) => {
 	};
 
 	const removeCutPoints = () => {
-		setCutPoints([]); 
+		setCutPoints([]);
 		setCurrentCutPoints([]);
 	};
 
@@ -159,7 +173,7 @@ const VideoEditor = ({ videoId }: Props) => {
 			await ffmpeg.writeFile("input.webm", videoData);
 
 			// Create segments to keep, excluding the portions between pairs of cut points
-			const sortedCuts = cutPoints.sort((a, b) => a - b);
+			const sortedCuts = [...cutPoints.sort((a, b) => a - b)];
 			const segments = [];
 
 			// Keep the portion before the first cut, if any
@@ -222,7 +236,8 @@ const VideoEditor = ({ videoId }: Props) => {
 			const url = URL.createObjectURL(blob);
 			setTrimmedSrc(url);
 
-			toast.success("Video trimmed and merged successfully!");
+			await uploadEditedVideo(blob, videoId);
+			toast.success("Video trimmed, merged, and uploaded successfully!");
 		} catch (error) {
 			console.error("Trimming and merging failed:", error);
 			toast.error("Failed to trim and merge video");
@@ -235,6 +250,58 @@ const VideoEditor = ({ videoId }: Props) => {
 	const handleDrag = (values: number[]) => {
 		const draggedPoint = values[0];
 		setPreviewTime(draggedPoint); // Update preview to show the dragged position
+	};
+
+	const uploadEditedVideo = async (fileBlob: Blob, videoId: string) => {
+		setIsUploading(true);
+		try {
+			const response = await axiosInstance(
+				`/api/video/upload-presigned-url?videoId=${videoId}`
+			);
+			const { signedUrl } = await response.data;
+
+			console.log(signedUrl);
+
+			if (!signedUrl) {
+				console.error("Failed to get presigned URL");
+				throw new Error("Failed to get presigned URL");
+			}
+
+			const totalSize = fileBlob.size;
+			let uploadedSize = 0;
+
+			const reader = fileBlob.stream().getReader();
+			const chunks = [];
+
+			while (true) {
+				const { done, value } = await reader.read();
+				if (done) break;
+				chunks.push(value);
+				uploadedSize += value.length;
+				const progress = ((uploadedSize / totalSize) * 100).toFixed(1);
+				setUploadProgress(Number(progress));
+			}
+
+			try {
+				const uploadResponse = await axios.put(signedUrl, new Blob(chunks), {
+					headers: { "Content-Type": "video/webm" },
+				});
+
+				console.log("Upload successful:", uploadResponse.status);
+			} catch (e) {
+				console.error("Error uploading to S3:", e);
+				throw new Error("Failed to upload video");
+			}
+
+			setUploadProgress(100);
+			return signedUrl.split("?")[0];
+		} catch (error) {
+			console.error("Upload failed:", error);
+			throw error;
+		} finally {
+			// setIsUploading(false);
+			// setUploadProgress(0);
+		}
 	};
 
 	return (
@@ -341,11 +408,11 @@ const VideoEditor = ({ videoId }: Props) => {
 															((range.end - range.start) / videoDuration) * 100
 														}%`,
 													}}
-													onMouseEnter={(e) => {
+													/* onMouseEnter={(e) => {
 														const hoverDiv = document.createElement("div");
 														hoverDiv.className =
-															"absolute -top-8 left-1/2 transform -translate-x-1/2 bg-red-100 text-red-700 text-xs px-2 py-1 rounded shadow-md";
-														hoverDiv.textContent = "🗑️ Remove Cut";
+															"absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-red-700 text-lg cursor-pointer";
+														hoverDiv.textContent = "🗑️";
 														e.currentTarget.appendChild(hoverDiv);
 													}}
 													onMouseLeave={(e) => {
@@ -356,8 +423,17 @@ const VideoEditor = ({ videoId }: Props) => {
 													onClick={(e) => {
 														e.stopPropagation();
 														removeCutRange(range.start, range.end);
-													}}
-												/>
+													}} */
+												>
+													<Trash2Icon
+														className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white cursor-pointer"
+														size={18}
+														onClick={(e) => {
+															e.stopPropagation();
+															removeCutRange(range.start, range.end);
+														}}
+													/>
+												</div>
 											))}
 								</div>
 							)}
@@ -442,6 +518,39 @@ const VideoEditor = ({ videoId }: Props) => {
 					)}
 				</CardContent>
 			</Card>
+			<Dialog open={isUploading} onOpenChange={() => {}}>
+				<DialogContent className="bg-white p-6 rounded-lg shadow-lg">
+					<DialogHeader>
+						<DialogTitle className="text-indigo-900">
+							Uploading Video
+						</DialogTitle>
+					</DialogHeader>
+					<div className="mt-4">
+						<p className="text-indigo-700">Uploading to S3...</p>
+						<Progress value={uploadProgress} className="mt-2 bg-indigo-100" />
+						<p className="text-indigo-600 text-sm mt-2">{uploadProgress}%</p>
+					</div>
+
+					{trimmedSrc && (
+						<div className="flex gap-4">
+							<Button
+								onClick={() => {
+									setIsUploading(false);
+									setUploadProgress(0);
+								}}
+								className="flex-1 bg-indigo-300 hover:bg-indigo-400 text-white"
+							>
+								Continue Editing
+							</Button>
+							<Link href={"/library"}>
+								<Button className="" variant="outline">
+									Go Back to Library
+								</Button>
+							</Link>
+						</div>
+					)}
+				</DialogContent>
+			</Dialog>
 		</div>
 	);
 };

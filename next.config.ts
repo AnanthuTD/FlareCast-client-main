@@ -25,6 +25,10 @@ const nextConfig: NextConfig = {
 				source: "/gcs/:path*",
 				destination: process.env.NEXT_PUBLIC_GCS_URL + "/:path*", // Proxy to Google Cloud Storage
 			},
+			{
+				source: "/s3/:path*",
+				destination: process.env.NEXT_PUBLIC_GCS_URL + "/:path*", // Proxy to s3 storage
+			},
 		];
 	},
 	images: {
