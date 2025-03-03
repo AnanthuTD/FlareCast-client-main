@@ -43,7 +43,7 @@ export async function getMyVideos(
 			limit: 10,
 			skip: 0,
 			folderId,
-			spaceId,,
+			spaceId,
 		},
 	});
 }
