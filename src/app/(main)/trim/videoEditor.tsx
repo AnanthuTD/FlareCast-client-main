@@ -63,7 +63,7 @@ const VideoEditor = ({ videoId }: Props) => {
 
 	// Set video source and get duration
 	useEffect(() => {
-		const webmUrl = `/gcs/67be819a854f18c190256151/original.webm`;
+		const webmUrl = `/gcs/${videoId}/original.webm`;
 		setVideoSrc(webmUrl);
 
 		const checkFileSizeAndFetch = async () => {
@@ -78,7 +78,7 @@ const VideoEditor = ({ videoId }: Props) => {
 				const videoElement = document.createElement("video");
 				videoElement.src = webmUrl;
 				videoElement.onloadedmetadata = () => {
-					setVideoDuration(14); // Hardcoded for now, update to dynamic
+					setVideoDuration(videoElement.duration); // Hardcoded for now, update to dynamic
 					setCutPoints([]); // Reset cumulative cut points
 					setCurrentCutPoints([]); // Reset current cut points
 				};
@@ -326,7 +326,7 @@ const VideoEditor = ({ videoId }: Props) => {
 
 	return (
 		<div className="min-h-screen bg-white p-6">
-{/* 			<h1 className="text-3xl font-bold mb-6 text-indigo-900">
+			{/* 			<h1 className="text-3xl font-bold mb-6 text-indigo-900">
 				{video?.title || "Video Editor"}
 			</h1> */}
 			<Card className="mb-4 bg-white shadow-md">
