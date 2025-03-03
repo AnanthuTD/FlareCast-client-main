@@ -326,11 +326,11 @@ const VideoEditor = ({ videoId }: Props) => {
 
 	return (
 		<div className="min-h-screen bg-white p-6">
-			<h1 className="text-3xl font-bold mb-6 text-indigo-900">
+{/* 			<h1 className="text-3xl font-bold mb-6 text-indigo-900">
 				{video?.title || "Video Editor"}
-			</h1>
-			<Card className="mb-6 bg-white shadow-md">
-				<CardContent>
+			</h1> */}
+			<Card className="mb-4 bg-white shadow-md">
+				<CardContent className="flex justify-center p-3">
 					<Player
 						hslUrl={`/gcs/${videoId}/original.webm`}
 						thumbnailsUrl={`/gcs/${videoId}/thumbnails/thumbnails.vtt`}
@@ -383,7 +383,7 @@ const VideoEditor = ({ videoId }: Props) => {
 							renderTrack={({ props, children }) => (
 								<div
 									{...props}
-									className="h-8 rounded-full cursor-pointer relative"
+									className="h-10 rounded-md cursor-pointer relative bg-gray-200"
 									onClick={(e) => {
 										const rect = e.currentTarget.getBoundingClientRect();
 										const clickPosition = e.clientX - rect.left;
@@ -460,12 +460,12 @@ const VideoEditor = ({ videoId }: Props) => {
 							renderThumb={({ props, isDragged, index }) => (
 								<div
 									{...props}
-									className={`h-6 w-6 rounded-full bg-indigo-300 ${
+									className={`w-2 h-full bg-indigo-300 ${
 										isDragged ? "shadow-lg" : ""
 									}`}
 									style={{
 										...props.style,
-										border: "2px solid #FFFFFF", // White border for contrast
+										border: "2px solid #FFFFFF",
 									}}
 								/>
 							)}

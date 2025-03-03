@@ -31,6 +31,7 @@ import AiTools from "../../ai-tools";
 import CopyLink from "../copy-link";
 import RichLink from "../rich-link";
 import { truncateString } from "@/lib/utils";
+import TrimButton from "../../trim-button";
 
 type Props = {
 	videoId: string;
@@ -47,6 +48,7 @@ const VideoPreview = ({ videoId }: Props) => {
 	const [isEditingDescription, setEditDescription] = useState(false);
 	const [title, setTitle] = useState("");
 	const [description, setDescription] = useState("");
+	const user = useUserStore((state) => state);
 
 	const { messages, setMessages } = useSSE<Video>(
 		`/api/video/${activeWorkspaceId}/events?userId=${userId}`,
@@ -184,6 +186,7 @@ const VideoPreview = ({ videoId }: Props) => {
 					</Card>
 					<Card>
 						<CardContent className="flex items-center py-2 justify-end gap-4">
+							<TrimButton trim={!!user.plan?.trim || true} videoId={videoId} />
 							<CopyLink
 								variant="outline"
 								className="rounded-full bg-transparent px-10"

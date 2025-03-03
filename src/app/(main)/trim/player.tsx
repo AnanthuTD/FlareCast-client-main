@@ -45,7 +45,7 @@ const Player: React.FC<PlayerProps> = ({
   }, [previewTime, trimStart, trimEnd]);
 
   return (
-    <div className="relative">
+    <div className="relative w-2/3 rounded-md overflow-hidden">
       <video
         ref={videoRef}
         controls

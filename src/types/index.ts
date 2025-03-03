@@ -279,6 +279,7 @@ export interface SubscriptionPlan {
 	workspace: number;
 	aiFeature: boolean;
 	active: boolean;
+	trim: boolean;
 }
 
 export interface SubscriptionData {

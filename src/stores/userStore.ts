@@ -1,3 +1,4 @@
+import { SubscriptionPlan } from '@/types'
 import { createStore } from 'zustand/vanilla'
 
 export type UserState = {
@@ -7,6 +8,7 @@ export type UserState = {
   email: string,
   image: string | null,
   id: string,
+  plan?: SubscriptionPlan
 }
 
 export type UserActions = {
