@@ -15,8 +15,9 @@ import { useWorkspaceStore } from "@/providers/WorkspaceStoreProvider";
 import { getSpaces } from "@/actions/space";
 import { isAxiosError } from "axios";
 import { toast } from "sonner";
+import { shareVideo } from "@/actions/video";
 
-interface TreeData {
+export interface TreeData {
 	id: string;
 	name: string;
 	children: TreeData[];
@@ -133,6 +134,19 @@ export default function MovePopover({
 					toast.error(e.response.data.message);
 				} else {
 					toast.error("Failed to move folder!");
+				}
+			}
+		} else if (type === "video") {
+			try {
+				await shareVideo({
+					videoId: sourceId,
+					destination: selectedNode,
+				});
+			} catch (e) {
+				if (isAxiosError(e)) {
+					toast.error(e.response.data.message);
+				} else {
+					toast.error("Failed to move video!");
 				}
 			}
 		}

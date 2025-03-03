@@ -1,4 +1,5 @@
 import axiosInstance from "@/axios";
+import { TreeData } from "@/components/global/move-tree";
 
 export async function getPreviewVideo(id: string) {
 	console.log(id);
@@ -42,7 +43,7 @@ export async function getMyVideos(
 			limit: 10,
 			skip: 0,
 			folderId,
-			spaceId,
+			spaceId,,
 		},
 	});
 }
@@ -299,5 +300,25 @@ export async function removeWatchLaterVideo({
 			success: false,
 			message: "Failed to remove video from watch later",
 		};
+	}
+}
+
+export async function deleteVideo(videoId: string) {
+	return await axiosInstance.delete(`/api/video/${videoId}`);
+}
+
+export async function shareVideo({
+	videoId,
+	destination,
+}: {
+	videoId: string;
+	destination: { id: string; type: TreeData["type"] };
+}) {
+	if (destination.type === "space") {
+		return await axiosInstance.post(`/api/video/${videoId}/share`, {
+			spaceId: destination.id,
+		});
+	} else {
+		alert("Work in progress. currently only support space");
 	}
 }
