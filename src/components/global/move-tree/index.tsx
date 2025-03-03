@@ -15,7 +15,7 @@ import { useWorkspaceStore } from "@/providers/WorkspaceStoreProvider";
 import { getSpaces } from "@/actions/space";
 import { isAxiosError } from "axios";
 import { toast } from "sonner";
-import { shareVideo } from "@/actions/video";
+import { moveVideo, shareVideo } from "@/actions/video";
 
 export interface TreeData {
 	id: string;
@@ -51,6 +51,8 @@ export default function MovePopover({
 				workspaceFolders = await fetchFolders(activeWorkspace.id);
 			}
 
+			console.log(workspaceFolders);
+
 			let spaces = [];
 			if (showSpaces) {
 				spaces = await getSpaces(activeWorkspace.id);
@@ -84,7 +86,9 @@ export default function MovePopover({
 
 	useEffect(() => {
 		async function updateTreeData() {
-			if (!selectedNode || selectedNode.type === "workspace") return;
+			if (!selectedNode) return;
+			if (selectedNode.type === "workspace") return;
+			if (selectedNode.type === "space" && !showSpaces) return;
 
 			let children: TreeData[] = [];
 
@@ -132,7 +136,7 @@ export default function MovePopover({
 		}
 	}, [selectedNode, setTreeData]);
 
-	async function handleMove() {
+	async function handleShare() {
 		if (!selectedNode || !selectedNode.type || !selectedNode.id) return;
 
 		if (type === "folder") {
@@ -149,16 +153,31 @@ export default function MovePopover({
 				}
 			}
 		} else if (type === "video") {
-			try {
-				await shareVideo({
-					videoId: sourceId,
-					destination: selectedNode,
-				});
-			} catch (e) {
-				if (isAxiosError(e)) {
-					toast.error(e.response.data.message);
-				} else {
-					toast.error("Failed to move video!");
+			if (label === "move") {
+				try {
+					await moveVideo({
+						videoId: sourceId,
+						destination: selectedNode,
+					});
+				} catch (e) {
+					if (isAxiosError(e)) {
+						toast.error(e.response.data.message);
+					} else {
+						toast.error("Failed to move video!");
+					}
+				}
+			} else {
+				try {
+					await shareVideo({
+						videoId: sourceId,
+						destination: selectedNode,
+					});
+				} catch (e) {
+					if (isAxiosError(e)) {
+						toast.error(e.response.data.message);
+					} else {
+						toast.error("Failed to share video!");
+					}
 				}
 			}
 		}
@@ -192,7 +211,7 @@ export default function MovePopover({
 				<DialogFooter>
 					<Button
 						className="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-md"
-						onClick={handleMove}
+						onClick={handleShare}
 					>
 						Move Here
 					</Button>

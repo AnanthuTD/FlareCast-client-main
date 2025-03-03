@@ -321,7 +321,22 @@ export async function shareVideo({
 		});
 	} else if (destination.type === "folder") {
 		return await axiosInstance.post(`/api/video/${videoId}/share`, {
-			folder: destination.id,
+			folderId: destination.id,
+		});
+	}
+}
+
+export async function moveVideo({
+	videoId,
+	destination,
+}: {
+	videoId: string;
+	destination: { id: string; type: TreeData["type"] };
+}) {
+	console.log(destination);
+	if (destination.type === "folder") {
+		return await axiosInstance.post(`/api/video/${videoId}/move`, {
+			folderId: destination.id,
 		});
 	}
 }

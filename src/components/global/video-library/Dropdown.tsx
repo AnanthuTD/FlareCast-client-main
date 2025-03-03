@@ -10,6 +10,7 @@ import DeleteFolderPop from "./DeleteFolderPop";
 import { useWorkspaceStore } from "@/providers/WorkspaceStoreProvider";
 import { useDeleteFolder } from "@/hooks/useDeleteFolder";
 import MovePopover from "../move-tree";
+import { usePathname } from "next/navigation";
 
 interface Props {
 	sourceId: string;
@@ -29,6 +30,7 @@ function Dropdown({
 	const activeWorkspace = useWorkspaceStore((state) => state.selectedWorkspace);
 
 	const { onDeleteFolder } = useDeleteFolder(activeWorkspace.id, sourceId);
+	const pathname = usePathname();
 
 	return (
 		<DropdownMenu>
@@ -49,6 +51,17 @@ function Dropdown({
 							sourceId={sourceId}
 							label="share"
 							showWorkspace={false}
+						/>
+					</DropdownMenuItem>
+				)}
+				{canMove && (
+					<DropdownMenuItem>
+						<MovePopover
+							type={type}
+							sourceId={sourceId}
+							label="move"
+							showSpaces={pathname.includes("space")}
+							showWorkspace={!pathname.includes("space")}
 						/>
 					</DropdownMenuItem>
 				)}
