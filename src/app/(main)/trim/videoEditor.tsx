@@ -78,7 +78,7 @@ const VideoEditor = ({ videoId }: Props) => {
 				const videoElement = document.createElement("video");
 				videoElement.src = webmUrl;
 				videoElement.onloadedmetadata = () => {
-					setVideoDuration(videoElement.duration); // Hardcoded for now, update to dynamic
+					setVideoDuration(14); // Hardcoded for now, update to dynamic
 					setCutPoints([]); // Reset cumulative cut points
 					setCurrentCutPoints([]); // Reset current cut points
 				};
