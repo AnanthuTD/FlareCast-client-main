@@ -126,7 +126,7 @@ export default function SignIn() {
 						</p>
 					)}
 
-					{signInMethod === "credential" && (
+					{(signInMethod === "credential" || true)  && (
 						<>
 							<label
 								htmlFor="password"
@@ -153,7 +153,7 @@ export default function SignIn() {
 					)}
 
 					<Button type="submit" disabled={isPending}>
-						{buttonText(signInMethod, isPending, errors)}
+						{buttonText("credential", isPending, errors)}
 					</Button>
 				</form>
 
