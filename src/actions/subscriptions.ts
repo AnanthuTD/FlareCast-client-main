@@ -45,7 +45,9 @@ export const subscribeToPlan = async (
 	planId: string
 ): Promise<SubscriptionResponse> => {
 	try {
-		const response = await axiosInstance.post(`${API_BASE_URL}/subscribe`, { planId });
+		const response = await axiosInstance.post(`${API_BASE_URL}/subscribe`, {
+			planId,
+		});
 		return response.data;
 	} catch (error) {
 		const axiosError = error as AxiosError<ErrorResponse>;
@@ -115,4 +117,13 @@ export const cancelSubscription = async (): Promise<{
 			axiosError.response?.data.message || "Failed to cancel subscription"
 		);
 	}
+};
+
+export const getVideoLimit = async (): Promise<{
+	message: string;
+	permission: "granted" | "denied";
+	maxVideoCount: number | null;
+	totalVideoUploaded: number ;
+}> => {
+	return axiosInstance.get('/api/user/upload-permissions')
 };

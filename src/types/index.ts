@@ -268,18 +268,22 @@ export interface IChatFlat {
 }
 
 export interface SubscriptionPlan {
-	planId: string;
-	name: string;
-	price: number;
-	interval: number;
-	period: string;
-	description?: string;
-	videoPerMonth: number;
-	duration: number;
-	workspace: number;
-	aiFeature: boolean;
-	active: boolean;
-	trim: boolean;
+  id: string;
+  planId: string;
+  name: string;
+  price: number;
+  interval: number;
+  period: "daily" | "weekly" | "monthly" | "quarterly" | "yearly";
+  maxRecordingDuration?: number;
+  hasAiFeatures: boolean;
+  allowsCustomBranding: boolean;
+  hasAdvancedEditing: boolean;
+  maxMembers?: number;
+  monthlyVideoQuota?: number;
+  maxWorkspaces?: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface SubscriptionData {

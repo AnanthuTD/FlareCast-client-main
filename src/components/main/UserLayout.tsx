@@ -11,22 +11,27 @@ import {
 	History,
 	House,
 	Library,
-	SearchIcon,
 	Settings,
 } from "lucide-react";
 import { VideoSearchUI } from "../global/video-search";
 import { useWorkspaceStore } from "@/providers/WorkspaceStoreProvider";
 import Link from "next/link";
-
-const workspaces = [];
+import { useSocket } from "@/hooks/useSocket";
+import useVideoLimit from "@/hooks/useVideoLimit";
 
 export const UserLayout: React.FC<{ children: React.ReactNode }> = ({
 	children,
 }) => {
+	// to track active users
+	const {} = useSocket(
+		`${process.env.NEXT_PUBLIC_BACKEND_URL}/user` as string,
+		"/user/socket.io"
+	);
 	const activeWorkspaceId = useWorkspaceStore(
 		(state) => state.selectedWorkspace.id
 	);
 	const { count: notificationCount } = useNotificationCount(0);
+	const { data, refetch } = useVideoLimit();
 
 	const sidebarItems = React.useMemo(
 		() => [
@@ -92,7 +97,7 @@ export const UserLayout: React.FC<{ children: React.ReactNode }> = ({
 						</div>
 						<div className="flex gap-2.5 text-sm text-center items-center">
 							<div className="grow my-auto leading-loose text-gray-500">
-								1/25 videos
+								{data?.totalVideoUploaded}/{data?.maxVideoCount} videos
 							</div>
 							<Link href={"/upgrade"}>
 								<button className="flex gap-2 items-start py-1.5 pr-5 pl-4 font-medium leading-6 text-white whitespace-nowrap bg-indigo-500 rounded-[7992px]">
