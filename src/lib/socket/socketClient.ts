@@ -1,14 +1,16 @@
 import { io, Socket } from "socket.io-client";
 
-// Define event types for better type safety (optional, adjust as needed)
+// Define event types for type safety
 interface SocketEvents {
 	connect: () => void;
 	disconnect: (reason: string) => void;
 	connect_error: (err: Error) => void;
+	initial_data?: (data: any) => void; // Add custom events as needed
+	[key: string]: any; // Allow dynamic event names
 }
 
 class SocketClient {
-	private socket: Socket<SocketEvents, SocketEvents> | null = null;
+	private sockets: Map<string, Socket<SocketEvents, SocketEvents>> = new Map();
 	private static instance: SocketClient;
 
 	private constructor() {}
@@ -25,63 +27,74 @@ class SocketClient {
 		path: string,
 		token: string
 	): Socket<SocketEvents, SocketEvents> {
-		console.log("================================");
-		console.log("Connecting to:", { url, path, token });
-		console.log("================================");
+		const key = `${url}${path}`; // Unique key for namespace (e.g., "http://localhost:3000/admin-dashboard")
 
-		// If already connected, disconnect first to allow reconfiguration
-		if (this.socket?.connected) {
-			console.log("Already connected. Disconnecting existing socket.");
-			this.disconnect();
+		// Return existing socket if already connected
+		if (this.sockets.has(key) && this.sockets.get(key)!.connected) {
+			console.log(`Reusing existing socket for ${key}`);
+			return this.sockets.get(key)!;
 		}
 
-		// Create new socket instance
-		this.socket = io(url, {
+		// Create new socket for the namespace
+		console.log("================================");
+		console.log("Connecting to namespace:", { url, path, token });
+		console.log("================================");
+
+		const socket = io(`${url}`, {
 			reconnection: true,
 			reconnectionAttempts: 5,
 			reconnectionDelay: 1000,
 			transports: ["websocket"],
-			path,
-			auth: {
-				token,
-			},
+			auth: { token },
 			withCredentials: true,
+			path,
 		});
 
-		// Connection event handlers
-		this.socket.on("connect", () => {
-			if (!this.socket) return;
-			const transport = this.socket.io.engine.transport.name;
-			console.log(`Connected to ${url} using ${transport}`);
+		// Store the socket
+		this.sockets.set(key, socket);
 
-			this.socket.io.engine.on("upgrade", () => {
-				if (!this.socket) return;
-				const upgradedTransport = this.socket.io.engine.transport.name;
+		// Connection event handlers
+		socket.on("connect", () => {
+			const transport = socket.io.engine.transport.name;
+			console.log(`Connected to ${key} using ${transport}`);
+
+			socket.io.engine.on("upgrade", () => {
+				const upgradedTransport = socket.io.engine.transport.name;
 				console.log(`Upgraded to ${upgradedTransport}`);
 			});
 		});
 
-		this.socket.on("connect_error", (err) => {
-			console.error(`Connection failed to ${url}: ${err.message}`);
+		socket.on("connect_error", (err) => {
+			console.error(`Connection failed to ${key}: ${err.message}`);
 		});
 
-		this.socket.on("disconnect", (reason) => {
-			console.log(`Disconnected from ${url}: ${reason}`);
+		socket.on("disconnect", (reason) => {
+			console.log(`Disconnected from ${key}: ${reason}`);
 		});
 
-		return this.socket;
+		return socket;
 	}
 
-	disconnect(): void {
-		if (this.socket) {
-			this.socket.disconnect();
-			this.socket = null;
-			console.log("Socket disconnected.");
+	disconnect(key?: string): void {
+		if (key) {
+			const socket = this.sockets.get(key);
+			if (socket) {
+				socket.disconnect();
+				this.sockets.delete(key);
+				console.log(`Disconnected from namespace: ${key}`);
+			}
+		} else {
+			// Disconnect all
+			this.sockets.forEach((socket, ns) => {
+				socket.disconnect();
+				this.sockets.delete(ns);
+			});
+			console.log("All sockets disconnected.");
 		}
 	}
 
-	getSocket(): Socket<SocketEvents, SocketEvents> | null {
-		return this.socket;
+	getSocket(key: string): Socket<SocketEvents, SocketEvents> | null {
+		return this.sockets.get(key) || null;
 	}
 }
 

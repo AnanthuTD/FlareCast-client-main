@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { socketClient } from "@/lib/socket/socketClient";
-import { SocketEvents } from "@/lib/socket/socketEvents";
 
 export const useSocket = (url: string, path: string) => {
+  const key = `${url}${path}`;
   const [isConnected, setIsConnected] = useState(false);
   const [socketError, setSocketError] = useState<string | null>(null);
 
@@ -51,14 +51,14 @@ export const useSocket = (url: string, path: string) => {
   }, [url, path]);
 
   const emitEvent = (event: string, data: any) => {
-    const socket = socketClient.getSocket();
+    const socket = socketClient.getSocket(key);
     if (socket) {
       socket.emit(event, data);
     }
   };
 
   const onEvent = (event: string, callback: (data: any) => void) => {
-    const socket = socketClient.getSocket();
+    const socket = socketClient.getSocket(key);
     if (socket) {
       socket.on(event, callback);
     }
