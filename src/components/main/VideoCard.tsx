@@ -5,7 +5,7 @@ import Image from "next/image";
 import { VideoCardProps } from "@/types";
 import { Card, CardContent, CardHeader } from "../ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ExternalLink, Eye, MessageCircle } from "lucide-react";
+import { ExternalLink, Eye, MessageCircle, Video } from "lucide-react";
 import DropdownVideo from "../global/video-library/DropdownVideo";
 
 export const VideoCard: React.FC<VideoCardProps> = ({
@@ -13,17 +13,45 @@ export const VideoCard: React.FC<VideoCardProps> = ({
 	userName,
 	timeAgo,
 	title,
-	views,
+	totalViews,
 	comments,
 	shares,
 	thumbnailUrl,
 	userAvatarUrl,
 	onClick,
-	transcodeStatus = true,
+	transcodeStatus = "SUCCESS",
+	thumbnailStatus = "SUCCESS",
 	id,
 	spaceId,
+	type = "VOD",
 }) => {
-	const isClickable = transcodeStatus;
+	const isLive = type === "LIVE";
+	const isClickable = isLive || transcodeStatus === "SUCCESS";
+	const hasThumbnail = !!thumbnailUrl && thumbnailStatus === "SUCCESS";
+
+	// Determine fallback content based on type and thumbnail status
+	const renderThumbnailFallback = () => {
+		if (isLive) {
+			return (
+				<div className="flex items-center justify-center h-full bg-gray-800 text-white text-sm">
+					<Video className="w-6 h-6 mr-2" />
+					<span>Streaming Live</span>
+				</div>
+			);
+		}
+		if (thumbnailStatus === "PENDING") {
+			return (
+				<div className="flex items-center justify-center h-full bg-gray-200 text-gray-600 text-sm">
+					<span>Processing...</span>
+				</div>
+			);
+		}
+		return (
+			<div className="flex items-center justify-center h-full bg-gray-200 text-gray-600 text-sm">
+				<span>No Thumbnail</span>
+			</div>
+		);
+	};
 
 	return (
 		<Card
@@ -34,25 +62,33 @@ export const VideoCard: React.FC<VideoCardProps> = ({
 			style={{ cursor: isClickable ? "pointer" : "not-allowed" }}
 		>
 			<CardHeader>
-				<div
-					className={`relative w-full h-48 rounded-2xl overflow-hidden ${
-						thumbnailUrl ? "" : "bg-black"
-					}`}
-				>
-					{/* Video Thumbnail */}
-					{thumbnailUrl && (
+				<div className="relative w-full h-48 rounded-2xl overflow-hidden">
+					{/* Video Thumbnail or Fallback */}
+					{hasThumbnail ? (
 						<Image
 							src={thumbnailUrl}
 							alt="Video thumbnail"
 							fill
 							className="object-cover"
 						/>
+					) : (
+						renderThumbnailFallback()
 					)}
 
-					{/* Duration Badge */}
-					<div className="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded">
-						{duration}
-					</div>
+					{/* Live Stream Indicator (only if thumbnail exists) */}
+					{isLive && (
+						<div className="absolute top-2 left-2 bg-red-600 text-white text-xs px-2 py-1 rounded flex items-center gap-1">
+							<Video className="w-4 h-4" />
+							<span>LIVE</span>
+						</div>
+					)}
+
+					{/* Duration Badge (VOD only, if thumbnail exists) */}
+					{!isLive && hasThumbnail && (
+						<div className="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded">
+							{duration}
+						</div>
+					)}
 				</div>
 			</CardHeader>
 
@@ -84,7 +120,7 @@ export const VideoCard: React.FC<VideoCardProps> = ({
 						<div className="flex gap-4 mt-3 text-xs text-gray-500">
 							<div className="flex items-center gap-1">
 								<Eye />
-								<span>{views}</span>
+								<span>{totalViews}</span>
 							</div>
 							<div className="flex items-center gap-1">
 								<MessageCircle />
@@ -92,11 +128,7 @@ export const VideoCard: React.FC<VideoCardProps> = ({
 							</div>
 							<div className="flex items-center gap-1">
 								<ExternalLink />
-								<DropdownVideo
-									sourceId={id}
-									type={"video"}
-									canShare={!spaceId}
-								/>
+								<DropdownVideo sourceId={id} type="video" canShare={!spaceId} />
 								<span>{shares}</span>
 							</div>
 						</div>

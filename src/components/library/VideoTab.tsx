@@ -10,7 +10,7 @@ import { useUserStore } from "@/providers/UserStoreProvider";
 import { Video } from "@/types";
 import clsx from "clsx";
 import { useQueryData } from "@/hooks/useQueryData";
-import { Button } from "@/components/ui/button"; // Import Button from Shadcn UI
+import { Button } from "@/components/ui/button";
 
 interface NewVideo extends Video {
 	status: boolean;
@@ -41,15 +41,16 @@ function VideoTab({
 	);
 	const userId = useUserStore((state) => state.id);
 	const [newVideoStatus, setNewVideoStatus] = useState<NewVideo[]>([]);
-	const [page, setPage] = useState(1); // Current page
-	const pageSize = 10; // Matches your controller's default limit
+	const [page, setPage] = useState(1);
+	const pageSize = 10;
 
-	// Listen for SSE events
+	// SSE for real-time video events
 	const { messages, setMessages } = useSSE<NewVideo>(
 		`/api/video/${selectedWorkspace.id}/events?userId=${userId}`,
 		[selectedWorkspace.id, userId]
 	);
 
+	// Fetch videos with pagination
 	const { data: videoResponse, refetch } = useQueryData<VideoResponse>(
 		["workspace-videos", selectedWorkspace.id, folderId, spaceId, page],
 		() =>
@@ -65,21 +66,42 @@ function VideoTab({
 	const videos = videoResponse?.videos || [];
 
 	useEffect(() => {
-		if (messages.length > 0) {
-			const newMessage = messages[messages.length - 1];
-			setMessages([]);
+		if (messages.length === 0) return;
 
-			// If transcoding is done, remove it from pending list and refetch
-			if (newMessage.transcodeStatus !== "PENDING") {
-				console.log("Video transcoded successfully");
-				setNewVideoStatus((prev) => {
-					const data = prev.filter((m) => m.id !== newMessage.id);
-					console.log("update video: ", data);
-					return data;
-				});
+		const newMessage = messages[messages.length - 1];
+		setMessages([]); // Clear messages after processing
+
+		// Handle live stream event
+		if (
+			newMessage.event === "liveStream" &&
+			newMessage.message === "Started live stream"
+		) {
+			console.log("Live stream started:", newMessage.videoId);
+			refetch(); // Refetch immediately for live streams
+			return;
+		}
+
+		// Handle VOD processing updates
+		const isVod = newMessage.type === "VOD";
+		if (isVod) {
+			// Refetch if transcoding or thumbnail succeeds
+			if (
+				newMessage.transcodeStatus === "SUCCESS" ||
+				newMessage.thumbnailStatus === "SUCCESS"
+			) {
+				console.log(
+					"VOD processing complete (transcode/thumbnail):",
+					newMessage.id
+				);
+				setNewVideoStatus(
+					(prev) => prev.filter((m) => m.id !== newMessage.id) // Remove from pending
+				);
 				refetch();
-			} else {
-				// Update or add processing video status
+			} else if (
+				newMessage.transcodeStatus === "PENDING" ||
+				newMessage.thumbnailStatus === "PENDING"
+			) {
+				// Update or add to pending list
 				setNewVideoStatus((prev) => {
 					const existingIndex = prev.findIndex((m) => m.id === newMessage.id);
 					if (existingIndex !== -1) {
@@ -115,7 +137,7 @@ function VideoTab({
 	return (
 		<div>
 			<div className="flex flex-wrap gap-5">
-				{/* Processing videos (greyed out, disabled cursor) */}
+				{/* Pending videos (greyed out) */}
 				{newVideoStatus.map((v) => (
 					<div
 						key={v.id}
@@ -124,18 +146,17 @@ function VideoTab({
 							"hover:opacity-60"
 						)}
 					>
-						<VideoCard {...v} key={v.id} onClick={() => {}} />
+						<VideoCard {...v} onClick={() => {}} />
 					</div>
 				))}
 
-				{/* Clickable completed videos */}
+				{/* Completed videos */}
 				{videos.map((v) => (
 					<VideoCard {...v} key={v.id} onClick={() => handleOnClick(v.id)} />
 				))}
 			</div>
 
-			{/* Pagination Controls */}
-
+			{/* Pagination */}
 			{videoResponse && videoResponse.totalCount > pageSize && (
 				<div className="mt-4 flex justify-center gap-4">
 					<Button

@@ -123,17 +123,21 @@ export interface SignInButtonProps {
 }
 
 export interface VideoCardProps {
+	id: string;
 	duration: string;
-	userName: string;
-	timeAgo: string;
-	title: string;
-	views: number;
-	comments: number;
-	shares: number;
-	thumbnailUrl: string;
-	userAvatarUrl: string;
-	onClick: () => void;
-	transcodeStatus: boolean;
+	userName?: string; // Optional, derived from User relation
+	timeAgo?: string; // Calculated elsewhere (e.g., "2 hours ago")
+	title?: string;
+	totalViews: number; // Renamed from `views` to match Prisma
+	comments: number; // Derived from Chat[] or similar
+	shares: number; // Derived elsewhere
+	thumbnailUrl?: string;
+	userAvatarUrl?: string;
+	onClick?: () => void;
+	transcodeStatus?: VideoStatus;
+	spaceId?: string;
+	type?: VideoType;
+	thumbnailStatus: VideoStatus;
 }
 
 export interface SectionProps {
@@ -228,6 +232,8 @@ export interface Video {
 	transcriptionStatus: VideoStatus;
 	titleStatus: VideoStatus;
 	descriptionStatus: VideoStatus;
+	type: VideoType;
+	liveStreamStatus: VideoStatus;
 
 	userName: string;
 	comments: number;
@@ -245,7 +251,8 @@ export interface Video {
 	watchLater: { id: string } | null;
 }
 
-type VideoStatus = "SUCCESS" | "FAILED" | "PENDING";
+export type VideoStatus = "PENDING" | "SUCCESS" | "FAILED" | "PROCESSING";
+export type VideoType = "VOD" | "LIVE";
 
 export interface IChatHierarchical {
 	id: string;
@@ -268,22 +275,22 @@ export interface IChatFlat {
 }
 
 export interface SubscriptionPlan {
-  id: string;
-  planId: string;
-  name: string;
-  price: number;
-  interval: number;
-  period: "daily" | "weekly" | "monthly" | "quarterly" | "yearly";
-  maxRecordingDuration?: number;
-  hasAiFeatures: boolean;
-  allowsCustomBranding: boolean;
-  hasAdvancedEditing: boolean;
-  maxMembers?: number;
-  monthlyVideoQuota?: number;
-  maxWorkspaces?: number;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
+	id: string;
+	planId: string;
+	name: string;
+	price: number;
+	interval: number;
+	period: "daily" | "weekly" | "monthly" | "quarterly" | "yearly";
+	maxRecordingDuration?: number;
+	hasAiFeatures: boolean;
+	allowsCustomBranding: boolean;
+	hasAdvancedEditing: boolean;
+	maxMembers?: number;
+	monthlyVideoQuota?: number;
+	maxWorkspaces?: number;
+	isActive: boolean;
+	createdAt: string;
+	updatedAt: string;
 }
 
 export interface SubscriptionData {

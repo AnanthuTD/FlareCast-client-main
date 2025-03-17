@@ -1,6 +1,6 @@
 "use client";
+
 import React, { useEffect, useState, useMemo, useCallback } from "react";
-import Head from "next/head"; // Import Head
 import TabMenu from "../../tabs";
 import VideoTranscript from "../../video-transcript";
 import { toast } from "sonner";
@@ -59,8 +59,8 @@ const VideoPreview = ({ videoId }: Props) => {
 		try {
 			const { video } = await getPreviewVideo(videoId);
 			setVideo(video);
-			setTitle(video.title);
-			setDescription(video.description);
+			setTitle(video.title || "Untitled Video");
+			setDescription(video.description || "No Summary");
 		} catch (error) {
 			toast.error("Failed to get preview video");
 		}
@@ -75,17 +75,18 @@ const VideoPreview = ({ videoId }: Props) => {
 		const newMessage = messages[messages.length - 1];
 		setMessages([]);
 		setVideo((prevVideo) => {
-			if (!prevVideo) return prevVideo;
+			if (!prevVideo || prevVideo.id !== newMessage.id) return prevVideo;
 			return {
 				...prevVideo,
 				transcodeStatus:
-					newMessage.transcriptionStatus === "SUCCESS"
-						? "success"
-						: prevVideo.transcodeStatus,
+					newMessage.transcodeStatus || prevVideo.transcodeStatus,
 				transcription:
 					newMessage.transcriptionStatus === "SUCCESS"
 						? newMessage.transcription
 						: prevVideo.transcription,
+				liveStreamStatus:
+					newMessage.liveStreamStatus || prevVideo.liveStreamStatus,
+				type: newMessage.type || prevVideo.type,
 			};
 		});
 	}, [messages, setMessages]);
@@ -125,7 +126,8 @@ const VideoPreview = ({ videoId }: Props) => {
 	};
 
 	const pageUrl = `${process.env.NEXT_PUBLIC_HOST_URL}/preview/${videoId}`;
-	const thumbnailUrl = `/gcs/${videoId}/thumbnails/thumb00001.jpg`; // Adjust if hosted elsewhere
+	const thumbnailUrl = `/gcs/${videoId}/thumbnails/thumb00001.jpg`;
+	const hlsUrl = `/gcs/${videoId}/master.m3u8`;
 
 	return !video ? (
 		<div>
@@ -133,23 +135,6 @@ const VideoPreview = ({ videoId }: Props) => {
 		</div>
 	) : (
 		<>
-			<Head>
-				<title>{video.title}</title>
-				<meta property="og:title" content={video.title || "Untitled Video"} />
-				<meta
-					property="og:description"
-					content={truncateString(
-						video.description || "No description available",
-						200
-					)}
-				/>
-				<meta property="og:image" content={thumbnailUrl} />
-				<meta property="og:url" content={pageUrl} />
-				<meta property="og:type" content="video.other" />
-				<meta property="og:site_name" content="Your Video App Name" />
-				<meta property="og:video" content={`/gcs/${videoId}/master.m3u8`} />
-				<meta property="og:video:type" content="application/x-mpegURL" />
-			</Head>
 			<div className="grid grid-cols-1 xl:grid-cols-3 gap-5 w-full">
 				<div className="flex flex-col lg:col-span-2 gap-y-6">
 					<Card>
@@ -177,10 +162,11 @@ const VideoPreview = ({ videoId }: Props) => {
 						</CardHeader>
 						<CardContent>
 							<Player
-								hslUrl={`/gcs/${videoId}/master.m3u8`}
+								hslUrl={hlsUrl} // Use CloudFront URL
 								thumbnailsUrl={`/gcs/${videoId}/thumbnails/thumbnails.vtt`}
 								posterUrl={thumbnailUrl}
 								videoId={videoId}
+								type={video.type} // Pass video type
 							/>
 						</CardContent>
 					</Card>
@@ -263,7 +249,7 @@ const VideoPreview = ({ videoId }: Props) => {
 				<div className="lg:col-span-1">
 					<TabMenu
 						defaultValue="AI Tool"
-						triggers={["AI Tool", "Transcript", "Activity", "asd"]}
+						triggers={["AI Tool", "Transcript", "Activity"]}
 					>
 						{video.id && (
 							<AiTools videoId={video.id} trial={false} plan={"PRO"} />
