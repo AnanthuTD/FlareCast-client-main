@@ -123,7 +123,8 @@ export const getVideoLimit = async (): Promise<{
 	message: string;
 	permission: "granted" | "denied";
 	maxVideoCount: number | null;
-	totalVideoUploaded: number ;
+	totalVideoUploaded: number;
 }> => {
-	return axiosInstance.get('/api/user/upload-permissions')
+	const { data } = await axiosInstance.get("/api/user/upload-permission");
+	return data;
 };

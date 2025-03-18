@@ -97,7 +97,7 @@ export const UserLayout: React.FC<{ children: React.ReactNode }> = ({
 						</div>
 						<div className="flex gap-2.5 text-sm text-center items-center">
 							<div className="grow my-auto leading-loose text-gray-500">
-								{data?.totalVideoUploaded}/{data?.maxVideoCount} videos
+								{data?.totalVideoUploaded} / {data?.maxVideoCount ?? "unlimited"} videos
 							</div>
 							<Link href={"/upgrade"}>
 								<button className="flex gap-2 items-start py-1.5 pr-5 pl-4 font-medium leading-6 text-white whitespace-nowrap bg-indigo-500 rounded-[7992px]">

@@ -142,13 +142,13 @@ const VideoPreview = ({ videoId }: Props) => {
 							<div className="flex justify-between items-center">
 								{isEditingTitle ? (
 									<Input
-										value={title}
+										value={title || "Untitled Video"}
 										onChange={(e) => setTitle(e.target.value)}
 										onBlur={handleTitleSave}
 										autoFocus
 									/>
 								) : (
-									<h2 className="text-2xl font-bold">{video?.title}</h2>
+									<h2 className="text-2xl font-bold">{video?.title || "Untitled Video"}</h2>
 								)}
 								<Button
 									variant="ghost"
@@ -257,7 +257,7 @@ const VideoPreview = ({ videoId }: Props) => {
 						<VideoTranscript
 							transcript={video?.transcription || "Transcript not available"}
 						/>
-						{video?.id && <ChatBox videoId={video.id} />}
+						{video?.id && video.workspaceId && video.userId && <ChatBox videoId={video.id} />}
 					</TabMenu>
 				</div>
 			</div>
