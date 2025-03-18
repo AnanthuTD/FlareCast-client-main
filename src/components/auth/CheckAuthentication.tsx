@@ -11,7 +11,7 @@ const excludeFromAuth = [
 	"/verification/email/success",
 	"/verification/email/failure",
 	"/verification/email/notify",
-	"/verification/verification",
+	"/verification/invitation"
 ];
 
 function CheckAuthentication({ children }: { children: React.ReactNode }) {

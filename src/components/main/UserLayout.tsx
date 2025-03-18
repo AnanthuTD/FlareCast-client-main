@@ -112,7 +112,7 @@ export const UserLayout: React.FC<{ children: React.ReactNode }> = ({
 							</Link>
 						</div>
 					</form>
-					<ModeToggle />
+					{/* <ModeToggle /> */}
 					<div className="flex overflow-hidden gap-2.5 items-center self-stretch my-auto w-9 h-9 bg-white rounded-[7992px]">
 						<ProfilePicture />
 					</div>

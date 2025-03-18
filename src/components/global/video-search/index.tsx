@@ -6,6 +6,7 @@ import {
 	CommandList,
 	CommandItem,
 	CommandEmpty,
+	CommandSeparator,
 } from "@/components/ui/command";
 import { searchVideo, suggestFolders, suggestVideo } from "@/actions/video";
 import { useRouter } from "next/navigation";
@@ -193,8 +194,7 @@ export function VideoSearchUI({ workspaceId }: VideoSearchUIProps) {
 		const atBottom =
 			target.scrollHeight - target.scrollTop - target.clientHeight < 50;
 		if (atBottom) {
-			Promise.all([loadMoreVideos(), loadMoreFolders()]).finally(() => {
-			});
+			Promise.all([loadMoreVideos(), loadMoreFolders()]).finally(() => {});
 		}
 	};
 
@@ -214,10 +214,11 @@ export function VideoSearchUI({ workspaceId }: VideoSearchUIProps) {
 					onBlur={() => setTimeout(() => setShow(false), 100)}
 				/>
 				<CommandList
-					className={`left-0 right-0 top-full overflow-y-auto rounded-lg border bg-white h-[50vh] shadow-md ${
-						show ? "" : "hidden"
-					}`}
+					className={`overflow-y-auto rounded-lg border bg-white h-[50vh]`}
 					onScroll={handleScroll}
+					style={{
+						display: show ? "block" : "none",
+					}}
 				>
 					{isSearching && (
 						<CommandItem disabled className="flex items-center gap-2 py-2 px-2">
@@ -248,20 +249,26 @@ export function VideoSearchUI({ workspaceId }: VideoSearchUIProps) {
 						</CommandEmpty>
 					)}
 					{suggestedVideos.results.map((suggestion) => (
-						<CommandItem
-							key={suggestion.id} // Use id for uniqueness
-							onSelect={() => router.push(`/video/${suggestion.id}`)}
-							className="cursor-pointer hover:bg-gray-100 py-1.5 px-2"
-							value={suggestion.title}
-						>
-							<span className="flex gap-2">
-								<div>
-									<p>{suggestion.title}</p>
-									<span>{suggestion.user.name}</span> ·{" "}
-									<span>{new Date(suggestion.createdAt).toDateString()}</span>
-								</div>
-							</span>
-						</CommandItem>
+						<>
+							<CommandItem
+								key={suggestion.id} // Use id for uniqueness
+								onSelect={() => {
+									console.log("selected");
+									router.push(`/video/${suggestion.id}`);
+								}}
+								className="cursor-pointer hover:bg-gray-100 py-1.5 px-2"
+								value={suggestion.title}
+							>
+								<span className="flex gap-2">
+									<div>
+										<p>{suggestion.title}</p>
+										<span>{suggestion.user.name}</span> ·{" "}
+										<span>{new Date(suggestion.createdAt).toDateString()}</span>
+									</div>
+								</span>
+							</CommandItem>
+							<CommandSeparator />
+						</>
 					))}
 					{suggestedFolders.results.map((folder) => (
 						<CommandItem

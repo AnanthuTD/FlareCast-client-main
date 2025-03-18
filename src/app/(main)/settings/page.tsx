@@ -10,7 +10,7 @@ function SettingsPage() {
 			<h1>Settings</h1>
 
 			<TabMenu
-				defaultValue="Notification"
+				defaultValue="Personal"
 				triggers={["Personal", "Notification", "Workspace"]}
 			>
 				<PersonalSettings />

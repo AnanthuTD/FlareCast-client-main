@@ -24,6 +24,8 @@ import axiosInstance from "@/axios";
 import axios from "axios";
 import Link from "next/link";
 import { Trash2Icon } from "lucide-react";
+import { useUserStore } from "@/providers/UserStoreProvider";
+import EditingUpgradePrompt from "@/components/global/editing-upgrade-prompt";
 
 type Props = {
 	videoId: string;
@@ -41,6 +43,7 @@ const VideoEditor = ({ videoId }: Props) => {
 	const [previewTime, setPreviewTime] = useState<number>(0); // For real-time preview
 	const [uploadProgress, setUploadProgress] = useState<number>(0); // Upload progress state
 	const [isUploading, setIsUploading] = useState<boolean>(false); // Upload modal state
+	const { hasAdvancedEditing } = useUserStore((state) => state.plan);
 
 	// Load FFmpeg
 	useEffect(() => {
@@ -78,7 +81,7 @@ const VideoEditor = ({ videoId }: Props) => {
 				const videoElement = document.createElement("video");
 				videoElement.src = webmUrl;
 				videoElement.onloadedmetadata = () => {
-					setVideoDuration(14); // Hardcoded for now, update to dynamic
+					setVideoDuration(parseFloat(video?.duration || "14")); // Hardcoded for now, update to dynamic
 					setCutPoints([]); // Reset cumulative cut points
 					setCurrentCutPoints([]); // Reset current cut points
 				};
@@ -324,7 +327,7 @@ const VideoEditor = ({ videoId }: Props) => {
 		}
 	};
 
-	return (
+	return hasAdvancedEditing ? (
 		<div className="min-h-screen bg-white p-6">
 			{/* 			<h1 className="text-3xl font-bold mb-6 text-indigo-900">
 				{video?.title || "Video Editor"}
@@ -572,6 +575,8 @@ const VideoEditor = ({ videoId }: Props) => {
 				</DialogContent>
 			</Dialog>
 		</div>
+	) : (
+		<EditingUpgradePrompt />
 	);
 };
 

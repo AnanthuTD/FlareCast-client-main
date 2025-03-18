@@ -2,28 +2,25 @@ import { Button } from "@/components/ui/button";
 import { TabsContent } from "@/components/ui/tabs";
 import React from "react";
 import Loader from "../loader";
-import VideoRecorderDuotone from "@/components/icons/video-recorder-duotone";
-import { FileDuoToneBlack } from "@/components/icons";
 import {
 	Bot,
-	DownloadIcon,
 	FileTextIcon,
 	Pencil,
 	StarsIcon,
-	VideoIcon,
 } from "lucide-react";
 import AiChatBox from "./AiChatBox";
+import { SubscriptionPlan } from "@/types";
+import Link from "next/link";
 
 type Props = {
-	plan: "PRO" | "FREE";
-	trial: boolean;
+	plan: SubscriptionPlan;
 	videoId: string;
 };
 
 const AiTools = ({ plan, trial, videoId }: Props) => {
 	return (
 		<TabsContent value="AI Tool">
-			{trial || plan === "PRO" ? (
+			{plan?.hasAiFeatures ? (
 				<AiChatBox videoId={videoId} />
 			) : (
 				<div className="p-5 bg-white rounded-xl flex flex-col gap-y-6">
@@ -41,19 +38,23 @@ const AiTools = ({ plan, trial, videoId }: Props) => {
 									Try Now
 								</Loader>
 							</Button>
-							<Button
-								className="mt-2 text-sm bg-white text-indigo-400 border border-indigo-400 hover:bg-indigo-50"
-								variant="secondary"
-							>
-								<Loader state={false} color="#818CF8">
-									Pay Now
-								</Loader>
-							</Button>
+							<Link href={"/upgrade"}>
+								<Button
+									className="mt-2 text-sm bg-white text-indigo-400 border border-indigo-400 hover:bg-indigo-50"
+									variant="secondary"
+								>
+									<Loader state={false} color="#818CF8">
+										Upgrade Now
+									</Loader>
+								</Button>
+							</Link>
 						</div>
 					</div>
 					<div className="border-[1px] border-indigo-200 rounded-xl p-4 gap-4 flex flex-col bg-indigo-50">
 						<div className="flex items-center gap-2">
-							<h2 className="text-2xl font-bold text-indigo-400">Opal AI</h2>
+							<h2 className="text-2xl font-bold text-indigo-400">
+								Flarecast AI
+							</h2>
 							<StarsIcon color="#818CF8" fill="#818CF8" />
 						</div>
 						<div className="flex gap-2 items-start">
