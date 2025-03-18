@@ -52,6 +52,28 @@ export async function getMyVideos(
 	return data;
 }
 
+export async function getPromotionalVideos(
+	skip: number = 0,
+	limit: number = 10
+): Promise<{
+	videos: Video[];
+	totalCount: number;
+	page: number;
+	pageSize: number;
+	totalPages: number;
+	hasNext: boolean;
+	hasPrev: boolean;
+}> {
+	const { data } = await axiosInstance.get(`/api/video/promotionalVideos`, {
+		params: {
+			limit,
+			skip,
+		},
+	});
+
+	return data;
+}
+
 export async function getVideosForSpace(
 	workspaceId: string,
 	spaceId: string,

@@ -1,5 +1,4 @@
 import { VideoSection } from "@/components/main/VideoSection";
-import useRegisterFCMToken from "@/hooks/useRegisterFCMToken";
 import React from "react";
 
 const videoData = {
@@ -41,7 +40,6 @@ function HomePage() {
 	return (
 		<>
 			<VideoSection {...videoData.gettingStarted} />
-			<VideoSection {...videoData.newFeatures} />
 		</>
 	);
 }
