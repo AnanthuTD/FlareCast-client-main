@@ -252,7 +252,7 @@ const VideoPreview = ({ videoId }: Props) => {
 						triggers={["AI Tool", "Transcript", "Activity"]}
 					>
 						{video.id && (
-							<AiTools videoId={video.id} trial={false} plan={"PRO"} />
+							<AiTools videoId={video.id} trial={false} plan={user.plan} />
 						)}
 						<VideoTranscript
 							transcript={video?.transcription || "Transcript not available"}

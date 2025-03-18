@@ -26,6 +26,7 @@ import Link from "next/link";
 import { Trash2Icon } from "lucide-react";
 import { useUserStore } from "@/providers/UserStoreProvider";
 import EditingUpgradePrompt from "@/components/global/editing-upgrade-prompt";
+import { getPreviewVideo } from "@/actions/video";
 
 type Props = {
 	videoId: string;
@@ -69,6 +70,11 @@ const VideoEditor = ({ videoId }: Props) => {
 		const webmUrl = `/gcs/${videoId}/original.webm`;
 		setVideoSrc(webmUrl);
 
+		getPreviewVideo(videoId).then(({video}) => {
+			setVideo(video);
+			setVideoDuration(parseFloat(video?.duration || "14")); // Hardcoded for now, update to dynamic
+		});
+
 		const checkFileSizeAndFetch = async () => {
 			try {
 				const response = await fetch(webmUrl);
@@ -81,7 +87,7 @@ const VideoEditor = ({ videoId }: Props) => {
 				const videoElement = document.createElement("video");
 				videoElement.src = webmUrl;
 				videoElement.onloadedmetadata = () => {
-					setVideoDuration(parseFloat(video?.duration || "14")); // Hardcoded for now, update to dynamic
+					console.log(video);
 					setCutPoints([]); // Reset cumulative cut points
 					setCurrentCutPoints([]); // Reset current cut points
 				};

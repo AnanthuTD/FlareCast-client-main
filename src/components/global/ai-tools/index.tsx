@@ -18,6 +18,7 @@ type Props = {
 };
 
 const AiTools = ({ plan, trial, videoId }: Props) => {
+	console.log(plan)
 	return (
 		<TabsContent value="AI Tool">
 			{plan?.hasAiFeatures ? (

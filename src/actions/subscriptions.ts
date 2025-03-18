@@ -1,6 +1,6 @@
 import axiosInstance from "@/axios";
 import { SubscriptionPlan } from "@/types";
-import axios, { AxiosError } from "axios";
+import axios, { AxiosError, isAxiosError } from "axios";
 
 const API_BASE_URL = "/api/user/subscriptions";
 
@@ -125,6 +125,11 @@ export const getVideoLimit = async (): Promise<{
 	maxVideoCount: number | null;
 	totalVideoUploaded: number;
 }> => {
-	const { data } = await axiosInstance.get("/api/user/upload-permission");
-	return data;
+	try {
+		const { data } = await axiosInstance.get("/api/user/upload-permission");
+		return data;
+	} catch (error) {
+		if (isAxiosError(error)) return error.response?.data;
+		throw new Error("Failed to get video limit");
+	}
 };
