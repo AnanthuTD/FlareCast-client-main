@@ -7,38 +7,48 @@ import {
 	CardFooter,
 	CardHeader,
 	CardTitle,
-} from "@/components/ui/card"; // shadcn Card
-import { Separator } from "@/components/ui/separator"; // shadcn Separator
-import { Badge } from "@/components/ui/badge"; // shadcn Badge
+} from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
 import { Pagination, Navigation } from "swiper/modules";
-import { io, Socket } from "socket.io-client";
-import Cookies from "js-cookie";
 import ActiveSubscriptionModal from "./ActiveSubscriptionModal";
 import PaynowButton from "./PaynowButton";
 import SubscriptionPaymentModal from "./SubscriptionPaymentModal";
 import SubscriptionTable from "./SubscriptionTable";
 import { toast } from "sonner";
 import {
-  cancelSubscription,
+	cancelSubscription,
 	checkCanSubscribe,
 	getSubscriptionPlansAuthenticated,
 	subscribeToPlan,
 } from "@/actions/subscriptions";
-import { ActivePlan, SubscriptionData, SubscriptionPlan } from "@/types";
-import { Button } from "@/components/ui/button";
+import { ActivePlan, SubscriptionData } from "@/types";
 import { Check } from "lucide-react";
 import { useSocket } from "@/hooks/useSocket";
 
-/* const socket: Socket = io(`/api/user/`, {
-	auth: {
-		token: Cookies.get("accessToken"), 
-	},
-	transports: ["websocket"],
-}); */
+interface SubscriptionPlan {
+	id: string;
+	type: "free" | "paid";
+	planId?: string; // Optional for free plans
+	name: string;
+	price: number;
+	interval?: number; // Optional for free plans
+	period?: "daily" | "weekly" | "monthly" | "quarterly" | "yearly"; // Optional for free plans
+	maxRecordingDuration: number;
+	hasAiFeatures: boolean;
+	allowsCustomBranding: boolean;
+	hasAdvancedEditing: boolean;
+	maxMembers?: number;
+	maxVideoCount?: number;
+	maxWorkspaces?: number;
+	isActive: boolean;
+	createdAt: string;
+	updatedAt: string;
+}
 
 function SubscriptionPage() {
 	const [subscriptionData, setSubscriptionData] =
@@ -47,7 +57,7 @@ function SubscriptionPage() {
 		SubscriptionPlan[]
 	>([]);
 	const [activePlan, setActivePlan] = useState<ActivePlan | null>(null);
-	const {isConnected, onEvent} = useSocket(
+	const { isConnected, onEvent } = useSocket(
 		`${process.env.NEXT_PUBLIC_BACKEND_URL}/subscriptions` as string,
 		"/user/socket.io"
 	);
@@ -104,13 +114,9 @@ function SubscriptionPage() {
 
 	const handleCancelSubscription = async () => {
 		try {
-			const response = await cancelSubscription();
-			/* setSubscriptionData((prevData) =>
-				prevData ? { ...prevData, status: "cancelled" } : null
-			); */
-			// setActivePlan(null);
-      fetchSubscriptionPlans()
-			console.log(response);
+			await cancelSubscription();
+			fetchSubscriptionPlans(); // Refresh plans after cancellation
+			toast.success("Subscription cancelled successfully!");
 		} catch (err: any) {
 			console.error(err);
 			toast.error(
@@ -131,75 +137,95 @@ function SubscriptionPage() {
 						style={{ padding: "1rem 0" }}
 					>
 						{subscriptionPlans.map((plan) => (
-							<SwiperSlide key={plan.planId} style={{ width: "300px" }}>
-								{/* <div className="relative"> */}
-								{activePlan?.planId === plan.planId && (
-									<Badge className="absolute -top-2 -right-2 bg-green-500 hover:bg-green-600">
-										Active
-									</Badge>
-								)}
-								<Card
-									key={plan.planId}
-									className={`flex flex-col min-w-[300px] max-w-[350px] snap-center border-indigo-400 ${
-										plan.active ? "border-2 shadow-lg" : "border"
-									} bg-white text-gray-800 hover:shadow-xl transition-shadow duration-300`}
-								>
-									<CardHeader>
-										<CardTitle className="text-2xl font-semibold text-indigo-400">
-											{plan.name}
-										</CardTitle>
-										<div className="text-4xl font-bold mt-2">
-											₹{plan.price}
-											<span className="text-base font-normal text-gray-600">
-												/{plan.period}
-											</span>
-										</div>
-										{/* 	{
-											<p className="text-sm text-gray-500 mt-2">
-												{plan.description}{"ss "}
-											</p>
-										} */}
-									</CardHeader>
-									<CardContent className="flex-1">
-										<ul className="space-y-3">
-											<li className="flex items-center gap-2">
-												<Check className="h-5 w-5 text-indigo-400" />
-												<span>{plan.videoPerMonth} videos/month</span>
-											</li>
-											<li className="flex items-center gap-2">
-												<Check className="h-5 w-5 text-indigo-400" />
-												<span>{plan.duration} months duration</span>
-											</li>
-											<li className="flex items-center gap-2">
-												<Check className="h-5 w-5 text-indigo-400" />
-												<span>{plan.workspace} workspace(s)</span>
-											</li>
-											<li className="flex items-center gap-2">
-												<Check className="h-5 w-5 text-indigo-400" />
-												<span>
-													{plan.aiFeature
-														? "AI Features Included"
-														: "Basic Features"}
-												</span>
-											</li>
-										</ul>
-									</CardContent>
-									<CardFooter>
-										{activePlan && plan.active ? (
-											<ActiveSubscriptionModal
-												activePlan={activePlan}
-												cancelSubscription={handleCancelSubscription}
-											/>
-										) : (
-											<PaynowButton
-												activePlan={activePlan}
-												onSubscribe={handleSubscription}
-												plan={plan}
-											/>
-										)}
-									</CardFooter>
-								</Card>
-								{/* </div> */}
+							<SwiperSlide key={plan.id} style={{ width: "300px" }}>
+								<div className="relative">
+									{activePlan?.planId === plan.planId && (
+										<Badge className="absolute -top-2 -right-2 bg-green-500 hover:bg-green-600">
+											Active
+										</Badge>
+									)}
+									<Card
+										className={`flex flex-col min-w-[300px] max-w-[350px] snap-center border-indigo-400 ${
+											plan.isActive ? "border-2 shadow-lg" : "border"
+										} bg-white text-gray-800 hover:shadow-xl transition-shadow duration-300`}
+									>
+										<CardHeader>
+											<CardTitle className="text-2xl font-semibold text-indigo-400">
+												{plan.name}
+											</CardTitle>
+											<div className="text-4xl font-bold mt-2">
+												₹{plan.price}
+												{plan.type === "paid" && plan.period && (
+													<span className="text-base font-normal text-gray-600">
+														/{plan.period}
+													</span>
+												)}
+											</div>
+										</CardHeader>
+										<CardContent className="flex-1">
+											<ul className="space-y-3">
+												<li className="flex items-center gap-2">
+													<Check className="h-5 w-5 text-indigo-400" />
+													<span>
+														Max Recording: {plan.maxRecordingDuration} min
+													</span>
+												</li>
+												<li className="flex items-center gap-2">
+													<Check className="h-5 w-5 text-indigo-400" />
+													<span>
+														AI Features: {plan.hasAiFeatures ? "Yes" : "No"}
+													</span>
+												</li>
+												<li className="flex items-center gap-2">
+													<Check className="h-5 w-5 text-indigo-400" />
+													<span>
+														Custom Branding:{" "}
+														{plan.allowsCustomBranding ? "Yes" : "No"}
+													</span>
+												</li>
+												<li className="flex items-center gap-2">
+													<Check className="h-5 w-5 text-indigo-400" />
+													<span>
+														Advanced Editing:{" "}
+														{plan.hasAdvancedEditing ? "Yes" : "No"}
+													</span>
+												</li>
+												{plan.maxMembers && (
+													<li className="flex items-center gap-2">
+														<Check className="h-5 w-5 text-indigo-400" />
+														<span>Max Members: {plan.maxMembers}</span>
+													</li>
+												)}
+												{plan.maxVideoCount && (
+													<li className="flex items-center gap-2">
+														<Check className="h-5 w-5 text-indigo-400" />
+														<span>Max Videos: {plan.maxVideoCount}</span>
+													</li>
+												)}
+												{plan.maxWorkspaces && (
+													<li className="flex items-center gap-2">
+														<Check className="h-5 w-5 text-indigo-400" />
+														<span>Max Workspaces: {plan.maxWorkspaces}</span>
+													</li>
+												)}
+											</ul>
+										</CardContent>
+										<CardFooter>
+											{activePlan && activePlan.planId === plan.planId ? (
+												<ActiveSubscriptionModal
+													activePlan={activePlan}
+													cancelSubscription={handleCancelSubscription}
+												/>
+											) : (
+												<PaynowButton
+													activePlan={activePlan}
+													onSubscribe={handleSubscription}
+													plan={plan}
+												/>
+											)}
+										</CardFooter>
+									</Card>
+								</div>
 							</SwiperSlide>
 						))}
 					</Swiper>

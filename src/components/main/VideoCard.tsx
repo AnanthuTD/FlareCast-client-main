@@ -33,7 +33,7 @@ export const VideoCard: React.FC<VideoCardProps> = ({
 	const renderThumbnailFallback = () => {
 		if (isLive) {
 			return (
-				<div className="flex items-center justify-center h-full bg-gray-800 text-white text-sm">
+				<div className="flex items-center justify-center h-full  text-white text-sm">
 					<Video className="w-6 h-6 mr-2" />
 					<span>Streaming Live</span>
 				</div>
@@ -41,13 +41,13 @@ export const VideoCard: React.FC<VideoCardProps> = ({
 		}
 		if (thumbnailStatus === "PENDING") {
 			return (
-				<div className="flex items-center justify-center h-full bg-gray-200 text-gray-600 text-sm">
+				<div className="flex items-center justify-center h-full  text-gray-600 text-sm">
 					<span>Processing...</span>
 				</div>
 			);
 		}
 		return (
-			<div className="flex items-center justify-center h-full bg-gray-200 text-gray-600 text-sm">
+			<div className="flex items-center justify-center h-full  text-gray-600 text-sm">
 				<span>No Thumbnail</span>
 			</div>
 		);
@@ -64,7 +64,7 @@ export const VideoCard: React.FC<VideoCardProps> = ({
 			<CardHeader>
 				<div className="relative w-full h-48 rounded-2xl overflow-hidden">
 					{/* Video Thumbnail or Fallback */}
-					{hasThumbnail ? (
+					{/* {hasThumbnail ? (
 						<Image
 							src={thumbnailUrl}
 							alt="Video thumbnail"
@@ -73,7 +73,14 @@ export const VideoCard: React.FC<VideoCardProps> = ({
 						/>
 					) : (
 						renderThumbnailFallback()
-					)}
+					)} */}
+
+					<Avatar className="object-cover w-full h-full rounded-none">
+						<AvatarImage src={thumbnailUrl} />
+						<AvatarFallback className="rounded-none">
+							{renderThumbnailFallback()}
+						</AvatarFallback>
+					</Avatar>
 
 					{/* Live Stream Indicator (only if thumbnail exists) */}
 					{isLive && (
