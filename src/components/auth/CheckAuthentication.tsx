@@ -25,7 +25,7 @@ function CheckAuthentication({ children }: { children: React.ReactNode }) {
 		async function checkAuthorizedUser() {
 			try {
 				const { data } = await axiosInstance.get(
-					"/api/user/auth/check-authentication"
+					"/api/user/profile"
 				);
 
 				if (data.user) {

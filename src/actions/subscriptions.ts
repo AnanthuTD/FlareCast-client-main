@@ -126,7 +126,7 @@ export const getVideoLimit = async (): Promise<{
 	totalVideoUploaded: number;
 }> => {
 	try {
-		const { data } = await axiosInstance.get("/api/user/upload-permission");
+		const { data } = await axiosInstance.get("/api/user/limits/upload-permission");
 		return data;
 	} catch (error) {
 		if (isAxiosError(error)) return error.response?.data;
