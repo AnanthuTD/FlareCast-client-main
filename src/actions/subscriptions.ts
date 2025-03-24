@@ -126,10 +126,35 @@ export const getVideoLimit = async (): Promise<{
 	totalVideoUploaded: number;
 }> => {
 	try {
-		const { data } = await axiosInstance.get("/api/user/limits/upload-permission");
+		const { data } = await axiosInstance.get(
+			"/api/user/limits/upload-permission"
+		);
 		return data;
 	} catch (error) {
 		if (isAxiosError(error)) return error.response?.data;
 		throw new Error("Failed to get video limit");
+	}
+};
+
+export const verifyPayment = async ({
+	razorpayPaymentId,
+	razorpaySignature,
+	razorpaySubscriptionId,
+}: {
+	razorpayPaymentId: string;
+	razorpaySubscriptionId: string;
+	razorpaySignature: string;
+}): Promise<boolean> => {
+	try {
+		await axiosInstance.post(`${API_BASE_URL}/verify-payment`, {
+			razorpayPaymentId,
+			razorpaySubscriptionId,
+			razorpaySignature,
+		});
+		return true;
+	} catch (error) {
+		if (isAxiosError(error)) return error.response?.data;
+		console.log(error.response.data.message || "Failed to verify payment");
+		return false;
 	}
 };

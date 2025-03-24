@@ -243,6 +243,8 @@ export interface Video {
 	thumbnailUrl: string;
 	userAvatarUrl: string;
 
+	isPublic?: boolean;
+
 	User?: {
 		fullName?: string | null;
 		image?: string | null;
@@ -276,21 +278,22 @@ export interface IChatFlat {
 
 export interface SubscriptionPlan {
 	id: string;
-	planId: string;
-	name: string;
-	price: number;
-	interval: number;
-	period: "daily" | "weekly" | "monthly" | "quarterly" | "yearly";
-	maxRecordingDuration?: number;
-	hasAiFeatures: boolean;
-	allowsCustomBranding: boolean;
-	hasAdvancedEditing: boolean;
-	maxMembers?: number;
-	monthlyVideoQuota?: number;
-	maxWorkspaces?: number;
-	isActive: boolean;
-	createdAt: string;
-	updatedAt: string;
+  type: "free" | "paid";
+  planId?: string;
+  name: string;
+  price: number;
+  interval?: number;
+  period?: "daily" | "weekly" | "monthly" | "quarterly" | "yearly";
+  maxRecordingDuration: number;
+  hasAiFeatures: boolean;
+  allowsCustomBranding: boolean;
+  hasAdvancedEditing: boolean;
+  maxMembers?: number;
+  maxVideoCount?: number;
+  maxWorkspaces?: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface SubscriptionData {

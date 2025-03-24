@@ -84,6 +84,8 @@ const SubscriptionStatus: React.FC<SubscriptionStatusProps> = ({
 	const subscriptionStatus = subscriptionData.status;
 	const isCanceled = !!subscriptionData.cancelledAt;
 
+	console.log("Subscription status: " + subscriptionStatus)
+
 	return (
 		<div className="space-y-4">
 			<p>
@@ -96,7 +98,7 @@ const SubscriptionStatus: React.FC<SubscriptionStatusProps> = ({
 					}
 				>
 					{subscriptionStatus?.charAt(0).toUpperCase() +
-						subscriptionStatus?.slice(1)}
+						subscriptionStatus}
 				</span>
 			</p>
 

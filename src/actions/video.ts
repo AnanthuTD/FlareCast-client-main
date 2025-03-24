@@ -366,3 +366,16 @@ export async function moveVideo({
 		});
 	}
 }
+
+export async function updateVideoVisibility({
+	videoId,
+	isPublic,
+}: {
+	videoId: string;
+	isPublic: boolean;
+}) {
+	return await axiosInstance.patch(`/api/video/${videoId}/visibility`, {
+		videoId,
+		isPublic,
+	});
+}

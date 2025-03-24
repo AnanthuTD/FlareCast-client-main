@@ -32,6 +32,9 @@ import CopyLink from "../copy-link";
 import RichLink from "../rich-link";
 import { truncateString } from "@/lib/utils";
 import TrimButton from "../../trim-button";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
+
 
 type Props = {
 	videoId: string;
@@ -39,10 +42,10 @@ type Props = {
 
 const VideoPreview = ({ videoId }: Props) => {
 	const [video, setVideo] = useState<Video | null>(null);
+	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 	const activeWorkspaceId = useWorkspaceStore(
 		(state) => state.selectedWorkspace.id
 	);
-	const selectedSpaceId = useWorkspaceStore((state) => state.selectedSpace);
 	const userId = useUserStore((state) => state.id);
 	const [isEditingTitle, setEditTitle] = useState(false);
 	const [isEditingDescription, setEditDescription] = useState(false);
@@ -58,11 +61,18 @@ const VideoPreview = ({ videoId }: Props) => {
 	const fetchPreviewVideo = useCallback(async () => {
 		try {
 			const { video } = await getPreviewVideo(videoId);
+			if (!video) {
+				setErrorMessage("The requested video could not be found.");
+				return;
+			}
 			setVideo(video);
 			setTitle(video.title || "Untitled Video");
 			setDescription(video.description || "No Summary");
 		} catch (error) {
-			toast.error("Failed to get preview video");
+			setErrorMessage(
+				error.message || "Failed to load the video. Please try again later."
+			);
+			toast.error(error.message || "Failed to get preview video");
 		}
 	}, [videoId]);
 
@@ -125,143 +135,156 @@ const VideoPreview = ({ videoId }: Props) => {
 		}
 	};
 
+
+
 	const pageUrl = `${process.env.NEXT_PUBLIC_HOST_URL}/preview/${videoId}`;
 	const thumbnailUrl = `/gcs/${videoId}/thumbnails/thumb00001.jpg`;
 	const hlsUrl = `/gcs/${videoId}/master.m3u8`;
 
-	return !video ? (
-		<div>
-			<p>Loading video...</p>
-		</div>
-	) : (
-		<>
-			<div className="grid grid-cols-1 xl:grid-cols-3 gap-5 w-full">
-				<div className="flex flex-col lg:col-span-2 gap-y-6">
-					<Card>
-						<CardHeader>
-							<div className="flex justify-between items-center">
-								{isEditingTitle ? (
-									<Input
-										value={title || "Untitled Video"}
-										onChange={(e) => setTitle(e.target.value)}
-										onBlur={handleTitleSave}
+	return (
+		<div className="max-w-7xl mx-auto py-6">
+			{video ? (
+				<div className="grid grid-cols-1 xl:grid-cols-3 gap-5 w-full">
+					<div className="flex flex-col lg:col-span-2 gap-y-6">
+						<Card>
+							<CardHeader>
+								<div className="flex justify-between items-center">
+									{isEditingTitle ? (
+										<Input
+											value={title || "Untitled Video"}
+											onChange={(e) => setTitle(e.target.value)}
+											onBlur={handleTitleSave}
+											autoFocus
+										/>
+									) : (
+										<h2 className="text-2xl font-bold">
+											{video?.title || "Untitled Video"}
+										</h2>
+									)}
+									<Button
+										variant="ghost"
+										size="icon"
+										onClick={() => setEditTitle(!isEditingTitle)}
+									>
+										<Pencil className="w-4 h-4" />
+									</Button>
+								</div>
+								<p className="text-sm text-gray-500">{daysAgo}</p>
+							</CardHeader>
+							<CardContent>
+								<Player
+									hslUrl={hlsUrl}
+									thumbnailsUrl={`/gcs/${videoId}/thumbnails/thumbnails.vtt`}
+									posterUrl={thumbnailUrl}
+									videoId={videoId}
+									type={video.type}
+								/>
+							</CardContent>
+						</Card>
+						<Card>
+							<CardContent className="flex items-center py-2 justify-end gap-4">
+								<TrimButton
+									trim={!!user.plan?.trim || true}
+									videoId={videoId}
+								/>
+								<CopyLink videoId={videoId} isPublic={video.isPublic}/>
+								<RichLink
+									description={truncateString(video.description as string, 150)}
+									id={videoId}
+									source={`${videoId}/master.m3u8`}
+									title={video.title as string}
+								/>
+								<Download className="text-[#4d4c4c]" />
+								{video?.watchLater && video.watchLater.id ? (
+									<BookmarkCheckIcon
+										onClick={async () => {
+											const watchLater = video.watchLater;
+											setVideo((prev) => ({ ...prev, watchLater: null }));
+											const { success } = await removeWatchLaterVideo({
+												videoId: video.id,
+												workspaceId: video.workspaceId,
+											});
+											setVideo((prev) => ({
+												...prev,
+												watchLater: success ? null : watchLater,
+											}));
+										}}
+									/>
+								) : (
+									<BookmarkIcon
+										onClick={async () => {
+											setVideo((prev) => ({
+												...prev,
+												watchLater: { id: "temp-id" },
+											}));
+											const { watchLater } = await addWatchLaterVideo({
+												videoId: video.id,
+												workspaceId: video.workspaceId,
+											});
+											setVideo((prev) => ({ ...prev, watchLater }));
+										}}
+									/>
+								)}
+							</CardContent>
+						</Card>
+						<Card>
+							<CardHeader>
+								<div className="flex justify-between items-center">
+									<p className="text-lg font-semibold">Description</p>
+									<Button
+										variant="ghost"
+										size="icon"
+										onClick={() => setEditDescription(!isEditingDescription)}
+									>
+										<Pencil className="w-4 h-4" />
+									</Button>
+								</div>
+							</CardHeader>
+							<CardContent>
+								{isEditingDescription ? (
+									<Textarea
+										value={description}
+										onChange={(e) => setDescription(e.target.value)}
+										onBlur={handleDescriptionSave}
 										autoFocus
 									/>
 								) : (
-									<h2 className="text-2xl font-bold">{video?.title || "Untitled Video"}</h2>
+									<p className="text-md text-gray-700">
+										{video?.description || "No description available"}
+									</p>
 								)}
-								<Button
-									variant="ghost"
-									size="icon"
-									onClick={() => setEditTitle(!isEditingTitle)}
-								>
-									<Pencil className="w-4 h-4" />
-								</Button>
-							</div>
-							<p className="text-sm text-gray-500">{daysAgo}</p>
-						</CardHeader>
-						<CardContent>
-							<Player
-								hslUrl={hlsUrl} // Use CloudFront URL
-								thumbnailsUrl={`/gcs/${videoId}/thumbnails/thumbnails.vtt`}
-								posterUrl={thumbnailUrl}
-								videoId={videoId}
-								type={video.type} // Pass video type
-							/>
-						</CardContent>
-					</Card>
-					<Card>
-						<CardContent className="flex items-center py-2 justify-end gap-4">
-							<TrimButton trim={!!user.plan?.trim || true} videoId={videoId} />
-							<CopyLink
-								variant="outline"
-								className="rounded-full bg-transparent px-10"
-								videoId={videoId}
-							/>
-							<RichLink
-								description={truncateString(video.description as string, 150)}
-								id={videoId}
-								source={`${videoId}/master.m3u8`}
-								title={video.title as string}
-							/>
-							<Download className="text-[#4d4c4c]" />
-							{video?.watchLater && video.watchLater.id ? (
-								<BookmarkCheckIcon
-									onClick={async () => {
-										const watchLater = video.watchLater;
-										setVideo((prev) => ({ ...prev, watchLater: null }));
-										const { success } = await removeWatchLaterVideo({
-											videoId: video.id,
-											workspaceId: video.workspaceId,
-										});
-										setVideo((prev) => ({
-											...prev,
-											watchLater: success ? null : watchLater,
-										}));
-									}}
-								/>
-							) : (
-								<BookmarkIcon
-									onClick={async () => {
-										setVideo((prev) => ({
-											...prev,
-											watchLater: { id: "temp-id" },
-										}));
-										const { watchLater } = await addWatchLaterVideo({
-											videoId: video.id,
-											workspaceId: video.workspaceId,
-										});
-										setVideo((prev) => ({ ...prev, watchLater }));
-									}}
-								/>
+							</CardContent>
+						</Card>
+					</div>
+					<div className="lg:col-span-1">
+						<TabMenu
+							defaultValue="AI Tool"
+							triggers={["AI Tool", "Transcript", "Activity"]}
+						>
+							{video.id && (
+								<AiTools videoId={video.id} trial={false} plan={user.plan} />
 							)}
-						</CardContent>
-					</Card>
-					<Card>
-						<CardHeader>
-							<div className="flex justify-between items-center">
-								<p className="text-lg font-semibold">Description</p>
-								<Button
-									variant="ghost"
-									size="icon"
-									onClick={() => setEditDescription(!isEditingDescription)}
-								>
-									<Pencil className="w-4 h-4" />
-								</Button>
-							</div>
-						</CardHeader>
-						<CardContent>
-							{isEditingDescription ? (
-								<Textarea
-									value={description}
-									onChange={(e) => setDescription(e.target.value)}
-									onBlur={handleDescriptionSave}
-									autoFocus
-								/>
-							) : (
-								<p className="text-md text-gray-700">
-									{video?.description || "No description available"}
-								</p>
+							<VideoTranscript
+								transcript={video?.transcription || "Transcript not available"}
+							/>
+							{video?.id && video.workspaceId && video.userId && (
+								<ChatBox videoId={video.id} />
 							)}
-						</CardContent>
-					</Card>
+						</TabMenu>
+					</div>
 				</div>
-				<div className="lg:col-span-1">
-					<TabMenu
-						defaultValue="AI Tool"
-						triggers={["AI Tool", "Transcript", "Activity"]}
-					>
-						{video.id && (
-							<AiTools videoId={video.id} trial={false} plan={user.plan} />
-						)}
-						<VideoTranscript
-							transcript={video?.transcription || "Transcript not available"}
-						/>
-						{video?.id && video.workspaceId && video.userId && <ChatBox videoId={video.id} />}
-					</TabMenu>
+			) : errorMessage ? (
+				<Alert variant="destructive" className="max-w-2xl mx-auto">
+					<AlertCircle className="h-4 w-4" />
+					<AlertTitle>Video Not Found</AlertTitle>
+					<AlertDescription>{errorMessage}</AlertDescription>
+				</Alert>
+			) : (
+				<div>
+					<p>Loading video...</p>
 				</div>
-			</div>
-		</>
+			)}
+		</div>
 	);
 };
 

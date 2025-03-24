@@ -7,6 +7,8 @@ import {
 	QueryClient,
 } from "@tanstack/react-query";
 import React from "react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"; // Shadcn Alert component
+import { AlertCircle } from "lucide-react"; // Icon for the alert
 
 type Props = {
 	params: Promise<{ videoId: string }>;
@@ -18,7 +20,7 @@ export async function generateMetadata(
 	parent: ResolvingMetadata
 ): Promise<Metadata> {
 	const { videoId } = await params;
-	const { video } = await getPreviewVideoServer(videoId);
+	const { video, message } = await getPreviewVideoServer(videoId);
 
 	if (!video) {
 		return {
@@ -32,11 +34,8 @@ export async function generateMetadata(
 	const videoHlsUrl = `${process.env.NEXT_PUBLIC_GCS_URL}/${videoId}/master.m3u8`;
 
 	return {
-		// Basic meta tags
 		title: video.title || "Untitled Video",
 		description: video.description || "No description available",
-
-		// Open Graph meta tags
 		openGraph: {
 			title: video.title || "Untitled Video",
 			description: video.description || "No description available",
@@ -53,7 +52,7 @@ export async function generateMetadata(
 			videos: [
 				{
 					url: videoHlsUrl,
-					type: "application/x-mpegURL", // HLS format
+					type: "application/x-mpegURL",
 					width: 1280,
 					height: 720,
 				},
@@ -61,8 +60,6 @@ export async function generateMetadata(
 			locale: "en_US",
 			type: "video.other",
 		},
-
-		// Twitter Card meta tags (optional, for Twitter sharing)
 		twitter: {
 			card: "summary_large_image",
 			title: video.title || "Untitled Video",
@@ -74,17 +71,31 @@ export async function generateMetadata(
 
 const VideoPage = async ({ params }: Props) => {
 	const { videoId } = await params;
+	const { video, message } = await getPreviewVideoServer(videoId); // Fetch video data on the server
+
 	const query = new QueryClient();
 
-	// Pre-fetch video data for client-side hydration (optional)
+	// If you still want to prefetch for client-side hydration (optional)
 	/* await query.prefetchQuery({
-		queryKey: ["previewVideo", videoId],
-		queryFn: () => getPreviewVideoServer(videoId),
-	}); */
+    queryKey: ["previewVideo", videoId],
+    queryFn: () => getPreviewVideoServer(videoId),
+  }); */
 
 	return (
 		<HydrationBoundary state={dehydrate(query)}>
-			<VideoPreview videoId={videoId} />
+			{video ? (
+				<VideoPreview videoId={videoId} />
+			) : (
+				<div className="max-w-2xl mx-auto mt-8">
+					<Alert variant="destructive">
+						<AlertCircle className="h-4 w-4" />
+						<AlertTitle>Video Not Found</AlertTitle>
+						<AlertDescription>
+							{message || "The requested video could not be found."}
+						</AlertDescription>
+					</Alert>
+				</div>
+			)}
 		</HydrationBoundary>
 	);
 };

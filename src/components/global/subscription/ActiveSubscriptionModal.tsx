@@ -25,6 +25,7 @@ const ActiveSubscriptionModal: React.FC<ActiveSubscriptionModalProps> = ({
 	const showModal = () => setOpen(true);
 	const handleClose = () => setOpen(false);
 
+	console.log("active plan", activePlan)
 	return (
 		<>
 			<Button
