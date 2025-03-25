@@ -1,12 +1,17 @@
 import CreateFolders from "@/components/create-folder";
+import NewVideoButton from "@/components/global/new-video";
 import React from "react";
 
 type LibraryHeaderProps = {
 	folderId?: string;
+	workspaceId: string;
+	spaceId?: string;
 };
 
 export const LibraryHeader: React.FC<LibraryHeaderProps> = ({
 	folderId,
+	workspaceId,
+	spaceId,
 }) => {
 	return (
 		<div className="flex flex-wrap gap-10 justify-between items-center w-full font-medium max-md:max-w-full">
@@ -20,9 +25,11 @@ export const LibraryHeader: React.FC<LibraryHeaderProps> = ({
 			</div>
 			<div className="flex gap-2 items-center self-stretch my-auto text-sm tracking-normal leading-6 text-center">
 				<CreateFolders folderId={folderId} />
-				<button className="self-stretch px-5 pt-1.5 pb-2 my-auto text-white bg-indigo-500 rounded-[7992px]">
-					New video
-				</button>
+				<NewVideoButton
+					folderId={folderId ?? ''}
+					spaceId={spaceId ?? ''}
+					workspaceId={workspaceId}
+				/>
 			</div>
 		</div>
 	);

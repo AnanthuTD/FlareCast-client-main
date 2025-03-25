@@ -69,12 +69,15 @@ function VideoTab({
 		if (messages.length === 0) return;
 
 		const newMessage = messages[messages.length - 1];
+		console.log("new sse message: ", newMessage);
+		if (folderId !== newMessage.folderId || spaceId !== newMessage.spaceId)
+			return;
+
 		setMessages([]); // Clear messages after processing
 
 		// Handle live stream event
 		if (
-			newMessage.event === "liveStream" &&
-			newMessage.message === "Started live stream"
+			newMessage.event === "liveStream"
 		) {
 			console.log("Live stream started:", newMessage.videoId);
 			refetch(); // Refetch immediately for live streams

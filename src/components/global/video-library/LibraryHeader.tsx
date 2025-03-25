@@ -1,5 +1,7 @@
 import React from "react";
 import CreateFolders from "@/components/create-folder";
+import NewVideoButton from "../new-video";
+import { useWorkspaceStore } from "@/providers/WorkspaceStoreProvider";
 
 type LibraryHeaderProps = {
 	folderId?: string;
@@ -16,6 +18,8 @@ export const LibraryHeader: React.FC<LibraryHeaderProps> = ({
 	showCreateVideoButton = true,
 	spaceId,
 }) => {
+	const workspaceId = useWorkspaceStore((state) => state.selectedWorkspace.id);
+
 	return (
 		<div className="flex flex-wrap gap-10 justify-between items-center w-full font-medium max-md:max-w-full">
 			<div className="flex flex-col self-stretch my-auto w-[95px]">
@@ -30,9 +34,7 @@ export const LibraryHeader: React.FC<LibraryHeaderProps> = ({
 			<div className="flex gap-2 items-center self-stretch my-auto text-sm tracking-normal leading-6 text-center">
 				{showCreateFolderButton && <CreateFolders folderId={folderId} spaceId={spaceId} />}
 				{showCreateVideoButton && (
-					<button className="self-stretch px-5 pt-1.5 pb-2 my-auto text-white bg-indigo-500 rounded-[7992px]">
-						New video
-					</button>
+					<NewVideoButton folderId={folderId ?? ''} spaceId={spaceId ?? ''} workspaceId={workspaceId}/>
 				)}
 			</div>
 		</div>

@@ -19,6 +19,7 @@ import { Separator } from "@/components/ui/separator";
 import axiosInstance from "@/axios";
 // import { EventSource } from "eventsource";
 import { useUserStore } from "@/providers/UserStoreProvider";
+import NewVideoButton from "@/components/global/new-video";
 
 interface OptimisticFolder extends FolderType {
 	optimistic: boolean;
@@ -38,6 +39,8 @@ export default function VideoLibrary() {
 	const [optimisticFolders, setOptimisticFolders] = useOptimistic(folders);
 	const [isPending, startTransition] = useTransition();
 	const [refetchFolders, setRefetchFolders] = useState(false);
+	const workspaceId = useWorkspaceStore((state) => state.selectedWorkspace.id);
+  const spaceId = useWorkspaceStore((state) => state.selectedSpace || '');
 
 	function handleOnTest() {
 		axiosInstance.get("/api/video/test/events");
@@ -115,12 +118,7 @@ export default function VideoLibrary() {
 					>
 						New folder
 					</button>
-					<button
-						onClick={handleOnTest}
-						className="self-stretch px-5 pt-1.5 pb-2 my-auto text-white bg-indigo-500 rounded-[7992px]"
-					>
-						New video
-					</button>
+					<NewVideoButton folderId={''} spaceId={spaceId} workspaceId={workspaceId}/>
 				</div>
 			</div>
 			<div className="flex flex-col mt-8 w-full tracking-normal text-gray-500 max-md:max-w-full">
