@@ -1,11 +1,10 @@
 "use client";
 
 import * as React from "react";
-import Image from "next/image";
 import { VideoCardProps } from "@/types";
 import { Card, CardContent, CardHeader } from "../ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ExternalLink, Eye, MessageCircle, Video } from "lucide-react";
+import { ExternalLink, Eye, Video } from "lucide-react";
 import DropdownVideo from "../global/video-library/DropdownVideo";
 
 export const VideoCard: React.FC<VideoCardProps> = ({
@@ -64,17 +63,6 @@ export const VideoCard: React.FC<VideoCardProps> = ({
 			<CardHeader>
 				<div className="relative w-full h-48 rounded-2xl overflow-hidden">
 					{/* Video Thumbnail or Fallback */}
-					{/* {hasThumbnail ? (
-						<Image
-							src={thumbnailUrl}
-							alt="Video thumbnail"
-							fill
-							className="object-cover"
-						/>
-					) : (
-						renderThumbnailFallback()
-					)} */}
-
 					<Avatar className="object-cover w-full h-full rounded-none">
 						<AvatarImage src={thumbnailUrl} />
 						<AvatarFallback className="rounded-none">
@@ -129,14 +117,19 @@ export const VideoCard: React.FC<VideoCardProps> = ({
 								<Eye />
 								<span>{totalViews}</span>
 							</div>
-							<div className="flex items-center gap-1">
+							{/* <div className="flex items-center gap-1">
 								<MessageCircle />
 								<span>{comments}</span>
-							</div>
+							</div> */}
 							<div className="flex items-center gap-1">
 								<ExternalLink />
-								<DropdownVideo sourceId={id} type="video" canShare={!spaceId} />
-								<span>{shares}</span>
+								<DropdownVideo
+									sourceId={id}
+									type="video"
+									canShare={!spaceId}
+									// canDelete={category === "PROMOTIONAL"}
+								/>
+								{/* <span>{shares}</span> */}
 							</div>
 						</div>
 					</div>

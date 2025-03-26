@@ -11,6 +11,7 @@ import { Video } from "@/types";
 import clsx from "clsx";
 import { useQueryData } from "@/hooks/useQueryData";
 import { Button } from "@/components/ui/button";
+import Loader from "@/components/loader";
 
 interface NewVideo extends Video {
 	status: boolean;
@@ -51,7 +52,13 @@ function VideoTab({
 	);
 
 	// Fetch videos with pagination
-	const { data: videoResponse, refetch } = useQueryData<VideoResponse>(
+	const {
+		data: videoResponse,
+		refetch,
+		isFetching,
+		isPending,
+		isFetched,
+	} = useQueryData<VideoResponse>(
 		["workspace-videos", selectedWorkspace.id, folderId, spaceId, page],
 		() =>
 			getMyVideos(
@@ -76,9 +83,7 @@ function VideoTab({
 		setMessages([]); // Clear messages after processing
 
 		// Handle live stream event
-		if (
-			newMessage.event === "liveStream"
-		) {
+		if (newMessage.event === "liveStream") {
 			console.log("Live stream started:", newMessage.videoId);
 			refetch(); // Refetch immediately for live streams
 			return;
@@ -137,7 +142,9 @@ function VideoTab({
 		}
 	};
 
-	return (
+	return isFetching ? (
+		<Loader state={true} size="lg" color="gray-300" className="min-h-screen" />
+	) : (
 		<div>
 			<div className="flex flex-wrap gap-5">
 				{/* Pending videos (greyed out) */}

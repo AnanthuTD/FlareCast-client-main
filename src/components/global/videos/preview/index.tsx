@@ -1,10 +1,14 @@
 "use client";
 
-import React, { useEffect, useState, useMemo, useCallback } from "react";
+import React, {
+	useEffect,
+	useState,
+	useMemo,
+	useCallback,
+	Suspense,
+} from "react";
 import TabMenu from "../../tabs";
-import VideoTranscript from "../../video-transcript";
 import { toast } from "sonner";
-import Player from "@/components/global/videos/Player";
 import { useWorkspaceStore } from "@/providers/WorkspaceStoreProvider";
 import { useUserStore } from "@/providers/UserStoreProvider";
 import { useSSE } from "@/hooks/useVideoSSE";
@@ -26,15 +30,19 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import ChatBox from "../../chat-box";
-import AiTools from "../../ai-tools";
 import CopyLink from "../copy-link";
 import RichLink from "../rich-link";
 import { truncateString } from "@/lib/utils";
 import TrimButton from "../../trim-button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
+import Loader from "@/components/loader";
 
+// Lazy load heavy components
+const Player = React.lazy(() => import("@/components/global/videos/Player"));
+const AiTools = React.lazy(() => import("../../ai-tools"));
+const VideoTranscript = React.lazy(() => import("../../video-transcript"));
+const ChatBox = React.lazy(() => import("../../chat-box"));
 
 type Props = {
 	videoId: string;
@@ -135,8 +143,6 @@ const VideoPreview = ({ videoId }: Props) => {
 		}
 	};
 
-
-
 	const pageUrl = `${process.env.NEXT_PUBLIC_HOST_URL}/preview/${videoId}`;
 	const thumbnailUrl = `/gcs/${videoId}/thumbnails/thumb00001.jpg`;
 	const hlsUrl = `/gcs/${videoId}/master.m3u8`;
@@ -172,13 +178,24 @@ const VideoPreview = ({ videoId }: Props) => {
 								<p className="text-sm text-gray-500">{daysAgo}</p>
 							</CardHeader>
 							<CardContent>
-								<Player
-									hslUrl={hlsUrl}
-									thumbnailsUrl={`/gcs/${videoId}/thumbnails/thumbnails.vtt`}
-									posterUrl={thumbnailUrl}
-									videoId={videoId}
-									type={video.type}
-								/>
+								<Suspense
+									fallback={
+										<Loader
+											state={true}
+											size="lg"
+											color="gray-300"
+											className="h-64"
+										/>
+									}
+								>
+									<Player
+										hslUrl={hlsUrl}
+										thumbnailsUrl={`/gcs/${videoId}/thumbnails/thumbnails.vtt`}
+										posterUrl={thumbnailUrl}
+										videoId={videoId}
+										type={video.type}
+									/>
+								</Suspense>
 							</CardContent>
 						</Card>
 						<Card>
@@ -187,7 +204,7 @@ const VideoPreview = ({ videoId }: Props) => {
 									trim={!!user.plan?.trim || true}
 									videoId={videoId}
 								/>
-								<CopyLink videoId={videoId} isPublic={video.isPublic}/>
+								<CopyLink videoId={videoId} isPublic={video.isPublic} />
 								<RichLink
 									description={truncateString(video.description as string, 150)}
 									id={videoId}
@@ -261,15 +278,21 @@ const VideoPreview = ({ videoId }: Props) => {
 							defaultValue="AI Tool"
 							triggers={["AI Tool", "Transcript", "Activity"]}
 						>
-							{video.id && (
-								<AiTools videoId={video.id} trial={false} plan={user.plan} />
-							)}
-							<VideoTranscript
-								transcript={video?.transcription || "Transcript not available"}
-							/>
-							{video?.id && video.workspaceId && video.userId && (
-								<ChatBox videoId={video.id} />
-							)}
+							<Suspense
+								fallback={<Loader state={true} size="md" color="gray-300" />}
+							>
+								{video.id && (
+									<AiTools videoId={video.id} trial={false} plan={user.plan} />
+								)}
+								<VideoTranscript
+									transcript={
+										video?.transcription || "Transcript not available"
+									}
+								/>
+								{video?.id && video.workspaceId && video.userId && (
+									<ChatBox videoId={video.id} />
+								)}
+							</Suspense>
 						</TabMenu>
 					</div>
 				</div>
@@ -280,9 +303,12 @@ const VideoPreview = ({ videoId }: Props) => {
 					<AlertDescription>{errorMessage}</AlertDescription>
 				</Alert>
 			) : (
-				<div>
-					<p>Loading video...</p>
-				</div>
+				<Loader
+					state={true}
+					size="lg"
+					color="gray-300"
+					className="min-h-screen"
+				/>
 			)}
 		</div>
 	);

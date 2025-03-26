@@ -151,7 +151,7 @@ export default function VideoLibrary() {
 								</div>
 							</div>
 						</TabsContent>
-						<TabsContent value="archive">
+						{/* <TabsContent value="archive">
 							<div className="flex flex-col mt-8 w-full max-md:max-w-full">
 								<div className="text-lg font-medium tracking-tight leading-loose text-neutral-800">
 									Archive
@@ -166,7 +166,7 @@ export default function VideoLibrary() {
 								</div>
 								<ScreenshotTab />
 							</div>
-						</TabsContent>
+						</TabsContent> */}
 					</Tabs>
 				</div>
 			</div>
