@@ -158,3 +158,20 @@ export const verifyPayment = async ({
 		return false;
 	}
 };
+
+export const getSubscriptionByRazorpayId = async ({
+	razorpaySubscriptionId,
+}: {
+	razorpaySubscriptionId: string;
+}): Promise<any> => {
+	try {
+		const { data } = await axiosInstance.get(
+			`${API_BASE_URL}/${razorpaySubscriptionId}`
+		);
+		return data;
+	} catch (error) {
+		if (isAxiosError(error)) return error.response?.data;
+		console.log(error.response.data.message || "Failed to verify payment");
+		return null;
+	}
+};

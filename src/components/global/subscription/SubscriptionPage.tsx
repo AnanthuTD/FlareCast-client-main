@@ -15,6 +15,7 @@ import {
 	verifyPayment,
 } from "@/actions/subscriptions";
 import { Separator } from "@/components/ui/separator";
+import { useRouter } from "next/navigation";
 
 // Types
 declare global {
@@ -35,6 +36,7 @@ const SubscriptionPage: React.FC = () => {
 		`${process.env.NEXT_PUBLIC_BACKEND_URL}/subscriptions` as string,
 		"/user/socket.io"
 	);
+	const router = useRouter();
 
 	// Check subscription eligibility
 	const checkSubscriptionEligibility =
@@ -92,13 +94,18 @@ const SubscriptionPage: React.FC = () => {
 
 							if (verificationResponse) {
 								toast.success("Payment successful!");
-								await fetchPlans();
+								// await fetchPlans();
+								router.push(
+									`/payment/success/${response.razorpay_subscription_id}`
+								);
 							} else {
 								toast.error("Payment verification failed!");
+								router.push(`/payment/failure`);
 							}
 						} catch (error) {
 							console.error("Payment verification failed:", error);
 							toast.error("Payment processing error!");
+							router.push(`/payment/failure`);
 						}
 					},
 					prefill: { email: subscription.notify_info?.notify_email },
