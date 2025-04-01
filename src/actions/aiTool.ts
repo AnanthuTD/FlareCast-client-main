@@ -15,7 +15,7 @@ export const sendToAiAgent = async (
   videoId: string,
   message: string
 ): Promise<string> => {
-  const response = await axiosInstance.post("/api/video/chat", {
+  const response = await axiosInstance.post("/api/video/chats", {
     videoId,
     query: message,
   });
@@ -23,5 +23,5 @@ export const sendToAiAgent = async (
 };
 
 export const clearSessionHistory = async (sessionId: string): Promise<void> => {
-  await axiosInstance.post("/api/video/chat/clear-session", { sessionId });
+  await axiosInstance.post("/api/video/chats/clear-session", { sessionId });
 };

@@ -183,6 +183,7 @@ export async function suggestFolders({
 					query,
 					limit,
 					paginationToken,
+					workspaceId
 				},
 			}
 		);

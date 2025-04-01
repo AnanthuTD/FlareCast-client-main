@@ -77,20 +77,26 @@ function VideoTab({
 
 		const newMessage = messages[messages.length - 1];
 		console.log("new sse message: ", newMessage);
-		if (folderId !== newMessage.folderId || spaceId !== newMessage.spaceId)
+		console.log(folderId, newMessage.folderId, spaceId, newMessage.spaceId);
+		if (
+			(folderId ?? "") !== (newMessage.folderId ?? "") ||
+			(spaceId ?? "") !== (newMessage.spaceId ?? "")
+		)
 			return;
 
 		setMessages([]); // Clear messages after processing
 
+		refetch({});
+
 		// Handle live stream event
-		if (newMessage.event === "liveStream") {
-			console.log("Live stream started:", newMessage.videoId);
-			refetch(); // Refetch immediately for live streams
-			return;
-		}
+		// if (newMessage.event === "liveStream") {
+		// 	console.log("Live stream started:", newMessage.videoId);
+		// 	refetch(); // Refetch immediately for live streams
+		// 	return;
+		// }
 
 		// Handle VOD processing updates
-		const isVod = newMessage.type === "VOD";
+		/* const isVod = newMessage.type === "VOD";
 		if (isVod) {
 			// Refetch if transcoding or thumbnail succeeds
 			if (
@@ -123,7 +129,7 @@ function VideoTab({
 					return [...prev, newMessage];
 				});
 			}
-		}
+		} */
 	}, [messages, setMessages, refetch]);
 
 	const handleOnClick = (videoId: string) => {
@@ -142,7 +148,7 @@ function VideoTab({
 		}
 	};
 
-	return isFetching ? (
+	return isFetching && !videos.length ? (
 		<Loader state={true} size="lg" color="gray-300" className="min-h-screen" />
 	) : (
 		<div>

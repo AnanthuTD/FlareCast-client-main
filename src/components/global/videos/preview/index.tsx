@@ -92,7 +92,7 @@ const VideoPreview = ({ videoId }: Props) => {
 		if (!messages.length) return;
 		const newMessage = messages[messages.length - 1];
 		setMessages([]);
-		setVideo((prevVideo) => {
+		/* setVideo((prevVideo) => {
 			if (!prevVideo || prevVideo.id !== newMessage.id) return prevVideo;
 			return {
 				...prevVideo,
@@ -105,8 +105,10 @@ const VideoPreview = ({ videoId }: Props) => {
 				liveStreamStatus:
 					newMessage.liveStreamStatus || prevVideo.liveStreamStatus,
 				type: newMessage.type || prevVideo.type,
-			};
-		});
+			}; 
+			});
+			*/
+		fetchPreviewVideo();
 	}, [messages, setMessages]);
 
 	const daysAgo = useMemo(() => {
@@ -201,7 +203,7 @@ const VideoPreview = ({ videoId }: Props) => {
 						<Card>
 							<CardContent className="flex items-center py-2 justify-end gap-4">
 								<TrimButton
-									trim={!!user.plan?.trim || true}
+									trim={!!user.plan?.hasAdvancedEditing || true}
 									videoId={videoId}
 								/>
 								<CopyLink videoId={videoId} isPublic={video.isPublic} />

@@ -64,7 +64,7 @@ export const VideoCard: React.FC<VideoCardProps> = ({
 				<div className="relative w-full h-48 rounded-2xl overflow-hidden">
 					{/* Video Thumbnail or Fallback */}
 					<Avatar className="object-cover w-full h-full rounded-none">
-						<AvatarImage src={thumbnailUrl} />
+						<AvatarImage src={hasThumbnail ? thumbnailUrl : ""} />
 						<AvatarFallback className="rounded-none">
 							{renderThumbnailFallback()}
 						</AvatarFallback>
