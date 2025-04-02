@@ -60,12 +60,12 @@ export const UserLayout: React.FC<{ children: React.ReactNode }> = ({
 				notificationCount: 0,
 				link: "/watchlater",
 			},
-			{
+		/* 	{
 				icon: <History />,
 				label: "History",
 				notificationCount: 0,
 				link: "/history",
-			},
+			}, */
 			{
 				icon: <Settings />,
 				label: "Settings",
