@@ -75,7 +75,7 @@ axiosInstance.interceptors.response.use(
 
 				console.log("pathName: " + window.location.pathname)
 
-				if (!["/signin", "/signup"].includes(window.location.pathname) || window.location.pathname === '') {
+				if (!["/signin", "/signup"].includes(window.location.pathname) && window.location.pathname !== '/') {
 					window.location.href = "/signin";
 				}
 
