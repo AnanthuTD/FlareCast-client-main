@@ -73,7 +73,9 @@ axiosInstance.interceptors.response.use(
 				isRefreshing = false;
 				userStore.getState().clearAccessToken();
 
-				if (!["/signin", "/signup"].includes(window.location.pathname) || window.location.pathname === '/') {
+				console.log("pathName: " + window.location.pathname)
+
+				if (!["/signin", "/signup"].includes(window.location.pathname) || window.location.pathname === '') {
 					window.location.href = "/signin";
 				}
 
