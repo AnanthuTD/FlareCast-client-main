@@ -11,7 +11,8 @@ const excludeFromAuth = [
 	"/verification/email/success",
 	"/verification/email/failure",
 	"/verification/email/notify",
-	"/verification/invitation"
+	"/verification/invitation",
+	"/",
 ];
 
 function CheckAuthentication({ children }: { children: React.ReactNode }) {
@@ -24,9 +25,7 @@ function CheckAuthentication({ children }: { children: React.ReactNode }) {
 	useEffect(() => {
 		async function checkAuthorizedUser() {
 			try {
-				const { data } = await axiosInstance.get(
-					"/api/user/profile"
-				);
+				const { data } = await axiosInstance.get("/api/user/profile");
 
 				if (data.user) {
 					setUser(data.user);

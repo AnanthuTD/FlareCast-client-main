@@ -39,6 +39,16 @@ axiosInstance.interceptors.request.use(
 	(error) => Promise.reject(error)
 );
 
+const excludeFromAuth = [
+	"/signin",
+	"/signup",
+	"/verification/email/success",
+	"/verification/email/failure",
+	"/verification/email/notify",
+	"/verification/invitation",
+	"/",
+];
+
 // Response interceptor
 axiosInstance.interceptors.response.use(
 	(response) => response,
@@ -75,7 +85,7 @@ axiosInstance.interceptors.response.use(
 
 				console.log("pathName: " + window.location.pathname)
 
-				if (!["/signin", "/signup"].includes(window.location.pathname) && window.location.pathname !== '/') {
+				if (!excludeFromAuth.includes(window.location.pathname) && window.location.pathname !== '/') {
 					window.location.href = "/signin";
 				}
 
