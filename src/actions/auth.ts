@@ -5,7 +5,7 @@ export const checkUserExists = async ({ email }: { email: string }) => {
 		const response = await axiosInstance.get(
 			`/api/user/auth/user-exist?email=${email}`
 		);
-		return response.data;
+		return response.data.exists;
 	} catch (error) {
 		return error.response.data;
 	}

@@ -48,9 +48,10 @@ export default function SignIn() {
 		register,
 		onFormSubmit: onEmailChange,
 		errors,
-	} = useZodForm(emailSchema, mutate);
+	} = useZodForm(emailSchema, () => {});
 
 	useEffect(() => {
+		// console.log()
 		if (data) {
 			setSignInMethod(data.method);
 		}
@@ -66,10 +67,12 @@ export default function SignIn() {
 		e.preventDefault();
 		const callbackUrl = searchParams.get("callbackUrl");
 
-		if (signInMethod === "google") {
+		console.log("Submit clicked");
+
+		/* if (signInMethod === "google") {
 			console.log("Google sign in");
 			setTrigger(true);
-		} else if (signInMethod === "credential") {
+		} else if (signInMethod === "credential") { */
 			const userData = await signInWithCredential(
 				e.currentTarget.email.value,
 				e.currentTarget.password.value,
@@ -85,7 +88,9 @@ export default function SignIn() {
 					router.replace("/home");
 				}
 			}
-		}
+	/* 	} else {
+			console.log("Unknown signin method");
+		} */
 	};
 
 	return (
@@ -126,7 +131,7 @@ export default function SignIn() {
 						</p>
 					)}
 
-					{(signInMethod === "credential" || true)  && (
+					{(signInMethod === "credential" || true) && (
 						<>
 							<label
 								htmlFor="password"
@@ -152,8 +157,8 @@ export default function SignIn() {
 						</>
 					)}
 
-					<Button type="submit" disabled={isPending}>
-						{buttonText("credential", isPending, errors)}
+					<Button type="submit" /* disabled={isPending} */>
+						{buttonText("credential", /* isPending */ false, errors)}
 					</Button>
 				</form>
 
