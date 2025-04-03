@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
-import Script from "next/script";
 import { toast } from "sonner";
 import { useSocket } from "@/hooks/useSocket";
 import { SubscriptionData, ActivePlan, SubscriptionPlan } from "@/types";
@@ -31,7 +30,6 @@ const SubscriptionPage: React.FC = () => {
 		SubscriptionPlan[]
 	>([]);
 	const [activePlan, setActivePlan] = useState<ActivePlan | null>(null);
-	const [isRazorpayLoaded, setIsRazorpayLoaded] = useState(false);
 	const { onEvent } = useSocket(
 		`${process.env.NEXT_PUBLIC_BACKEND_URL}/subscriptions` as string,
 		"/user/socket.io"
@@ -67,61 +65,60 @@ const SubscriptionPage: React.FC = () => {
 	}, []);
 
 	// Handle subscription payment
-	const handleSubscribe = useCallback(
-		async (planId: string) => {
-			try {
-				const canSubscribe = await checkSubscriptionEligibility();
-				if (!canSubscribe || !isRazorpayLoaded) return;
+	const handleSubscribe = async (planId: string) => {
+		console.log("handleSubscribe");
+		try {
+			const canSubscribe = await checkSubscriptionEligibility();
 
-				const subscription = await subscribeToPlan(planId);
+			if (!canSubscribe) return;
 
-				const razorpayOptions = {
-					key: subscription.razorpayKeyId,
-					subscription_id: subscription.razorpaySubscriptionId,
-					name: "",
-					description: `${planId} Subscription`,
-					handler: async (response: {
-						razorpay_payment_id: string;
-						razorpay_subscription_id: string;
-						razorpay_signature: string;
-					}) => {
-						try {
-							const verificationResponse = await verifyPayment({
-								razorpayPaymentId: response.razorpay_payment_id,
-								razorpaySubscriptionId: response.razorpay_subscription_id,
-								razorpaySignature: response.razorpay_signature,
-							});
+			const subscription = await subscribeToPlan(planId);
 
-							if (verificationResponse) {
-								toast.success("Payment successful!");
-								// await fetchPlans();
-								router.push(
-									`/payment/success/${response.razorpay_subscription_id}`
-								);
-							} else {
-								toast.error("Payment verification failed!");
-								router.push(`/payment/failure`);
-							}
-						} catch (error) {
-							console.error("Payment verification failed:", error);
-							toast.error("Payment processing error!");
+			const razorpayOptions = {
+				key: subscription.razorpayKeyId,
+				subscription_id: subscription.razorpaySubscriptionId,
+				name: "",
+				description: `${planId} Subscription`,
+				handler: async (response: {
+					razorpay_payment_id: string;
+					razorpay_subscription_id: string;
+					razorpay_signature: string;
+				}) => {
+					try {
+						const verificationResponse = await verifyPayment({
+							razorpayPaymentId: response.razorpay_payment_id,
+							razorpaySubscriptionId: response.razorpay_subscription_id,
+							razorpaySignature: response.razorpay_signature,
+						});
+
+						if (verificationResponse) {
+							toast.success("Payment successful!");
+							// await fetchPlans();
+							router.push(
+								`/payment/success/${response.razorpay_subscription_id}`
+							);
+						} else {
+							toast.error("Payment verification failed!");
 							router.push(`/payment/failure`);
 						}
-					},
-					prefill: { email: subscription.notify_info?.notify_email },
-					theme: { color: "#3399cc" },
-				};
+					} catch (error) {
+						console.error("Payment verification failed:", error);
+						toast.error("Payment processing error!");
+						router.push(`/payment/failure`);
+					}
+				},
+				prefill: { email: subscription.notify_info?.notify_email },
+				theme: { color: "#3399cc" },
+			};
 
-				const razorpay = new window.Razorpay(razorpayOptions);
-				razorpay.open();
-				// setSubscriptionData(subscription);
-			} catch (err: any) {
-				console.error(err);
-				toast.error(err.response?.data?.message || "Failed to subscribe!");
-			}
-		},
-		[checkSubscriptionEligibility, isRazorpayLoaded, fetchPlans]
-	);
+			const razorpay = new window.Razorpay(razorpayOptions);
+			razorpay.open();
+			// setSubscriptionData(subscription);
+		} catch (err: any) {
+			console.error(err);
+			toast.error(err.response?.data?.message || "Failed to subscribe!");
+		}
+	};
 
 	// Handle subscription cancellation
 	const handleCancel = useCallback(async () => {
@@ -147,11 +144,6 @@ const SubscriptionPage: React.FC = () => {
 
 	return (
 		<div className="p-6 bg-white w-full">
-			<Script
-				src="https://checkout.razorpay.com/v1/checkout.js"
-				onLoad={() => setIsRazorpayLoaded(true)}
-			/>
-
 			<SubscriptionPlans
 				plans={subscriptionPlans}
 				activePlan={activePlan}

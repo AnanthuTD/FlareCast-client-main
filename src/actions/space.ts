@@ -85,7 +85,7 @@ export async function addMemberToSpace({
 	memberId: string;
 	spaceId: string;
 }): Promise<ApiResponse<Member>> {
-	alert('adding member to space')
+	// alert('adding member to space')
 	try {
 		const response = await axiosInstance.post<ApiResponse<Member>>(
 			`/api/collaboration/space/${spaceId}/member`,
