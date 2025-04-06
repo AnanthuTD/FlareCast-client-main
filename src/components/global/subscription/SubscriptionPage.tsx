@@ -15,6 +15,7 @@ import {
 } from "@/actions/subscriptions";
 import { Separator } from "@/components/ui/separator";
 import { useRouter } from "next/navigation";
+import Script from "next/script";
 
 // Types
 declare global {
@@ -144,6 +145,11 @@ const SubscriptionPage: React.FC = () => {
 
 	return (
 		<div className="p-6 bg-white w-full">
+			<Script
+				src="https://checkout.razorpay.com/v1/checkout.js"
+				// onLoad={() => setIsRazorpayLoaded(true)}
+				strategy="lazyOnload"
+			/>
 			<SubscriptionPlans
 				plans={subscriptionPlans}
 				activePlan={activePlan}
