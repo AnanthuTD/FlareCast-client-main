@@ -51,7 +51,7 @@ export function NotificationPreferenceTable() {
 
 	const fetchPreferences = async () => {
 		try {
-			const response = await axiosInstance.get("/api/notification/preferences");
+			const response = await axiosInstance.get("/api/notifications/preferences");
 			setPreferences(response.data);
 		} catch (error) {
 			console.error(error);
@@ -70,7 +70,7 @@ export function NotificationPreferenceTable() {
 	) => {
 		try {
 			const response = await axiosInstance.patch(
-				"/api/notification/preference",
+				"/api/notifications/preference",
 				{
 					checked,
 					preferenceId,

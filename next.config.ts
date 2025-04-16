@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
 		return [
 			{
 				source: "/api/:path*",
-				destination: process.env.NEXT_PUBLIC_API_GATEWAY_URL + "/api/:path*", // Proxy to user-service
+				destination: process.env.NEXT_PUBLIC_API_GATEWAY_URL + "/api/:path*",
 			},
 			{
 				source: "/gcs/:path*",

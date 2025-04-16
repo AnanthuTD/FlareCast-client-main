@@ -6,12 +6,12 @@ export const fetchNotifications = (
 	limit: number
 ) => {
 	return axiosInstance.get(
-		`/api/notification/?type=${type}&page=${page}&limit=${limit}`
+		`/api/notifications/?type=${type}&page=${page}&limit=${limit}`
 	);
 };
 
 export const markAsRead = () => {
-	return axiosInstance.patch("/api/notification/read/all");
+	return axiosInstance.patch("/api/notifications/read/all");
 };
 
 export const deleteNotification = (ids: string[]) => {
@@ -23,7 +23,7 @@ export const deleteNotification = (ids: string[]) => {
 export const fetchNotificationCount = async () => {
 	try {
 		const { data } = (await axiosInstance.get<{ count: number }>(
-			"/api/notification/count"
+			"/api/notifications/count"
 		)) ?? { count: 0 };
 
 		return data.count;

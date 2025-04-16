@@ -5,7 +5,7 @@ import useRegisterFCMToken from "@/hooks/useRegisterFCMToken";
 import React from "react";
 
 function FCMProvider({ children }: { children: React.ReactNode }) {
-	useRegisterFCMToken("/api/notification/register/fcm");
+	useRegisterFCMToken("/api/notifications/register/fcm");
 	useFCM(FCMRoles.USER);
 	
 	return <>{children}</>;
