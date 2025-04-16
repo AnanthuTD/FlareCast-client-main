@@ -32,8 +32,8 @@ export const getDefaultWorkspace = (
 
 export const InitializeWorkspaceStore = ({ children }) => {
 	const { isConnected, onEvent } = useSocket(
-		`${process.env.NEXT_PUBLIC_BACKEND_URL}/workspace` as string, 
-		"/collaboration/socket.io"
+		`${process.env.NEXT_PUBLIC_BACKEND_URL}/workspaces` as string, 
+		"/workspaces/socket.io"
 	);
 
 	useEffect(() => {

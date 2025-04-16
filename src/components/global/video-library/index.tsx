@@ -33,8 +33,8 @@ export const VideoLibrary: React.FC<VideoLibraryProps> = ({
 		(state) => state.selectedWorkspace.id
 	);
 	const { onEvent, emitEvent } = useSocket(
-		"/api/collaboration/folder" as string,
-		"/collaboration/socket.io"
+		"/api/folders" as string,
+		"/folders/ws"
 	);
 
 	const { data: folders = [], refetch } = useQueryData(

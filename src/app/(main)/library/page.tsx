@@ -43,7 +43,7 @@ export default function VideoLibrary() {
   const spaceId = useWorkspaceStore((state) => state.selectedSpace || '');
 
 	function handleOnTest() {
-		axiosInstance.get("/api/video/test/events");
+		axiosInstance.get("/api/videos/test/events");
 	}
 
 	useEffect(() => {

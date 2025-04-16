@@ -9,7 +9,7 @@ export const fetchFolders = async (
 	try {
 		console.log(folderId, spaceId);
 		const response = await axiosInstance.get(
-			`/api/collaboration/folder/${workspaceId}`,
+			`/api/folders/${workspaceId}`,
 			{ params: { folderId, spaceId } }
 		);
 		return response.data;
@@ -25,7 +25,7 @@ export const createFolder = async (
 ): Promise<Folder | never> => {
 	try {
 		const response = await axiosInstance.post(
-			`/api/collaboration/folder/${workspaceId}`,
+			`/api/folders/${workspaceId}`,
 			{ folderId, spaceId }
 		);
 		return response.data;
@@ -40,7 +40,7 @@ export const deleteFolder = async (
 ): Promise<Folder | never> => {
 	try {
 		const response = await axiosInstance.delete(
-			`/api/collaboration/folder/${folderId}`
+			`/api/folders/${folderId}`
 		);
 		return response.data;
 	} catch (error) {
@@ -57,7 +57,7 @@ export const renameFolder = async ({
 }): Promise<Folder | never> => {
 	try {
 		const response = await axiosInstance.patch(
-			`/api/collaboration/folder/${folderId}/rename`,
+			`/api/folders/${folderId}/rename`,
 			{ name: folderName }
 		);
 		return response.data;
@@ -72,7 +72,7 @@ export const fetchVideosInFolder = async (
 ): Promise<Video> => {
 	try {
 		const response = await axiosInstance.get(
-			`/api/collaboration/folder/${workspaceId}/${folderId}/videos`
+			`/api/folders/${workspaceId}/${folderId}/videos`
 		);
 		return response.data;
 	} catch (error) {
@@ -89,7 +89,7 @@ export const fetchParentFolders = async (
 ): Promise<FetchParentFolderRes> | never => {
 	try {
 		const response = await axiosInstance.get(
-			`/api/collaboration/folder/${workspaceId}/${folderId}/parents`
+			`/api/folders/${workspaceId}/${folderId}/parents`
 		);
 		return response.data;
 	} catch (error) {
@@ -106,7 +106,7 @@ export const moveFolder = ({
 	destination: { type: "folder" | "workspace", id: "workspace" };
 }) => {
 	return axiosInstance.patch(
-		`/api/collaboration/folder/${folderId}/move`,
+		`/api/folders/${folderId}/move`,
 		destination
 	);
 };

@@ -265,7 +265,7 @@ const VideoEditor = ({ videoId }: Props) => {
 		setIsUploading(true);
 		try {
 			const response = await axiosInstance(
-				`/api/video/upload-presigned-url?videoId=${videoId}`
+				`/api/videos/upload-presigned-url?videoId=${videoId}`
 			);
 			const { signedUrl, key, videoId: editedVideoId } = await response.data;
 
@@ -298,7 +298,7 @@ const VideoEditor = ({ videoId }: Props) => {
 				console.log("Upload to s3 successful", uploadResponse.status);
 
 				try {
-					await axiosInstance.post(`/api/video/${editedVideoId}/edit-success`, {
+					await axiosInstance.post(`/api/videos/${editedVideoId}/edit-success`, {
 						key,
 						status: "success",
 					});
@@ -308,13 +308,13 @@ const VideoEditor = ({ videoId }: Props) => {
 						"Failed to notify server about successful video upload",
 						error
 					);
-					await axiosInstance.post(`/api/video/${editedVideoId}/edit-success`, {
+					await axiosInstance.post(`/api/videos/${editedVideoId}/edit-success`, {
 						key,
 						status: "failure",
 					});
 				}
 			} catch (e) {
-				await axiosInstance.post(`/api/video/${editedVideoId}/edit-success`, {
+				await axiosInstance.post(`/api/videos/${editedVideoId}/edit-success`, {
 					key,
 					status: "failure",
 				});

@@ -33,7 +33,7 @@ const SubscriptionPage: React.FC = () => {
 	const [activePlan, setActivePlan] = useState<ActivePlan | null>(null);
 	const { onEvent } = useSocket(
 		`${process.env.NEXT_PUBLIC_BACKEND_URL}/subscriptions` as string,
-		"/user/socket.io"
+		"/users/socket.io"
 	);
 	const router = useRouter();
 

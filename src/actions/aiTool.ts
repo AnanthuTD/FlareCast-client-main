@@ -5,7 +5,7 @@ export const fetchChats = async (
   cursor: string | null,
   limit: number = 10
 ): Promise<ChatResponse> => {
-  const response = await axiosInstance.get(`/api/video/chats/${videoId}`, {
+  const response = await axiosInstance.get(`/api/videos/chats/${videoId}`, {
     params: { cursor, limit },
   });
   return response.data as ChatResponse;
@@ -15,7 +15,7 @@ export const sendToAiAgent = async (
   videoId: string,
   message: string
 ): Promise<string> => {
-  const response = await axiosInstance.post("/api/video/chats", {
+  const response = await axiosInstance.post("/api/videos/chats", {
     videoId,
     query: message,
   });
@@ -23,5 +23,5 @@ export const sendToAiAgent = async (
 };
 
 export const clearSessionHistory = async (sessionId: string): Promise<void> => {
-  await axiosInstance.post("/api/video/chats/clear-session", { sessionId });
+  await axiosInstance.post("/api/videos/chats/clear-session", { sessionId });
 };

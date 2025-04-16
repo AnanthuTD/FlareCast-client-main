@@ -9,7 +9,7 @@ export const fetchWorkspaces = async (): Promise<
 	| never
 > => {
 	try {
-		const response = await axiosInstance.get(`/api/collaboration/workspace`);
+		const response = await axiosInstance.get(`/api/workspaces`);
 		return response.data;
 	} catch (error) {
 		throw error.response.data;
@@ -36,7 +36,7 @@ export const createWorkspace = async (data: CreateWorkspaceProps) => {
 		}
 	});
 
-	return await axiosInstance.post(`/api/collaboration/workspace`, {
+	return await axiosInstance.post(`/api/workspaces`, {
 		name: data.name,
 		members: emails,
 	});
@@ -46,7 +46,7 @@ export const getMembers = async (workspaceId: string) => {
 	if (!workspaceId) throw new Error("Workspace ID required");
 
 	return await axiosInstance.get(
-		`/api/collaboration/workspace/${workspaceId}/members`
+		`/api/workspaces/${workspaceId}/members`
 	);
 };
 
@@ -59,7 +59,7 @@ export const updateRole = async (
 		throw new Error("All fields are required");
 
 	return await axiosInstance.patch(
-		`/api/collaboration/workspace/${workspaceId}/member/${memberId}`,
+		`/api/workspaces/${workspaceId}/member/${memberId}`,
 		{ role }
 	);
 };
@@ -68,7 +68,7 @@ export const removeMember = async (workspaceId: string, memberId: string) => {
 	if (!workspaceId || !memberId) throw new Error("All fields are required");
 
 	return await axiosInstance.delete(
-		`/api/collaboration/workspace/${workspaceId}/member/${memberId}`
+		`/api/workspaces/${workspaceId}/member/${memberId}`
 	);
 };
 
@@ -76,7 +76,7 @@ export const renameWorkspace = async (workspaceId: string, name: string) => {
 	if (!workspaceId || !name) throw new Error("All fields are required");
 
 	return await axiosInstance.patch(
-		`/api/collaboration/workspace/${workspaceId}`,
+		`/api/workspaces/${workspaceId}`,
 		{ name }
 	);
 };
@@ -92,7 +92,7 @@ export const searchMembers = async ({
 }) => {
 	try {
 		const res = await axiosInstance.get(
-			`/api/collaboration/workspace/${workspaceId}/search`,
+			`/api/workspaces/${workspaceId}/search`,
 			{
 				params: {
 					q: query,

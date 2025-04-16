@@ -24,7 +24,7 @@ const ChatBox = ({ videoId }: Props) => {
 	const [replyTo, setReplyTo] = useState<IChatFlat | null>(null);
 	const { emitEvent, onEvent } = useSocket(
 		`${process.env.NEXT_PUBLIC_BACKEND_URL}/chats`,
-		`/collaboration/socket.io`
+		`/chats/socket.io`
 	);
 	const [isAtBottom, setIsAtBottom] = useState(true);
 

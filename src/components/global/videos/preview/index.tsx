@@ -62,7 +62,7 @@ const VideoPreview = ({ videoId }: Props) => {
 	const user = useUserStore((state) => state);
 
 	const { messages, setMessages } = useSSE<Video>(
-		`/api/video/${activeWorkspaceId}/events?userId=${userId}`,
+		`/api/videos/${activeWorkspaceId}/events?userId=${userId}`,
 		[activeWorkspaceId, userId]
 	);
 

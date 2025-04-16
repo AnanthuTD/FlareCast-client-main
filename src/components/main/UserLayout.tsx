@@ -25,7 +25,7 @@ export const UserLayout: React.FC<{ children: React.ReactNode }> = ({
 	// to track active users
 	const {} = useSocket(
 		`${process.env.NEXT_PUBLIC_BACKEND_URL}/user` as string,
-		"/user/socket.io"
+		"/users/socket.io"
 	);
 	const activeWorkspaceId = useWorkspaceStore(
 		(state) => state.selectedWorkspace.id

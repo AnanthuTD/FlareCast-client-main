@@ -47,7 +47,7 @@ function VideoTab({
 
 	// SSE for real-time video events
 	const { messages, setMessages } = useSSE<NewVideo>(
-		`/api/video/${selectedWorkspace.id}/events?userId=${userId}`,
+		`/api/videos/${selectedWorkspace.id}/events?userId=${userId}`,
 		[selectedWorkspace.id, userId]
 	);
 

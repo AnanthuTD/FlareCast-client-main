@@ -3,7 +3,7 @@ import axiosInstance from "@/axios";
 export async function getSpaces(workspaceId: string) {
 	try {
 		const { data } = await axiosInstance.get(
-			`/api/collaboration/space/workspace/${workspaceId}`
+			`/api/spaces/workspace/${workspaceId}`
 		);
 		return data;
 	} catch {
@@ -17,7 +17,7 @@ export async function createSpace(
 	members: string[] = [],
 	type: "CLOSED" | "OPEN" = "OPEN"
 ) {
-	return await axiosInstance.post(`/api/collaboration/space`, {
+	return await axiosInstance.post(`/api/spaces`, {
 		workspaceId,
 		name,
 		members,
@@ -27,7 +27,7 @@ export async function createSpace(
 
 export async function deleteSpace(workspaceId: string, spaceId: string) {
 	return await axiosInstance.delete(
-		`/api/collaboration/space/${workspaceId}/${spaceId}`
+		`/api/spaces/${workspaceId}/${spaceId}`
 	);
 }
 
@@ -37,7 +37,7 @@ export async function renameSpace(
 	name: string
 ) {
 	return await axiosInstance.patch(
-		`/api/collaboration/space/${workspaceId}/${spaceId}`,
+		`/api/spaces/${workspaceId}/${spaceId}`,
 		{
 			name,
 		}
@@ -57,7 +57,7 @@ export async function getSpaceMembers(
 ): Promise<Member[]> {
 	try {
 		const res = await axiosInstance.get(
-			`/api/collaboration/space/${workspaceId}/${spaceId}/members`
+			`/api/spaces/${workspaceId}/${spaceId}/members`
 		);
 		return res.data.members as [];
 	} catch {
@@ -88,7 +88,7 @@ export async function addMemberToSpace({
 	// alert('adding member to space')
 	try {
 		const response = await axiosInstance.post<ApiResponse<Member>>(
-			`/api/collaboration/space/${spaceId}/member`,
+			`/api/spaces/${spaceId}/member`,
 			{ memberId }
 		);
 		return response.data.member; // Extract data
@@ -111,7 +111,7 @@ export async function removeMemberFromSpace({
 }): Promise<ApiResponse<void>> {
 	try {
 		const response = await axiosInstance.delete<ApiResponse<void>>(
-			`/api/collaboration/space/${spaceId}/member/${memberId}`
+			`/api/spaces/${spaceId}/member/${memberId}`
 		);
 		return response.data;
 	} catch (error) {
@@ -131,7 +131,7 @@ export async function fetchExistingMembers({
 }): Promise<ApiResponse<Member[]>> {
 	try {
 		const response = await axiosInstance.get<ApiResponse<Member[]>>(
-			`/api/collaboration/space/${spaceId}/members`
+			`/api/spaces/${spaceId}/members`
 		);
 		return response.data;
 	} catch (error) {

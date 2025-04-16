@@ -49,7 +49,7 @@ const GoogleSignIn: React.FC = ({ trigger = false, setTrigger = () => {} }) => {
 		setLoading(true);
 		try {
 			const { data } = await axiosInstance.post<GoogleSignInResponse>(
-				"/api/user/auth/google-sign-in",
+				"/api/users/auth/google-sign-in",
 				{ code: authResult }
 			);
 			toast.success("Successfully logged in!", {

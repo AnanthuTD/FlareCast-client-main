@@ -19,7 +19,7 @@ export const inviteMembers = async (
 	});
 
 	return await axiosInstance.post(
-		`/api/collaboration/invitation/${workspaceId}`,
+		`/api/invitations/${workspaceId}`,
 		{
 			emails,
 		}
@@ -27,13 +27,13 @@ export const inviteMembers = async (
 };
 
 export const acceptInvitation = async (invitationId: string) => {
-	return await axios.post("/api/collaboration/invitation/accept", {
+	return await axios.post("/api/invitations/accept", {
 		token: invitationId,
 	});
 };
 
 export const rejectInvitation = async (invitationId: string) => {
-	return await axios.post(`/api/collaboration/invitation/reject`, {
+	return await axios.post(`/api/invitations/reject`, {
     token: invitationId,
   });
 };

@@ -104,7 +104,7 @@ const PersonalSettings = () => {
 			if (formData.image) formDataToSend.append("image", formData.image);
 
 			const response = await axiosInstance.put(
-				`/api/user/profile/update`,
+				`/api/users/profile/update`,
 				formDataToSend,
 				{
 					headers: { "Content-Type": "multipart/form-data" },

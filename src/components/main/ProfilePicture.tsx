@@ -20,7 +20,7 @@ function ProfilePicture() {
 
 	const handleLogout = async () => {
 		try {
-			await axiosInstance.post("/api/user/auth/logout");
+			await axiosInstance.post("/api/users/auth/logout");
 			clearAccessToken();
 			console.log("User logged out");
 			router.push("/signin");

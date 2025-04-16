@@ -2,7 +2,7 @@ import axiosInstance from "@/axios";
 import { SubscriptionPlan } from "@/types";
 import axios, { AxiosError, isAxiosError } from "axios";
 
-const API_BASE_URL = "/api/user/subscriptions";
+const API_BASE_URL = "/api/subscriptions";
 
 // Interface for error response
 interface ErrorResponse {
@@ -92,7 +92,7 @@ export const getSubscriptionPlans = async (): Promise<{
 	activeSubscription: SubscriptionResponse | null;
 }> => {
 	try {
-		const response = await axios.get(`/api/user/subscription-plans`);
+		const response = await axios.get(`${API_BASE_URL}/public/plans`);
 		return response.data;
 	} catch (error) {
 		const axiosError = error as AxiosError<ErrorResponse>;
@@ -127,7 +127,7 @@ export const getVideoLimit = async (): Promise<{
 }> => {
 	try {
 		const { data } = await axiosInstance.get(
-			"/api/user/limits/upload-permission"
+			"/api/users/limits/upload-permission"
 		);
 		return data;
 	} catch (error) {

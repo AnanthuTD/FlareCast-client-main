@@ -39,7 +39,7 @@ const AcceptInvitationPage: React.FC = () => {
 		try {
 			setIsLoading(true);
 			const response = await axios.post(
-				"/api/collaboration/invitation/accept",
+				"/api/invitations/accept",
 				{ token }
 			);
 

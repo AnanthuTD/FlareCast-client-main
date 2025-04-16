@@ -70,7 +70,7 @@ axiosInstance.interceptors.response.use(
 			isRefreshing = true;
 
 			try {
-				const response = await axios.get("/api/user/auth/refresh-token");
+				const response = await axios.post("/api/users/auth/refresh-token");
 				const newAccessToken = response.data.accessToken;
 
 				userStore.getState().setAccessToken(newAccessToken);

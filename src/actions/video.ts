@@ -4,7 +4,7 @@ import { TreeData } from "@/components/global/move-tree";
 export async function getPreviewVideo(id: string) {
 	console.log(id);
 	try {
-		const response = await axiosInstance.get(`/api/video/${id}/video`);
+		const response = await axiosInstance.get(`/api/videos/${id}/video`);
 		return response.data;
 	} catch (error) {
 		console.error(error);
@@ -25,7 +25,7 @@ export async function getPreviewVideoServer(id: string) {
 
 export async function postView(videoId: string) {
 	try {
-		await axiosInstance.patch(`/api/video/${videoId}/viewed`);
+		await axiosInstance.patch(`/api/videos/${videoId}/viewed`);
 	} catch (error) {
 		console.error(error);
 		throw error.response.data;
@@ -40,7 +40,7 @@ export async function getMyVideos(
 	skip: number = 0,
 	limit: number = 10
 ) {
-	const { data } = await axiosInstance.get(`/api/video/${workspaceId}`, {
+	const { data } = await axiosInstance.get(`/api/videos/${workspaceId}`, {
 		params: {
 			limit,
 			skip,
@@ -64,7 +64,7 @@ export async function getPromotionalVideos(
 	hasNext: boolean;
 	hasPrev: boolean;
 }> {
-	const { data } = await axiosInstance.get(`/api/video/promotionalVideos`, {
+	const { data } = await axiosInstance.get(`/api/videos/promotionalVideos`, {
 		params: {
 			limit,
 			skip,
@@ -80,7 +80,7 @@ export async function getVideosForSpace(
 	folderId: string
 ) {
 	return await axiosInstance.get(
-		`/api/video/workspace/${workspaceId}/space/${spaceId}`,
+		`/api/videos/workspace/${workspaceId}/space/${spaceId}`,
 		{
 			params: {
 				limit: 10,
@@ -92,13 +92,13 @@ export async function getVideosForSpace(
 }
 
 export async function updateTitle(videoId: string, title: string) {
-	return await axiosInstance.put(`/api/video/${videoId}/update/title`, {
+	return await axiosInstance.put(`/api/videos/${videoId}/update/title`, {
 		title,
 	});
 }
 
 export async function updateDescription(videoId: string, description: string) {
-	return await axiosInstance.put(`/api/video/${videoId}/update/description`, {
+	return await axiosInstance.put(`/api/videos/${videoId}/update/description`, {
 		description,
 	});
 }
@@ -113,7 +113,7 @@ export async function searchVideo({
 	limit: number;
 }) {
 	try {
-		const { data } = await axiosInstance.get(`/api/video/search`, {
+		const { data } = await axiosInstance.get(`/api/videos/search`, {
 			params: {
 				query,
 				workspaceId,
@@ -140,7 +140,7 @@ export async function suggestVideo({
 	paginationToken?: string;
 }) {
 	try {
-		const { data } = await axiosInstance.get(`/api/video/search/autocomplete`, {
+		const { data } = await axiosInstance.get(`/api/videos/search/autocomplete`, {
 			params: {
 				query,
 				workspaceId,
@@ -177,7 +177,7 @@ export async function suggestFolders({
 }) {
 	try {
 		const { data } = await axiosInstance.get(
-			`/api/collaboration/folder/${workspaceId}/search`,
+			`/api/folders/${workspaceId}/search`,
 			{
 				params: {
 					query,
@@ -257,7 +257,7 @@ export async function getWatchLaterVideos({
 }): Promise<Video[]> {
 	try {
 		const { data } = await axiosInstance.get<WatchLater>(
-			"/api/video/watch-later",
+			"/api/videos/watch-later",
 			{
 				params: {
 					limit,
@@ -287,7 +287,7 @@ export async function addWatchLaterVideo({
 			message: string;
 			watchLater: { id: string };
 		}>(
-			"/api/video/watch-later",
+			"/api/videos/watch-later",
 			{ videoId },
 			{ params: { workspaceId } } // Pass workspaceId as query param if required by your API
 		);
@@ -316,7 +316,7 @@ export async function removeWatchLaterVideo({
 			message: string;
 			watchLater: null;
 		}>(
-			`/api/video/${videoId}/watch-later`,
+			`/api/videos/${videoId}/watch-later`,
 			{ params: { workspaceId } } // Pass workspaceId as query param if required by your API
 		);
 
@@ -331,7 +331,7 @@ export async function removeWatchLaterVideo({
 }
 
 export async function deleteVideo(videoId: string) {
-	return await axiosInstance.delete(`/api/video/${videoId}`);
+	return await axiosInstance.delete(`/api/videos/${videoId}`);
 }
 
 export async function shareVideo({
@@ -343,11 +343,11 @@ export async function shareVideo({
 }) {
 	console.log(destination);
 	if (destination.type === "space") {
-		return await axiosInstance.post(`/api/video/${videoId}/share`, {
+		return await axiosInstance.post(`/api/videos/${videoId}/share`, {
 			spaceId: destination.id,
 		});
 	} else if (destination.type === "folder") {
-		return await axiosInstance.post(`/api/video/${videoId}/share`, {
+		return await axiosInstance.post(`/api/videos/${videoId}/share`, {
 			folderId: destination.id,
 		});
 	}
@@ -362,7 +362,7 @@ export async function moveVideo({
 }) {
 	console.log(destination);
 	if (destination.type === "folder") {
-		return await axiosInstance.post(`/api/video/${videoId}/move`, {
+		return await axiosInstance.post(`/api/videos/${videoId}/move`, {
 			folderId: destination.id,
 		});
 	}
@@ -375,7 +375,7 @@ export async function updateVideoVisibility({
 	videoId: string;
 	isPublic: boolean;
 }) {
-	return await axiosInstance.patch(`/api/video/${videoId}/visibility`, {
+	return await axiosInstance.patch(`/api/videos/${videoId}/visibility`, {
 		videoId,
 		isPublic,
 	});
