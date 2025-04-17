@@ -146,3 +146,7 @@ body {
 		@apply bg-background text-foreground;
 	}
 }
+
+.rounded-button {
+  border-radius: 9999px;
+}

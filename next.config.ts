@@ -22,6 +22,7 @@ const nextConfig: NextConfig = {
 			"cdn.builder.io",
 			"lh3.googleusercontent.com",
 			"d1j5jvhpjcqj6b.cloudfront.net",
+			"readdy.ai"
 		],
 	},
 	typescript: {

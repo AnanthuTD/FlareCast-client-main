@@ -7,7 +7,6 @@ import CheckAuthentication from "@/components/auth/CheckAuthentication";
 import { UserStoreProvider } from "@/providers/UserStoreProvider";
 import { Suspense } from "react";
 import { Toaster } from "sonner";
-// import { AntdRegistry } from '@ant-design/nextjs-registry';
 
 const geistSans = Geist({
 	variable: "--font-geist-sans",
