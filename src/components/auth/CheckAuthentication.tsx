@@ -29,7 +29,7 @@ function CheckAuthentication({ children }: { children: React.ReactNode }) {
 
 				if (data.user) {
 					setUser(data.user);
-					if (excludeFromAuth.includes(pathName)) {
+					if (!excludeFromAuth.includes(pathName)) {
 						if (!searchParams.get("callbackUrl")) {
 							router.replace("/home");
 						}
