@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import { Button } from "@/components/ui/button";
+import { PlayCircleIcon } from 'lucide-react';
 
 const HeroSection: React.FC = () => {
   return (
@@ -28,7 +29,7 @@ const HeroSection: React.FC = () => {
                 Get Started Free
               </Button>
               <Button variant="outline" className="border-[#6366F1] text-[#6366F1] hover:bg-[#6366F1] hover:text-white transition-colors duration-300 text-lg px-8 py-6 !rounded-button whitespace-nowrap cursor-pointer">
-                <i className="fas fa-play-circle mr-2"></i> Watch Demo
+                <PlayCircleIcon className="mr-2"></PlayCircleIcon> Watch Demo
               </Button>
             </div>
           </div>

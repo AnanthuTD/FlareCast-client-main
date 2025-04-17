@@ -1,5 +1,12 @@
 import Image from "next/image";
 import { Card } from "@/components/ui/card";
+import {
+	BrainIcon,
+	CheckCircle2Icon,
+	RadioTowerIcon,
+	Users2Icon,
+	VideoIcon,
+} from "lucide-react";
 
 const FeaturesSection: React.FC = () => {
 	return (
@@ -17,7 +24,7 @@ const FeaturesSection: React.FC = () => {
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
 					<Card className="p-6 hover:shadow-lg transition-shadow duration-300 border border-gray-100 hover:border-[#6366F1]/20 h-full">
 						<div className="h-14 w-14 rounded-full bg-[#6366F1]/10 flex items-center justify-center mb-6">
-							<i className="fas fa-video text-2xl text-[#6366F1]"></i>
+							<VideoIcon color="#6366F1" />
 						</div>
 						<h3 className="text-xl font-bold mb-3">Instant Recording</h3>
 						<p className="text-indigo-900/70">
@@ -27,7 +34,7 @@ const FeaturesSection: React.FC = () => {
 					</Card>
 					<Card className="p-6 hover:shadow-lg transition-shadow duration-300 border border-gray-100 hover:border-[#6366F1]/20 h-full">
 						<div className="h-14 w-14 rounded-full bg-[#6366F1]/10 flex items-center justify-center mb-6">
-							<i className="fas fa-broadcast-tower text-2xl text-[#6366F1]"></i>
+							<RadioTowerIcon color="#6366F1" />
 						</div>
 						<h3 className="text-xl font-bold mb-3">Live Streaming</h3>
 						<p className="text-indigo-900/70">
@@ -37,7 +44,7 @@ const FeaturesSection: React.FC = () => {
 					</Card>
 					<Card className="p-6 hover:shadow-lg transition-shadow duration-300 border border-gray-100 hover:border-[#6366F1]/20 h-full">
 						<div className="h-14 w-14 rounded-full bg-[#6366F1]/10 flex items-center justify-center mb-6">
-							<i className="fas fa-users text-2xl text-[#6366F1]"></i>
+							<Users2Icon color="#6366F1" />
 						</div>
 						<h3 className="text-xl font-bold mb-3">Team Collaboration</h3>
 						<p className="text-indigo-900/70">
@@ -47,7 +54,7 @@ const FeaturesSection: React.FC = () => {
 					</Card>
 					<Card className="p-6 hover:shadow-lg transition-shadow duration-300 border border-gray-100 hover:border-[#6366F1]/20 h-full">
 						<div className="h-14 w-14 rounded-full bg-[#6366F1]/10 flex items-center justify-center mb-6">
-							<i className="fas fa-brain text-2xl text-[#6366F1]"></i>
+							<BrainIcon color="#6366F1" />
 						</div>
 						<h3 className="text-xl font-bold mb-3">AI-Powered Tools</h3>
 						<p className="text-indigo-900/70">
@@ -69,15 +76,15 @@ const FeaturesSection: React.FC = () => {
 							</p>
 							<ul className="space-y-3">
 								<li className="flex items-start">
-									<i className="fas fa-check-circle text-[#6366F1] mt-1 mr-3"></i>
+									<CheckCircle2Icon className="text-[#6366F1] mt-1 mr-3" />
 									<span>Unlimited workspaces for different projects</span>
 								</li>
 								<li className="flex items-start">
-									<i className="fas fa-check-circle text-[#6366F1] mt-1 mr-3"></i>
+									<CheckCircle2Icon className="text-[#6366F1] mt-1 mr-3" />
 									<span>Granular permission controls</span>
 								</li>
 								<li className="flex items-start">
-									<i className="fas fa-check-circle text-[#6366F1] mt-1 mr-3"></i>
+									<CheckCircle2Icon className="text-[#6366F1] mt-1 mr-3" />
 									<span>Real-time updates with WebSocket technology</span>
 								</li>
 							</ul>
