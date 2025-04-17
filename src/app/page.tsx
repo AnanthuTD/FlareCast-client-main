@@ -5,6 +5,7 @@ import HowItWorks from "@/components/global/landing-page/HowItWorks";
 import PricingSection from "@/components/global/landing-page/PricingSection";
 import CTASection from "@/components/global/landing-page/CTASection";
 import Footer from "@/components/global/landing-page/Footer";
+import DownloadSection from "@/components/global/landing-page/DownloadSection";
 
 const Home: React.FC = () => {
 	return (
@@ -14,6 +15,7 @@ const Home: React.FC = () => {
 			<FeaturesSection />
 			<HowItWorks />
 			<PricingSection />
+			<DownloadSection />
 			<CTASection />
 			<Footer />
 		</div>

@@ -1,13 +1,22 @@
 import axiosInstance from "@/axios";
+import { apiRequest } from "@/axios/adapter";
+import { Notification } from "@/types";
 
-export const fetchNotifications = (
+export const fetchNotifications = async (
 	type: string,
 	page: number,
 	limit: number
 ) => {
-	return axiosInstance.get(
-		`/api/notifications/?type=${type}&page=${page}&limit=${limit}`
+	const result = await apiRequest<{
+		message: string;
+		notifications: Notification[];
+		count: number;
+	}>(
+		axiosInstance.get(
+			`/api/notifications/?type=${type}&page=${page}&limit=${limit}`
+		)
 	);
+	return result;
 };
 
 export const markAsRead = () => {

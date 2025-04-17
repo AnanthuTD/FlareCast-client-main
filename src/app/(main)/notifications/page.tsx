@@ -48,14 +48,14 @@ const NotificationPanel = () => {
 
 	useEffect(() => {
 		async function getNotifications() {
-			try {
-				const { data } = await fetchNotifications(tab, page, limit);
-				setNotifications(data.notifications);
+			const response = await fetchNotifications(tab, page, limit);
+			if (!response.error && response.data) {
+				if (!Array.isArray(response.data.notifications)) {
+					throw new Error("Received notification is not an array!");
+				}
+				setNotifications(response.data.notifications);
 				setTotalPages(data.totalPages);
-			} catch (err) {
-				if (isAxiosError(err)) toast.error(err.response?.data?.message);
-				else toast.error(err?.message || "Failed to fetch notification!");
-			}
+			} else toast.error(response.error || "Failed to fetch notification!");
 		}
 
 		(() => {
@@ -183,7 +183,7 @@ const NotificationPanel = () => {
 					)}
 				</div>
 				<AnimatePresence>
-					{notifications.map((notif) => (
+					{notifications?.map((notif) => (
 						<motion.div
 							key={notif.id}
 							initial={{ opacity: 0, y: -10 }}

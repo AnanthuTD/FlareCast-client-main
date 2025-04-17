@@ -91,7 +91,7 @@ const FeaturesSection: React.FC = () => {
 						</div>
 						<div className="md:w-1/2">
 							<Image
-								src="https://readdy.ai/api/search-image?query=Professional%20workspace%20management%20interface%20with%20folders%20and%20collaboration%20features%2C%20modern%20UI%20design%20with%20purple%20accents%2C%20organized%20video%20content%20in%20a%20clean%20layout%2C%20team%20collaboration%20dashboard%20with%20user%20avatars%2C%20professional%20software%20interface%2C%20high-quality%20screen%20display&width=600&height=400&seq=workspace-ui-1&orientation=landscape"
+								src="/application-screenshot.png"
 								alt="Workspace Management"
 								width={600}
 								height={400}
