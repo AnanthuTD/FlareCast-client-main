@@ -6,14 +6,14 @@ import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import React, { useState, useEffect } from "react";
 
 const excludeFromAuth = [
-	"/signin",
-	"/signup",
 	"/verification/email/success",
 	"/verification/email/failure",
 	"/verification/email/notify",
 	"/verification/invitation",
 	"/",
 ];
+
+const routesNotPermittedForAuthUsers = ["/signin", "/signup"];
 
 function CheckAuthentication({ children }: { children: React.ReactNode }) {
 	const router = useRouter();
@@ -31,7 +31,8 @@ function CheckAuthentication({ children }: { children: React.ReactNode }) {
 					setUser(data.user);
 					if (!excludeFromAuth.includes(pathName)) {
 						if (!searchParams.get("callbackUrl")) {
-							router.replace("/home");
+							if (routesNotPermittedForAuthUsers.includes(pathName))
+								router.replace("/home");
 						}
 					}
 				}
