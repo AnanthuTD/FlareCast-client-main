@@ -149,6 +149,7 @@ const DownloadSection: React.FC = () => {
 									onClick={() => handleDownload("msi", "Windows")}
 									className="w-full bg-[#6366F1] text-white hover:bg-[#5254cc] transition-colors duration-300 rounded-md whitespace-nowrap cursor-pointer"
 									aria-label="Download FlareCast MSI for Windows"
+									disabled={!getAssetByExt("msi")}
 								>
 									<DownloadIcon />
 									Download .msi ({getAssetSize("msi")})
@@ -157,13 +158,13 @@ const DownloadSection: React.FC = () => {
 									onClick={() => handleDownload("exe", "Windows")}
 									className="w-full bg-[#6366F1] text-white hover:bg-[#5254cc] transition-colors duration-300 rounded-md whitespace-nowrap cursor-pointer"
 									aria-label="Download FlareCast EXE for Windows"
+									disabled={!getAssetByExt("exe")}
 								>
 									<DownloadIcon />
 									Download .exe ({getAssetSize("exe")})
 								</Button>
 								<p className="text-sm text-center text-gray-500">
-									Version {release.tag_name.replace(/^v/, "")} (
-									{getAssetSize("msi")})
+									Version {release.tag_name.replace(/^v/, "")}
 								</p>
 							</div>
 						</Card>
