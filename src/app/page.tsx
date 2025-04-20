@@ -6,24 +6,14 @@ import PricingSection from "@/components/global/landing-page/PricingSection";
 import CTASection from "@/components/global/landing-page/CTASection";
 import Footer from "@/components/global/landing-page/Footer";
 import DownloadSection from "@/components/global/landing-page/DownloadSection";
-import { cache } from "react";
-import { getSubscriptionPlans } from "@/actions";
-
-const getCachedPlans = cache(async () => {
-	try {
-		const { plans } = await getSubscriptionPlans();
-		return plans;
-	} catch (e) {
-		console.error(e);
-		return null;
-	}
-});
+import { fetchLatestRelease, getSubscriptionPlans } from "@/actions";
 
 export const revalidate = 60 * 60 * 24; // 24 hr
 export const runtime = "edge";
 
 export default async function Home() {
-	const plans = await getCachedPlans();
+	const { plans } = (await getSubscriptionPlans()) ?? {};
+	const release = await fetchLatestRelease();
 
 	return (
 		<div className="min-h-screen bg-white text-indigo-900 overflow-x-hidden">
@@ -32,7 +22,7 @@ export default async function Home() {
 			<FeaturesSection />
 			<HowItWorks />
 			{plans && <PricingSection plans={plans} />}
-			<DownloadSection />
+			{release && <DownloadSection release={release} />}
 			<CTASection />
 			<Footer />
 		</div>
