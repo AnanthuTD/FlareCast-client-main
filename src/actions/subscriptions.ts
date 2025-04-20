@@ -1,27 +1,8 @@
 import axiosInstance from "@/axios";
-import { SubscriptionPlan } from "@/types";
-import axios, { AxiosError, isAxiosError } from "axios";
+import { ErrorResponse, SubscriptionPlan, SubscriptionResponse } from "@/types";
+import { AxiosError, isAxiosError } from "axios";
 
 const API_BASE_URL = "/api/subscriptions";
-
-// Interface for error response
-interface ErrorResponse {
-	error?: string;
-	message: string;
-}
-
-// Interface for subscription response (based on controller response)
-interface SubscriptionResponse {
-	id?: string;
-	userId: string;
-	planId: string;
-	status: string;
-	razorpayKeyId: string;
-	shortUrl: string;
-	subscriptionType: string;
-	amount: number;
-	[key: string]: any;
-}
 
 // Check if user can subscribe
 export const checkCanSubscribe = async (): Promise<{
@@ -77,22 +58,6 @@ export const getSubscriptionPlansAuthenticated = async (): Promise<{
 }> => {
 	try {
 		const response = await axiosInstance.get(`${API_BASE_URL}/plans`);
-		return response.data;
-	} catch (error) {
-		const axiosError = error as AxiosError<ErrorResponse>;
-		throw new Error(
-			axiosError.response?.data.message || "Failed to fetch subscription plans"
-		);
-	}
-};
-
-// Get available subscription plans
-export const getSubscriptionPlans = async (): Promise<{
-	plans: SubscriptionPlan[];
-	activeSubscription: SubscriptionResponse | null;
-}> => {
-	try {
-		const response = await axios.get(`${API_BASE_URL}/public/plans`);
 		return response.data;
 	} catch (error) {
 		const axiosError = error as AxiosError<ErrorResponse>;

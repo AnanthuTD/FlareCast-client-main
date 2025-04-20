@@ -278,22 +278,22 @@ export interface IChatFlat {
 
 export interface SubscriptionPlan {
 	id: string;
-  type: "free" | "paid";
-  planId?: string;
-  name: string;
-  price: number;
-  interval?: number;
-  period?: "daily" | "weekly" | "monthly" | "quarterly" | "yearly";
-  maxRecordingDuration: number;
-  hasAiFeatures: boolean;
-  allowsCustomBranding: boolean;
-  hasAdvancedEditing: boolean;
-  maxMembers?: number;
-  maxVideoCount?: number;
-  maxWorkspaces?: number;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
+	type: "free" | "paid";
+	planId?: string;
+	name: string;
+	price: number;
+	interval?: number;
+	period?: "daily" | "weekly" | "monthly" | "quarterly" | "yearly";
+	maxRecordingDuration: number;
+	hasAiFeatures: boolean;
+	allowsCustomBranding: boolean;
+	hasAdvancedEditing: boolean;
+	maxMembers?: number;
+	maxVideoCount?: number;
+	maxWorkspaces?: number;
+	isActive: boolean;
+	createdAt: string;
+	updatedAt: string;
 }
 
 export interface SubscriptionData {
@@ -318,59 +318,77 @@ export interface ActivePlan extends SubscriptionPlan {
 }
 
 interface Uploader {
-  login: string;
-  id: number;
-  node_id: string;
-  avatar_url: string;
-  gravatar_id: string;
-  url: string;
-  html_url: string;
-  followers_url: string;
-  following_url: string;
-  gists_url: string;
-  starred_url: string;
-  subscriptions_url: string;
-  organizations_url: string;
-  repos_url: string;
-  events_url: string;
-  received_events_url: string;
-  type: string;
-  user_view_type: string;
-  site_admin: boolean;
+	login: string;
+	id: number;
+	node_id: string;
+	avatar_url: string;
+	gravatar_id: string;
+	url: string;
+	html_url: string;
+	followers_url: string;
+	following_url: string;
+	gists_url: string;
+	starred_url: string;
+	subscriptions_url: string;
+	organizations_url: string;
+	repos_url: string;
+	events_url: string;
+	received_events_url: string;
+	type: string;
+	user_view_type: string;
+	site_admin: boolean;
 }
 
 export interface Asset {
-  url: string;
-  id: number;
-  node_id: string;
-  name: string;
-  label: string;
-  uploader: Uploader;
-  content_type: string;
-  state: string;
-  size: number;
-  download_count: number;
-  created_at: string;
-  updated_at: string;
-  browser_download_url: string;
+	url: string;
+	id: number;
+	node_id: string;
+	name: string;
+	label: string;
+	uploader: Uploader;
+	content_type: string;
+	state: string;
+	size: number;
+	download_count: number;
+	created_at: string;
+	updated_at: string;
+	browser_download_url: string;
 }
 
 export interface GitHubRelease {
-  url: string;
-  assets_url: string;
-  upload_url: string;
-  html_url: string;
-  id: number;
-  node_id: string;
-  tag_name: string;
-  target_commitish: string;
-  name: string;
-  draft: boolean;
-  prerelease: boolean;
-  created_at: string;
-  published_at: string;
-  assets: Asset[];
-  tarball_url: string;
-  zipball_url: string;
-  body: string;
+	url: string;
+	assets_url: string;
+	upload_url: string;
+	html_url: string;
+	id: number;
+	node_id: string;
+	tag_name: string;
+	target_commitish: string;
+	name: string;
+	draft: boolean;
+	prerelease: boolean;
+	created_at: string;
+	published_at: string;
+	assets: Asset[];
+	tarball_url: string;
+	zipball_url: string;
+	body: string;
+}
+
+export interface ErrorResponse {
+	error?: string;
+	message: string;
+}
+
+// Interface for subscription response
+export interface SubscriptionResponse {
+	id?: string;
+	userId: string;
+	planId: string;
+	status: string;
+	razorpayKeyId: string;
+	shortUrl: string;
+	subscriptionType: string;
+	amount: number;
+	[key: string]: any;
 }

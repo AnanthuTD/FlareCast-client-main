@@ -6,20 +6,35 @@ import PricingSection from "@/components/global/landing-page/PricingSection";
 import CTASection from "@/components/global/landing-page/CTASection";
 import Footer from "@/components/global/landing-page/Footer";
 import DownloadSection from "@/components/global/landing-page/DownloadSection";
+import { cache } from "react";
+import { getSubscriptionPlans } from "@/actions";
 
-const Home: React.FC = () => {
+const getCachedPlans = cache(async () => {
+	try {
+		const { plans } = await getSubscriptionPlans();
+		return plans;
+	} catch (e) {
+		console.error(e);
+		return null;
+	}
+});
+
+export const revalidate = 60 * 60 * 24; // 24 hr
+export const runtime = "edge";
+
+export default async function Home() {
+	const plans = await getCachedPlans();
+
 	return (
 		<div className="min-h-screen bg-white text-indigo-900 overflow-x-hidden">
 			<Navigation />
 			<HeroSection />
 			<FeaturesSection />
 			<HowItWorks />
-			<PricingSection />
+			{plans && <PricingSection plans={plans} />}
 			<DownloadSection />
 			<CTASection />
 			<Footer />
 		</div>
 	);
-};
-
-export default Home;
+}
