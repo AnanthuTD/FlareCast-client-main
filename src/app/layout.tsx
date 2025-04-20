@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import ReactQueryProvider from "@/react-query";
+import ReactQueryProvider from "@/app/ReactQueryProvider";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import CheckAuthentication from "@/components/auth/CheckAuthentication";
 import { UserStoreProvider } from "@/providers/UserStoreProvider";
