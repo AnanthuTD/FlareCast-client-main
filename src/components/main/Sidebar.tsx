@@ -15,7 +15,7 @@ import { SidebarItem } from "./SidebarItem";
 import { SpaceCard } from "./SpaceCard";
 import Image from "next/image";
 import { useWorkspaceStore } from "@/providers/WorkspaceStoreProvider";
-import { fetchWorkspaces } from "@/actions/workspace";
+import { fetchWorkspaces, getMembers } from "@/actions/workspace";
 import { getSpaces } from "@/actions/space";
 import { toast } from "sonner";
 import {
@@ -28,6 +28,7 @@ import { CreateWorkspace } from "../global/create-workspace";
 import { GiftIcon, LucideIcon } from "lucide-react";
 import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
 import { InviteMembers } from "../global/invite-members";
+import { useQuery } from "@tanstack/react-query";
 
 interface UserSidebarProps {
 	sidebarItems: {
@@ -110,6 +111,12 @@ const Sidebar: React.FC<UserSidebarProps> = ({ sidebarItems }) => {
 		}
 	};
 
+	const { data: workspaceMembers } = useQuery({
+		placeholderData: [],
+		queryKey: ["workspace-members", activeWorkspace?.id],
+		queryFn: async () => await getMembers(activeWorkspace!.id),
+	});
+
 	return (
 		<>
 			<div className="flex gap-2.5 items-center w-60 bg-white">
@@ -165,7 +172,7 @@ const Sidebar: React.FC<UserSidebarProps> = ({ sidebarItems }) => {
 										</Select>
 									)}
 									<div className="text-xs tracking-normal leading-loose text-gray-500">
-										1 member
+										{workspaceMembers.length} member
 									</div>
 								</div>
 							</div>

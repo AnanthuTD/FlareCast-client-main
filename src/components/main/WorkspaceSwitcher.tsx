@@ -25,7 +25,8 @@ import {
 	setLocalStorageWorkspace,
 } from "../InitializeWorkspaceStore";
 import { toast } from "sonner";
-import { fetchWorkspaces } from "@/actions/workspace";
+import { fetchWorkspaces, getMembers } from "@/actions/workspace";
+import { useQuery } from "@tanstack/react-query";
 
 export function WorkspaceSwitcher({}: {}) {
 	const { isMobile } = useSidebar();
@@ -78,6 +79,12 @@ export function WorkspaceSwitcher({}: {}) {
 		}
 	};
 
+	const { data: workspaceMembers } = useQuery({
+		placeholderData: [],
+		queryKey: ["workspace-members", activeWorkspace?.id],
+		queryFn: async () => await getMembers(activeWorkspace!.id),
+	});
+
 	return (
 		<SidebarMenu>
 			<SidebarMenuItem>
@@ -118,7 +125,7 @@ export function WorkspaceSwitcher({}: {}) {
 									</Select>
 								)}
 								<div className="text-xs tracking-normal leading-loose text-gray-500">
-									1 member
+									{workspaceMembers.length} member
 								</div>
 							</div>
 						</div>
