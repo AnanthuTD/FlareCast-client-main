@@ -1,3 +1,5 @@
+import { LucideIcon } from "lucide-react";
+
 export interface TestimonialProps {
 	rating: number;
 	quote: string;
@@ -146,7 +148,7 @@ export interface SectionProps {
 }
 
 export interface SidebarItemProps {
-	icon: string;
+	icon: LucideIcon;
 	label: string;
 	isActive?: boolean;
 	notificationCount?: number;

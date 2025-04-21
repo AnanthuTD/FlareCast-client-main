@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { TabsContent } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -13,91 +13,185 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { useWorkspaceStore } from "@/providers/WorkspaceStoreProvider";
-import { getMembers, removeMember, renameWorkspace, updateRole } from "@/actions/workspace";
+import {
+	getMembers,
+	removeMember,
+	renameWorkspace,
+	updateRole,
+} from "@/actions/workspace";
 import { toast } from "sonner";
 import { isAxiosError } from "axios";
-import { Label } from "@/components/ui/label";
-import { inviteMembers } from "@/actions/invitation";
+import { InviteMembers } from "../invite-members";
+import { useUserStore } from "@/providers/UserStoreProvider";
+import { useQuery } from "@tanstack/react-query";
 
-const roles = ["MEMBER", "ADMIN", "EDITOR"];
+interface User {
+	id: string;
+	name: string;
+}
+
+interface MemberData {
+	id: string;
+	userId: string;
+	createdAt: Date;
+	role: string;
+	workspaceId: string;
+	spaceIds: string[];
+	User: User;
+}
+
+const roles = ["MEMBER", "ADMIN", "EDITOR", "OWNER"];
 
 const WorkspaceSettings = () => {
-	const workspace = useWorkspaceStore((state) => state.selectedWorkspace);
-	const [workspaceName, setWorkspaceName] = useState(workspace?.name || "");
-	const [userRole, setUserRole] = useState("owner"); // Assume current user role
-	const [membersList, setMembersList] = useState([]);
-	const membersRef = useRef<HTMLInputElement | null>(null);
+	const activeWorkspace = useWorkspaceStore((state) => state.selectedWorkspace);
+	const [workspaceName, setWorkspaceName] = useState(
+		activeWorkspace?.name || ""
+	);
+	const userId = useUserStore((s) => s.id);
+	const [isRenaming, setIsRenaming] = useState(false);
+	const [isUpdatingRole, setIsUpdatingRole] = useState<string | null>(null);
+	const [isRemovingMember, setIsRemovingMember] = useState<string | null>(null);
 
-	useEffect(() => {
-		console.log("Workspace", workspace);
+	const {
+		data: workspaceMembers,
+		error: memberFetchError,
+		isLoading,
+		refetch,
+	} = useQuery<MemberData[]>({
+		placeholderData: [],
+		queryKey: ["workspace-members", activeWorkspace?.id],
+		queryFn: async () => await getMembers(activeWorkspace!.id),
+	});
 
-		async function fetchWorkspaceMembers(workspaceId) {
+	const isAdminOrOwner = useMemo(() => {
+		const user = workspaceMembers?.find((m) => m.userId === userId);
+		return user ? user.role === "ADMIN" || user.role === "OWNER" : false;
+	}, [userId, workspaceMembers]);
+
+	const handleRoleUpdate = useCallback(
+		async (memberId: string, role: string) => {
+			setIsUpdatingRole(memberId);
 			try {
-				if (workspaceId) {
-					const { data } = await getMembers(workspaceId);
-					setMembersList(data);
-				}
+				await updateRole(activeWorkspace.id, memberId, role);
+				toast.success("Role updated successfully!");
+				refetch();
 			} catch (err) {
 				if (isAxiosError(err)) toast.error(err.response?.data?.message);
-				else toast.error(err?.message || "Failed to fetch members!");
+				else toast.error(err?.message || "Failed to update role!");
+			} finally {
+				setIsUpdatingRole(null);
 			}
-		}
+		},
+		[activeWorkspace.id, refetch]
+	);
 
-		if (workspace?.id) {
-			fetchWorkspaceMembers(workspace.id);
-		}
-	}, [workspace?.id]);
-
-	const handleRoleUpdate = async (memberId: string, role: string) => {
-		try {
-			await updateRole(workspace.id, memberId, role);
-			toast.success("Role updated successfully!");
-			setMembersList((prev) =>
-				prev.map((member) =>
-					member.id === memberId ? { ...member, role } : member
+	const handleRemoveMember = useCallback(
+		async (memberId: string) => {
+			const member = workspaceMembers?.find((m) => m.id === memberId);
+			if (
+				!confirm(
+					`Are you sure you want to remove ${member?.User.name} from the workspace?`
 				)
-			);
-		} catch (err) {
-			if (isAxiosError(err)) toast.error(err.response?.data?.message);
-			else toast.error(err?.message || "Failed to update role!");
-		}
-	};
-
-	const handleRemoveMember = async (memberId: string) => {
-		try {
-			await removeMember(workspace.id, memberId);
-			toast.success("Member removed successfully!");
-			setMembersList((prev) => prev.filter((member) => member.id !== memberId));
-		} catch (err) {
-			if (isAxiosError(err)) toast.error(err.response?.data?.message);
-			else toast.error(err?.message || "Failed to remove member!");
-		}
-	};
-
-	const handleInvitation = async () => {
-		const emails = membersRef?.current?.value;
-		if (!emails) return toast.error("Please enter an email address.");
-
-		try {
-			const { data } = await inviteMembers(workspace.id, emails);
-			toast.success(data.message);
-		} catch (err) {
-			if (isAxiosError(err)) toast.error(err.response?.data?.message);
-			else toast.error(err?.message || "Failed to invite members!");
-		}
-	};
+			) {
+				return;
+			}
+			setIsRemovingMember(memberId);
+			try {
+				await removeMember(activeWorkspace.id, memberId);
+				toast.success("Member removed successfully!");
+				refetch();
+			} catch (err) {
+				if (isAxiosError(err)) toast.error(err.response?.data?.message);
+				else toast.error(err?.message || "Failed to remove member!");
+			} finally {
+				setIsRemovingMember(null);
+			}
+		},
+		[activeWorkspace.id, refetch, workspaceMembers]
+	);
 
 	const handleWorkspaceRename = async () => {
+		if (!workspaceName.trim()) {
+			toast.error("Workspace name cannot be empty!");
+			return;
+		}
+		setIsRenaming(true);
 		try {
-      await renameWorkspace(workspace.id, workspaceName);
-      toast.success("Workspace name updated successfully!");
-    } catch (err) {
-      if (isAxiosError(err)) toast.error(err.response?.data?.message);
-      else toast.error(err?.message || "Failed to update workspace name!");
-    }
+			await renameWorkspace(activeWorkspace.id, workspaceName);
+			toast.success("Workspace name updated successfully!");
+		} catch (err) {
+			if (isAxiosError(err)) toast.error(err.response?.data?.message);
+			else toast.error(err?.message || "Failed to update workspace name!");
+		} finally {
+			setIsRenaming(false);
+		}
 	};
 
-	const isAdminOrOwner = userRole === "admin" || userRole === "owner";
+	const memberList = useMemo(() => {
+		return workspaceMembers?.map((member) => (
+			<div
+				key={member.id}
+				className="flex items-center justify-between border p-2 rounded-md"
+			>
+				<span className="text-sm">{member.User.name}</span>
+				{isAdminOrOwner ? (
+					<>
+						<Select
+							defaultValue={member.role}
+							onValueChange={(role) => handleRoleUpdate(member.id, role)}
+							disabled={isUpdatingRole === member.id}
+						>
+							<SelectTrigger
+								className="w-[120px]"
+								aria-label={`Select role for ${member.User.name}`}
+							>
+								<SelectValue placeholder="Select Role" />
+							</SelectTrigger>
+							<SelectContent>
+								{roles.map((role) => (
+									<SelectItem key={role} value={role}>
+										{role}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+						<Button
+							className="ml-2 bg-red-500"
+							onClick={() => handleRemoveMember(member.id)}
+							disabled={isRemovingMember === member.id}
+						>
+							{isRemovingMember === member.id ? "Deleting..." : "Delete"}
+						</Button>
+					</>
+				) : (
+					<span className="text-sm text-gray-500">{member.role}</span>
+				)}
+			</div>
+		));
+	}, [
+		workspaceMembers,
+		isAdminOrOwner,
+		isUpdatingRole,
+		isRemovingMember,
+		handleRoleUpdate,
+		handleRemoveMember,
+	]);
+
+	if (!activeWorkspace) {
+		return <div>No workspace selected</div>;
+	}
+
+	if (isLoading) {
+		return <div>Loading members...</div>;
+	}
+
+	if (memberFetchError) {
+		return (
+			<div className="text-red-500">
+				Failed to load members: {memberFetchError.message}
+			</div>
+		);
+	}
 
 	return (
 		<TabsContent
@@ -107,13 +201,33 @@ const WorkspaceSettings = () => {
 			{/* Workspace Name Editor */}
 			<Card>
 				<CardContent className="p-4 space-y-2">
-					<label className="text-sm font-medium">Workspace Name</label>
-					<Input
-						value={workspaceName}
-						onChange={(e) => setWorkspaceName(e.target.value)}
-						className="w-full"
-					/>
-					<Button className="mt-2 bg-indigo-500" onClick={handleWorkspaceRename}>Save</Button>
+					<form
+						onSubmit={(e) => {
+							e.preventDefault();
+							handleWorkspaceRename();
+						}}
+					>
+						<label htmlFor="workspace-name" className="text-sm font-medium">
+							Workspace Name
+						</label>
+						<Input
+							id="workspace-name"
+							value={workspaceName}
+							onChange={(e) => setWorkspaceName(e.target.value)}
+							className="w-full"
+							aria-describedby="workspace-name-help"
+						/>
+						<p id="workspace-name-help" className="text-sm text-gray-500">
+							Enter a new name for your workspace.
+						</p>
+						<Button
+							type="submit"
+							className="mt-2 bg-indigo-500"
+							disabled={isRenaming}
+						>
+							{isRenaming ? "Saving..." : "Save"}
+						</Button>
+					</form>
 				</CardContent>
 			</Card>
 
@@ -121,64 +235,20 @@ const WorkspaceSettings = () => {
 			<Card>
 				<CardContent className="p-4 space-y-2">
 					<h2 className="text-lg font-semibold">Members</h2>
-					<div className="space-y-3">
-						{membersList.map((member) => (
-							<div
-								key={member.id}
-								className="flex items-center justify-between border p-2 rounded-md"
-							>
-								<span className="text-sm">{member.User.name}</span>
-								{isAdminOrOwner ? (
-									<>
-										<Select
-											defaultValue={member.role}
-											onValueChange={(role) =>
-												handleRoleUpdate(member.id, role)
-											}
-										>
-											<SelectTrigger className="w-[120px]">
-												<SelectValue placeholder="Select Role" />
-											</SelectTrigger>
-											<SelectContent>
-												{roles.map((role) => (
-													<SelectItem key={role} value={role}>
-														{role}
-													</SelectItem>
-												))}
-											</SelectContent>
-										</Select>
-										<Button
-											className="ml-2 bg-red-500"
-											onClick={() => handleRemoveMember(member.id)}
-										>
-											Delete
-										</Button>
-									</>
-								) : (
-									<span className="text-sm text-gray-500">{member.role}</span>
-								)}
-							</div>
-						))}
-					</div>
+					{workspaceMembers?.length === 0 ? (
+						<div className="text-gray-500 text-center">
+							No members found. Invite members to get started!
+						</div>
+					) : (
+						<div className="space-y-3">{memberList}</div>
+					)}
 				</CardContent>
 			</Card>
 
 			{/* Invite New Members */}
 			<Card>
-				<CardContent className="p-4 space-y-2">
-					<h2 className="text-lg font-semibold">Invite Members</h2>
-					<div className="flex flex-col gap-4">
-						<Label htmlFor="members">Members</Label>
-						<Input
-							id="members"
-							placeholder="separate emails with a space"
-							className="col-span-3"
-							ref={membersRef}
-						/>
-					</div>
-					<Button className="bg-indigo-500" onClick={handleInvitation}>
-						Invite New Member
-					</Button>
+				<CardContent>
+					<InviteMembers workspaceId={activeWorkspace.id} />
 				</CardContent>
 			</Card>
 		</TabsContent>

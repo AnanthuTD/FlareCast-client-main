@@ -1,4 +1,5 @@
 import axiosInstance from "@/axios";
+import { apiRequest } from "@/axios/adapter";
 import { Workspaces } from "@/stores/useWorkspaces";
 import zod from "zod";
 
@@ -45,9 +46,14 @@ export const createWorkspace = async (data: CreateWorkspaceProps) => {
 export const getMembers = async (workspaceId: string) => {
 	if (!workspaceId) throw new Error("Workspace ID required");
 
-	return await axiosInstance.get(
-		`/api/workspaces/${workspaceId}/members`
+	const { data, error } = await apiRequest(
+		axiosInstance.get(`/api/workspaces/${workspaceId}/members`)
 	);
+	console.log("Workspace data: ", data)
+
+	if (!error) return data;
+
+	throw new Error(error);
 };
 
 export const updateRole = async (
@@ -75,10 +81,7 @@ export const removeMember = async (workspaceId: string, memberId: string) => {
 export const renameWorkspace = async (workspaceId: string, name: string) => {
 	if (!workspaceId || !name) throw new Error("All fields are required");
 
-	return await axiosInstance.patch(
-		`/api/workspaces/${workspaceId}`,
-		{ name }
-	);
+	return await axiosInstance.patch(`/api/workspaces/${workspaceId}`, { name });
 };
 
 export const searchMembers = async ({

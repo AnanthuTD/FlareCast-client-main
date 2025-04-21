@@ -25,10 +25,13 @@ import {
 } from "../InitializeWorkspaceStore";
 import { CreateSpace } from "../global/create-space";
 import { CreateWorkspace } from "../global/create-workspace";
+import { GiftIcon, LucideIcon } from "lucide-react";
+import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
+import { InviteMembers } from "../global/invite-members";
 
 interface UserSidebarProps {
 	sidebarItems: {
-		icon: string;
+		icon: LucideIcon;
 		label: string;
 		isActive?: boolean;
 		link: string;
@@ -139,7 +142,9 @@ const Sidebar: React.FC<UserSidebarProps> = ({ sidebarItems }) => {
 											</SelectTrigger>
 											<SelectContent className="backdrop-blur-xl">
 												<SelectGroup>
-													<SelectLabel className="flex justify-between items-center">Workspaces <CreateWorkspace/> </SelectLabel>
+													<SelectLabel className="flex justify-between items-center">
+														Workspaces <CreateWorkspace />{" "}
+													</SelectLabel>
 													<SelectSeparator />
 													{/* TODO: fix this. this will duplicate. filter it */}
 													{/* {workspaces.owned.map((workspace) => (
@@ -166,22 +171,17 @@ const Sidebar: React.FC<UserSidebarProps> = ({ sidebarItems }) => {
 							</div>
 						</div>
 
-						<button
-							onClick={() => {
-								alert("Invite Teammates not defined!");
-							}}
-							className="flex rounded-b-2xl overflow-hidden items-start py-2.5 pl-3.5 w-full text-xs font-medium tracking-normal leading-loose text-center border border-solid bg-teal-400 bg-opacity-20 border-teal-400 border-opacity-20 text-neutral-800 max-md:pr-5"
-						>
-							<div className="flex gap-3 items-start py-1 pr-0.5 pl-1">
-								<img
-									loading="lazy"
-									src="https://cdn.builder.io/api/v1/image/assets/TEMP/c50b51837989b4b9298d5227a91a051b72b0ef995129f99a0317e92377b6bd29?placeholderIfAbsent=true&apiKey=c5dccb8c30704e8b9e01b46fd4eecdec"
-									className="object-contain shrink-0 aspect-square w-[18px]"
-									alt=""
-								/>
-								<div>Invite Teammates</div>
-							</div>
-						</button>
+						<Dialog>
+							<DialogTrigger className="flex rounded-b-2xl overflow-hidden items-start py-2.5 pl-3.5 w-full text-xs font-medium tracking-normal leading-loose text-center border border-solid bg-teal-400 bg-opacity-20 border-teal-400 border-opacity-20 text-neutral-800 max-md:pr-5">
+								<div className="flex gap-3 items-start py-1 pr-0.5 pl-1">
+									<GiftIcon width={18} />
+									<div>Invite Teammates</div>
+								</div>
+							</DialogTrigger>
+							<DialogContent>
+								<InviteMembers workspaceId={activeWorkspace.id} />
+							</DialogContent>
+						</Dialog>
 					</div>
 
 					<nav className="flex overflow-hidden items-start py-6 mt-3 w-full font-medium tracking-normal">
@@ -200,7 +200,7 @@ const Sidebar: React.FC<UserSidebarProps> = ({ sidebarItems }) => {
 								<CreateSpace />
 							</div>
 
-							{spaces.map(({ id, name, image = '' }) => (
+							{spaces.map(({ id, name, image = "" }) => (
 								<SpaceCard key={id} name={name} avatar={image} id={id} />
 							))}
 

@@ -5,7 +5,7 @@ import { SidebarItemProps } from "@/types";
 import { usePathname, useRouter } from "next/navigation";
 
 export const SidebarItem: React.FC<SidebarItemProps> = ({
-	icon,
+	icon: Icon,
 	label,
 	isActive,
 	notificationCount,
@@ -41,7 +41,7 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
 					className="object-contain shrink-0 w-6 aspect-square"
 					alt=""
 				/> */}
-				{icon}
+				{Icon && <Icon />}
 				<div className="overflow-hidden pr-1">{label}</div>
 			</div>
 			{notificationCount !== undefined && (
