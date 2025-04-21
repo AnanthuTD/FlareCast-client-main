@@ -8,8 +8,7 @@ import Footer from "@/components/global/landing-page/Footer";
 import DownloadSection from "@/components/global/landing-page/DownloadSection";
 import { fetchLatestRelease, getSubscriptionPlans } from "@/actions";
 
-export const revalidate = 60 * 60 * 24; // 24 hr
-export const runtime = "edge";
+export const revalidate = 86400; // 24 hr
 
 export default async function Home() {
 	const { plans } = (await getSubscriptionPlans()) ?? {};
