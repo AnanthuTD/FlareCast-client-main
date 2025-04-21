@@ -213,7 +213,7 @@ export enum NotifStatus {
 
 export interface Video {
 	id: string;
-	title?: string;
+	title: string;
 	description?: string;
 	createdAt: Date;
 	userId: string;

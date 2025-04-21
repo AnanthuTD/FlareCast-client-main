@@ -57,13 +57,15 @@ export const VideoCard: React.FC<VideoCardProps> = ({
 			className={`w-[350px] rounded-xl overflow-hidden transition-opacity ${
 				isClickable ? "opacity-100" : "opacity-50"
 			}`}
-			onClick={isClickable ? onClick : undefined}
-			style={{ cursor: isClickable ? "pointer" : "not-allowed" }}
 		>
 			<CardHeader>
 				<div className="relative w-full h-48 rounded-2xl overflow-hidden">
 					{/* Video Thumbnail or Fallback */}
-					<Avatar className="object-cover w-full h-full rounded-none">
+					<Avatar
+						onClick={isClickable ? onClick : undefined}
+						className="object-cover w-full h-full rounded-none"
+						style={{ cursor: isClickable ? "pointer" : "not-allowed" }}
+					>
 						<AvatarImage src={hasThumbnail ? thumbnailUrl : ""} />
 						<AvatarFallback className="rounded-none">
 							{renderThumbnailFallback()}

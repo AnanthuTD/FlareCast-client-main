@@ -54,7 +54,8 @@ export async function getMyVideos(
 
 export async function getPromotionalVideos(
 	skip: number = 0,
-	limit: number = 10
+	limit: number = 10,
+	category: string
 ): Promise<{
 	videos: Video[];
 	totalCount: number;
@@ -64,10 +65,11 @@ export async function getPromotionalVideos(
 	hasNext: boolean;
 	hasPrev: boolean;
 }> {
-	const { data } = await axiosInstance.get(`/api/videos/promotionalVideos`, {
+	const { data } = await axiosInstance.get(`/api/videos/public/videos`, {
 		params: {
 			limit,
 			skip,
+			category
 		},
 	});
 
@@ -140,14 +142,17 @@ export async function suggestVideo({
 	paginationToken?: string;
 }) {
 	try {
-		const { data } = await axiosInstance.get(`/api/videos/search/autocomplete`, {
-			params: {
-				query,
-				workspaceId,
-				limit,
-				paginationToken,
-			},
-		});
+		const { data } = await axiosInstance.get(
+			`/api/videos/search/autocomplete`,
+			{
+				params: {
+					query,
+					workspaceId,
+					limit,
+					paginationToken,
+				},
+			}
+		);
 
 		return (
 			data || {
@@ -183,7 +188,7 @@ export async function suggestFolders({
 					query,
 					limit,
 					paginationToken,
-					workspaceId
+					workspaceId,
 				},
 			}
 		);

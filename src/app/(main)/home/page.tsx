@@ -1,46 +1,62 @@
-import { VideoSection } from "@/components/main/VideoSection";
+import PromotionalVideoGrid from "@/components/global/promotional-video-tab";
+import { getQueryClient } from "@/lib/get-query-client";
+import axios from "axios";
 import React from "react";
 
-const videoData = {
-	gettingStarted: {
-		title: "Getting Started",
-		videos: Array(5).fill({
-			duration: "4 min",
-			userName: "Moksh Garg",
-			timeAgo: "2mo",
-			title: "Loom Message - 31 January 2023",
-			views: 3,
-			comments: 0,
-			shares: 0,
-			thumbnailUrl:
-				"https://cdn.builder.io/api/v1/image/assets/TEMP/0e211fdd8d570385198dc92c489ea1887e302f2bbfa3e20c297c5972bccac9da?placeholderIfAbsent=true&apiKey=c5dccb8c30704e8b9e01b46fd4eecdec",
-			userAvatarUrl:
-				"https://cdn.builder.io/api/v1/image/assets/TEMP/d22a00db697691c85c7d72a4be44f017a90f980bdec24fba5b431c8ea84e9eb2?placeholderIfAbsent=true&apiKey=c5dccb8c30704e8b9e01b46fd4eecdec",
-		}),
-	},
-	newFeatures: {
-		title: "New Features",
-		videos: Array(5).fill({
-			duration: "4 min",
-			userName: "Moksh Garg",
-			timeAgo: "2mo",
-			title: "Loom Message - 31 January 2023",
-			views: 3,
-			comments: 0,
-			shares: 0,
-			thumbnailUrl:
-				"https://cdn.builder.io/api/v1/image/assets/TEMP/d04b6940fee6059d569beca58082ec42acf8abaed7058502329468748a11dece?placeholderIfAbsent=true&apiKey=c5dccb8c30704e8b9e01b46fd4eecdec",
-			userAvatarUrl:
-				"https://cdn.builder.io/api/v1/image/assets/TEMP/dbea0e913516a48f4cd6c3f7eb302b5283deee6a8dbe579de8d8268fb080a9d3?placeholderIfAbsent=true&apiKey=c5dccb8c30704e8b9e01b46fd4eecdec",
-		}),
-	},
+const PAGE_LIMIT = 6;
+const PAGE_SKIP = 0;
+
+const getVideos = async (category = "PROMOTIONAL") => {
+	const { data } = await axios.get(
+		`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/videos/public/videos`,
+		{
+			params: {
+				limit: PAGE_LIMIT,
+				skip: PAGE_SKIP,
+				category,
+			},
+		}
+	);
+	return data;
 };
 
-function HomePage() {
+async function HomePage() {
+	const queryClient = getQueryClient();
+
+	await queryClient.prefetchInfiniteQuery({
+		queryKey: ["promotional-video"],
+		queryFn: async () => await getVideos("PROMOTIONAL"),
+		initialPageParam: null,
+	});
+
+	await queryClient.prefetchInfiniteQuery({
+		queryKey: ["get-started-video"],
+		queryFn: async () => await getVideos("GET_STARTED"),
+		initialPageParam: null,
+	});
+
 	return (
-		<>
-			<VideoSection {...videoData.gettingStarted} />
-		</>
+		<div className="flex flex-col py-px max-w-full">
+			<div className="text-lg font-medium tracking-tight leading-7 text-neutral-800 max-md:max-w-full">
+				GET STARTED
+			</div>
+			<div className="flex overflow-hidden flex-wrap gap-3 items-center mt-5 w-full max-md:max-w-full">
+				<PromotionalVideoGrid
+					category="GET_STARTED"
+					queryKey="get-started-video"
+				/>
+			</div>
+
+			<div className="text-lg font-medium tracking-tight leading-7 text-neutral-800 max-md:max-w-full">
+				PROMOTIONAL
+			</div>
+			<div className="flex overflow-hidden flex-wrap gap-3 items-center mt-5 w-full max-md:max-w-full">
+				<PromotionalVideoGrid
+					category="PROMOTIONAL"
+					queryKey="promotional-video"
+				/>
+			</div>
+		</div>
 	);
 }
 
