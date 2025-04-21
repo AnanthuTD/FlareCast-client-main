@@ -1,8 +1,8 @@
 "use client";
 import { fetchFolders } from "@/actions/folder";
+import { FolderList } from "@/components/global/video-library/FolderList";
 import { VideoSection } from "@/components/global/video-library/VideoSection";
 import FolderPredecessors from "@/components/library/bread-crumb";
-import { FolderList } from "@/components/library/folder/new/FolderList";
 import { LibraryHeader } from "@/components/library/folder/new/LibraryHeader";
 import { useQueryData } from "@/hooks/useQueryData";
 import { useWorkspaceStore } from "@/providers/WorkspaceStoreProvider";
@@ -18,7 +18,7 @@ export default function Page() {
 	const spaceId = useWorkspaceStore((state) => state.selectedSpace);
 
 	const { data: folders = [], isFetched } = useQueryData(
-		["workspace-folders"],
+		["workspace-folders", folderId],
 		() => fetchFolders(activeWorkspaceId, folderId as string)
 	);
 
@@ -32,7 +32,7 @@ export default function Page() {
 			<FolderPredecessors folderId={folderId as string} />
 			<div className="flex flex-col mt-8 w-full tracking-normal text-gray-500 max-md:max-w-full">
 				<FolderList folders={folders as Folder[]} />
-				<VideoSection  folderId={folderId} spaceId={spaceId} />
+				<VideoSection folderId={folderId} spaceId={spaceId} />
 			</div>
 		</div>
 	);

@@ -1,17 +1,28 @@
 import axiosInstance from "@/axios";
 import { Folder, Video } from "@/types";
 
-export const fetchFolders = async (
-	workspaceId: string,
-	folderId?: string,
-	spaceId?: string
-): Promise<Folder[] | never> => {
+export const fetchFolders = async ({
+	workspaceId,
+	folderId,
+	spaceId,
+	limit,
+	skip,
+	createdAt,
+	lastFolderId,
+}: {
+	workspaceId: string;
+	folderId?: string;
+	spaceId?: string;
+	createdAt?: string;
+	lastFolderId?: string;
+	limit: number;
+	skip: number;
+}): Promise<Folder[] | never> => {
 	try {
 		console.log(folderId, spaceId);
-		const response = await axiosInstance.get(
-			`/api/folders/${workspaceId}`,
-			{ params: { folderId, spaceId } }
-		);
+		const response = await axiosInstance.get(`/api/folders/${workspaceId}`, {
+			params: { folderId, spaceId, limit, skip, createdAt, lastFolderId },
+		});
 		return response.data;
 	} catch (error) {
 		throw error.response.data;
@@ -24,10 +35,10 @@ export const createFolder = async (
 	spaceId?: string
 ): Promise<Folder | never> => {
 	try {
-		const response = await axiosInstance.post(
-			`/api/folders/${workspaceId}`,
-			{ folderId, spaceId }
-		);
+		const response = await axiosInstance.post(`/api/folders/${workspaceId}`, {
+			folderId,
+			spaceId,
+		});
 		return response.data;
 	} catch (error) {
 		throw error.response.data;
@@ -39,9 +50,7 @@ export const deleteFolder = async (
 	folderId: string
 ): Promise<Folder | never> => {
 	try {
-		const response = await axiosInstance.delete(
-			`/api/folders/${folderId}`
-		);
+		const response = await axiosInstance.delete(`/api/folders/${folderId}`);
 		return response.data;
 	} catch (error) {
 		throw error.response.data;
@@ -103,10 +112,7 @@ export const moveFolder = ({
 	destination,
 }: {
 	folderId: string;
-	destination: { type: "folder" | "workspace", id: "workspace" };
+	destination: { type: "folder" | "workspace"; id: "workspace" };
 }) => {
-	return axiosInstance.patch(
-		`/api/folders/${folderId}/move`,
-		destination
-	);
+	return axiosInstance.patch(`/api/folders/${folderId}/move`, destination);
 };

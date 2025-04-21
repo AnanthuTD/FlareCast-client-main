@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useEffect } from "react";
 import { VideoLibraryTabs } from "./videoLibraryTabs";
 import { Separator } from "@/components/ui/separator";
@@ -13,7 +15,7 @@ import Divider from "../divider";
 import AddMembers from "../add-member";
 
 interface VideoLibraryProps {
-	spaceId: string;
+	spaceId?: string;
 	title: string;
 	fetchFolders: (
 		workspaceId: string,
