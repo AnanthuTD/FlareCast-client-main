@@ -1,7 +1,6 @@
 "use client";
 import React, { useEffect } from "react";
 import { InputField } from "@/components/signup/InputField";
-import AuthLayoutWrapper from "@/components/auth/AuthLayoutWrapper";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/signIn/Button";
 import useZodForm from "@/hooks/useZodForm";
@@ -32,7 +31,6 @@ const SignUpForm: React.FC = () => {
 		{ id: "email", label: "Email address", type: "email" },
 		{ id: "firstName", label: "First Name" },
 		{ id: "lastName", label: "Last Name" },
-		// { id: "password", label: "Password", type: "password" },
 	];
 
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -52,7 +50,6 @@ const SignUpForm: React.FC = () => {
 	}, [data, router]);
 
 	return (
-		<AuthLayoutWrapper page="signup">
 			<main className="flex flex-col items-center self-center py-24 mt-12 max-w-full w-[448px] max-md:mt-10">
 				<h1 className="text-3xl font-bold tracking-tighter leading-none text-center text-neutral-800">
 					Sign up to FlareCast
@@ -122,7 +119,6 @@ const SignUpForm: React.FC = () => {
 					</div>
 				</form>
 			</main>
-		</AuthLayoutWrapper>
 	);
 };
 

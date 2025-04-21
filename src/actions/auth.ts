@@ -23,6 +23,7 @@ export const signInWithCredential = async (
 			image: string;
 			id: string;
 			email: string;
+			refreshToken: string;
 	  }
 	| never
 > => {

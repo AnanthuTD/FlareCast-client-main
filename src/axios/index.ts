@@ -1,5 +1,4 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
-import { createUserStore } from "@/stores/userStore";
 
 const config: AxiosRequestConfig = {
 	timeout: 10000,
@@ -11,7 +10,6 @@ const config: AxiosRequestConfig = {
 };
 
 const axiosInstance: AxiosInstance = axios.create(config);
-const userStore = createUserStore();
 
 let isRefreshing = false;
 let refreshSubscribers: ((token: string) => void)[] = [];
@@ -22,22 +20,9 @@ const onTokenRefreshed = (token: string) => {
 	refreshSubscribers = [];
 };
 
-const addRefreshSubscriber = (callback: (token: string) => void) => {
+const addRefreshSubscriber = (callback: () => void) => {
 	refreshSubscribers.push(callback);
 };
-
-// Request interceptor
-axiosInstance.interceptors.request.use(
-	(config) => {
-		const accessToken = userStore.getState().accessToken;
-
-		if (accessToken) {
-			config.headers.Authorization = `Bearer ${accessToken}`;
-		}
-		return config;
-	},
-	(error) => Promise.reject(error)
-);
 
 const excludeFromAuth = [
 	"/signin",
@@ -59,8 +44,7 @@ axiosInstance.interceptors.response.use(
 			if (isRefreshing) {
 				// Wait for the new token if refresh is in progress
 				return new Promise((resolve) => {
-					addRefreshSubscriber((token) => {
-						originalRequest.headers.Authorization = `Bearer ${token}`;
+					addRefreshSubscriber(() => {
 						resolve(axiosInstance(originalRequest));
 					});
 				});
@@ -73,17 +57,12 @@ axiosInstance.interceptors.response.use(
 				const response = await axios.post("/api/users/auth/refresh-token");
 				const newAccessToken = response.data.accessToken;
 
-				userStore.getState().setAccessToken(newAccessToken);
-				onTokenRefreshed(newAccessToken); // Notify all waiting requests
+				onTokenRefreshed(newAccessToken);
 				isRefreshing = false;
 
-				originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
 				return axiosInstance(originalRequest);
 			} catch (refreshError) {
 				isRefreshing = false;
-				userStore.getState().clearAccessToken();
-
-				console.log("pathName: " + window.location.pathname)
 
 				if (!excludeFromAuth.includes(window.location.pathname) && window.location.pathname !== '/') {
 					window.location.href = "/signin";
