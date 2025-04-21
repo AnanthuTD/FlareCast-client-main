@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import React, { useEffect } from "react";
 import { VideoLibraryTabs } from "./videoLibraryTabs";
@@ -13,22 +13,17 @@ import { useSocket } from "@/hooks/useSocket";
 import { SocketEvents } from "@/lib/socket/socketEvents";
 import Divider from "../divider";
 import AddMembers from "../add-member";
+import { fetchFolders } from "@/actions/folder";
 
 interface VideoLibraryProps {
 	spaceId?: string;
 	title: string;
-	fetchFolders: (
-		workspaceId: string,
-		folderId?: string,
-		spaceId?: string
-	) => Promise<Folder[]>;
 	folderId?: string;
 }
 
 export const VideoLibrary: React.FC<VideoLibraryProps> = ({
 	spaceId,
 	title,
-	fetchFolders,
 	folderId,
 }) => {
 	const activeWorkspaceId = useWorkspaceStore(
@@ -41,7 +36,7 @@ export const VideoLibrary: React.FC<VideoLibraryProps> = ({
 
 	const { data: folders = [], refetch } = useQueryData(
 		["workspace-folders"],
-		() => fetchFolders(activeWorkspaceId, folderId, spaceId)
+		() => fetchFolders({ workspaceId: activeWorkspaceId, folderId, spaceId })
 	);
 
 	useEffect(() => {
