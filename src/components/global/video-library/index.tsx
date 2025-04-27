@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { VideoLibraryTabs } from "./videoLibraryTabs";
 import { Separator } from "@/components/ui/separator";
 import { LibraryHeader } from "./LibraryHeader";
@@ -14,6 +14,7 @@ import { SocketEvents } from "@/lib/socket/socketEvents";
 import Divider from "../divider";
 import AddMembers from "../add-member";
 import { fetchFolders } from "@/actions/folder";
+import { useInfiniteQuery } from "@tanstack/react-query";
 
 interface VideoLibraryProps {
 	spaceId?: string;
@@ -34,10 +35,53 @@ export const VideoLibrary: React.FC<VideoLibraryProps> = ({
 		"/folders/ws"
 	);
 
-	const { data: folders = [], refetch } = useQueryData(
-		["workspace-folders"],
-		() => fetchFolders({ workspaceId: activeWorkspaceId, folderId, spaceId })
-	);
+	const {
+		data,
+		fetchNextPage,
+		hasNextPage,
+		isFetchingNextPage,
+		isLoading,
+		error,
+		refetch,
+	} = useInfiniteQuery({
+		queryKey: ["workspace-folders", activeWorkspaceId, folderId],
+		queryFn: async ({ pageParam = {} }) => {
+			const { createdAt, lastFolderId, skip = 0 } = pageParam;
+			console.log("hellow: ");
+			const response = await fetchFolders({
+				workspaceId: activeWorkspaceId,
+				folderId: folderId as string,
+				spaceId,
+				createdAt,
+				lastFolderId,
+				limit: 10,
+				skip,
+			});
+			console.log("response", response);
+			return response;
+		},
+		getNextPageParam: (lastPage, allPages) => {
+			if (!lastPage.nextCursor) return undefined;
+			return {
+				createdAt: lastPage.nextCursor.createdAt,
+				lastFolderId: lastPage.nextCursor.lastFolderId,
+				skip: allPages.reduce((acc, page) => acc + page.folders.length, 0),
+			};
+		},
+		initialPageParam: {
+			createdAt: undefined,
+			lastFolderId: folderId,
+			skip: 0,
+		},
+		enabled: !!activeWorkspaceId,
+	});
+
+	console.log("💾 data: ", data);
+
+	const folders = useMemo(() => {
+		console.debug("♾️ folders: ", data);
+		return data?.pages.flatMap((page) => page.folders) ?? [];
+	}, [data]);
 
 	useEffect(() => {
 		onEvent(SocketEvents.FOLDER_CREATED, () => {
@@ -77,7 +121,7 @@ export const VideoLibrary: React.FC<VideoLibraryProps> = ({
 
 				<h2 className="text-xl font-bold">Folders</h2>
 
-				<FolderList folders={folders as Folder[]} />
+				<FolderList folders={folders as Folder[]} fetchNextPage={fetchNextPage} isFetchingNextPage={isFetchingNextPage} hasNextPage={hasNextPage} />
 			</div>
 
 			<Separator />
