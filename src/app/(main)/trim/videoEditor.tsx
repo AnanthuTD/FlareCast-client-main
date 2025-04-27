@@ -87,9 +87,8 @@ const VideoEditor = ({ videoId }: Props) => {
 				const videoElement = document.createElement("video");
 				videoElement.src = webmUrl;
 				videoElement.onloadedmetadata = () => {
-					console.log(video);
-					setCutPoints([]); // Reset cumulative cut points
-					setCurrentCutPoints([]); // Reset current cut points
+					setCutPoints([]); 
+					setCurrentCutPoints([]);
 				};
 			} catch (error) {
 				console.error("Failed to fetch video:", error);
@@ -151,8 +150,6 @@ const VideoEditor = ({ videoId }: Props) => {
 	};
 
 	const removeCutRange = (start: number, end: number) => {
-		console.log(start, end);
-		console.log(cutPoints);
 		const sortedCuts = cutPoints.sort((a, b) => a - b);
 		const newCutPoints = sortedCuts.filter((point, i) => {
 			if (point !== start && point !== end) return true;
@@ -173,8 +170,6 @@ const VideoEditor = ({ videoId }: Props) => {
 			cutPoints.length % 2 !== 0
 		)
 			return;
-
-		console.log("cut points: ", cutPoints);
 
 		setLoading(true);
 		try {
@@ -205,8 +200,6 @@ const VideoEditor = ({ videoId }: Props) => {
 					duration: videoDuration - sortedCuts[sortedCuts.length - 1],
 				});
 			}
-
-			console.log("Segments to keep:", segments);
 
 			if (segments.length === 0) {
 				toast.error("No valid segments to keep");
@@ -269,8 +262,6 @@ const VideoEditor = ({ videoId }: Props) => {
 			);
 			const { signedUrl, key, videoId: editedVideoId } = await response.data;
 
-			console.log(signedUrl);
-
 			if (!signedUrl) {
 				console.error("Failed to get presigned URL");
 				throw new Error("Failed to get presigned URL");
@@ -295,16 +286,14 @@ const VideoEditor = ({ videoId }: Props) => {
 				const uploadResponse = await axios.put(signedUrl, new Blob(chunks), {
 					headers: { "Content-Type": "video/webm" },
 				});
-				console.log("Upload to s3 successful", uploadResponse.status);
 
 				try {
 					await axiosInstance.post(`/api/videos/${editedVideoId}/edit-success`, {
 						key,
 						status: "success",
 					});
-					console.log("Notifying server success");
 				} catch (error) {
-					console.log(
+					console.error(
 						"Failed to notify server about successful video upload",
 						error
 					);

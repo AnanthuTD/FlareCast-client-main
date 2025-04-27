@@ -51,8 +51,6 @@ export default function MovePopover({
 				workspaceFolders = await fetchFolders(activeWorkspace.id);
 			}
 
-			console.log(workspaceFolders);
-
 			let spaces = [];
 			if (showSpaces) {
 				spaces = await getSpaces(activeWorkspace.id);
@@ -131,7 +129,6 @@ export default function MovePopover({
 		}
 
 		if (selectedNode && selectedNode.type) {
-			console.log("Fetching children for:", selectedNode);
 			updateTreeData();
 		}
 	}, [selectedNode, setTreeData]);

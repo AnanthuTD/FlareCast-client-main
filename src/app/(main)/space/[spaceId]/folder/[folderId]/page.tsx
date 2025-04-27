@@ -8,7 +8,6 @@ import React from "react";
 const SpaceFolderPage = () => {
   const params = useParams<{ spaceId: string, folderId: string }>();
   const searchParams = useSearchParams();
-  console.log(params.spaceId, params.folderId)
 
   return (
     <>

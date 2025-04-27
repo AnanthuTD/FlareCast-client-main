@@ -19,8 +19,6 @@ function FolderPredecessors({ folderId }: { folderId?: string }) {
     const [currentFolder, setCurrentFolder] = useState<null | Folder>(null);
 
     useEffect(() => {
-        console.log("parentFolder id = " + folderId)
-
         if (activeWorkspaceId && folderId && typeof folderId === 'string') {
             // Fetch the parent folders based on the current folderId
             fetchParentFolders(activeWorkspaceId, folderId)

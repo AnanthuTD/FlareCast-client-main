@@ -71,9 +71,6 @@ const Sidebar: React.FC<UserSidebarProps> = ({ sidebarItems }) => {
 
 				setSelectedWorkspace(selectedWorkspace);
 
-				console.log(selectedWorkspace);
-
-				console.log("Fetched workspaces:", workspaces);
 				setWorkspaces(workspaces);
 			})
 			.catch((error) => {
@@ -85,7 +82,6 @@ const Sidebar: React.FC<UserSidebarProps> = ({ sidebarItems }) => {
 	useEffect(() => {
 		getSpaces(activeWorkspace.id)
 			.then((spaces) => {
-				console.log("Fetched spaces:", spaces);
 				setSpaces(spaces);
 			})
 			.catch((error) => {
@@ -94,13 +90,7 @@ const Sidebar: React.FC<UserSidebarProps> = ({ sidebarItems }) => {
 			});
 	}, [setSpaces, activeWorkspace.id]);
 
-	console.log(activeWorkspace, workspaces);
-
 	const onChangeActiveWorkspace = (value: string) => {
-		console.log("==========================================");
-		console.log("Workspace changed to ", value);
-		console.log("==========================================");
-
 		const selectedWorkspace = workspaces.member.find(
 			(workspace) => workspace.id === value
 		);

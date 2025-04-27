@@ -67,7 +67,6 @@ const SubscriptionPage: React.FC = () => {
 
 	// Handle subscription payment
 	const handleSubscribe = async (planId: string) => {
-		console.log("handleSubscribe");
 		try {
 			const canSubscribe = await checkSubscriptionEligibility();
 

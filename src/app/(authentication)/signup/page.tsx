@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useEffect } from "react";
 import { InputField } from "@/components/signup/InputField";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -34,12 +35,7 @@ const SignUpForm: React.FC = () => {
 	];
 
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-		e.preventDefault(); // Prevent the default behavior
-
-		const formData = new FormData(e.currentTarget);
-		const values = Object.fromEntries(formData.entries());
-		console.log(values);
-
+		e.preventDefault();
 		onFormSubmit();
 	};
 

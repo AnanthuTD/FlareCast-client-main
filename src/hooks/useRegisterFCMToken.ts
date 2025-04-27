@@ -11,8 +11,6 @@ const useRegisterFCMToken = (url: string) => {
       try {
         const fcmToken = await getToken(messaging, { vapidKey: process.env.NEXT_PUBLIC_VAPID_KEY });
 
-        console.log('fcmToken: ', fcmToken);
-
         if (fcmToken) {
           // Send token to your server to associate it with the user
           await axiosInstance.post(url, {

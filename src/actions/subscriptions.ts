@@ -119,7 +119,7 @@ export const verifyPayment = async ({
 		return true;
 	} catch (error) {
 		if (isAxiosError(error)) return error.response?.data;
-		console.log(error.response.data.message || "Failed to verify payment");
+		console.error(error.response.data.message || "Failed to verify payment");
 		return false;
 	}
 };
@@ -136,7 +136,7 @@ export const getSubscriptionByRazorpayId = async ({
 		return data;
 	} catch (error) {
 		if (isAxiosError(error)) return error.response?.data;
-		console.log(error.response.data.message || "Failed to verify payment");
+		console.error(error.response.data.message || "Failed to verify payment");
 		return null;
 	}
 };

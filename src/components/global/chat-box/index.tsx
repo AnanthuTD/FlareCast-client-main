@@ -93,7 +93,6 @@ const ChatBox = ({ videoId }: Props) => {
 
 	useEffect(() => {
 		const unsubscribe = onEvent("newMessage", (newMessage: IChatFlat) => {
-			console.log("newMessage: ", newMessage);
 
 			queryClient.setQueryData(["chats", videoId], (old: any) => {
 				if (!old || !old.pages?.length) return old;
@@ -104,7 +103,6 @@ const ChatBox = ({ videoId }: Props) => {
 				if (newMessage.user.id === userId && newMessage.tempId) {
 					const findIndex = chats.findIndex((p) => {
 						if (p.id === newMessage.tempId) {
-							console.log(p, newMessage);
 							return true;
 						}
 					});

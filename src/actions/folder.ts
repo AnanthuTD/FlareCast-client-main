@@ -19,10 +19,10 @@ export const fetchFolders = async ({
 	skip: number;
 }): Promise<Folder[] | never> => {
 	try {
-		console.log(folderId, spaceId);
 		const response = await axiosInstance.get(`/api/folders/${workspaceId}`, {
 			params: { folderId, spaceId, limit, skip, createdAt, lastFolderId },
 		});
+		console.log("Fetched folders: ", response.data)
 		return response.data;
 	} catch (error) {
 		throw error.response.data;

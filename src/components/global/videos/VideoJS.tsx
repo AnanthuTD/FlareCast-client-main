@@ -68,7 +68,6 @@ export const VideoJS: React.FC<VideoJSProps> = ({ options, onReady }) => {
         qualityLevelsPlugin[i].enabled = i === index;
       }
       setSelectedQuality(index);
-      console.log(qualityLevelsPlugin)
     }
   };
 

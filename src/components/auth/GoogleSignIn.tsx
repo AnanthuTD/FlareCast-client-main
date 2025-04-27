@@ -26,11 +26,9 @@ const GoogleSignIn: React.FC = ({ trigger = false, setTrigger = () => {} }) => {
 	const handleGoogleLoginSuccess = (user: any) => {
 		const callbackUrl = searchParams.get("callbackUrl");
 		if (callbackUrl) {
-			console.log("Google login refresh: " + user.refreshToken);
 			// if callbackUrl then redirect back to it
 			window.location.href = `${callbackUrl}?refreshToken=${user.refreshToken}`;
 		} else {
-			console.log("Google login success:", user);
 			setUser(user);
 			router.replace("/home");
 		}
@@ -55,7 +53,6 @@ const GoogleSignIn: React.FC = ({ trigger = false, setTrigger = () => {} }) => {
 			toast.success("Successfully logged in!", {
 				description: "You have successfully logged in with Google.",
 			});
-			console.log("Login data:", data);
 			handleGoogleLoginSuccess(data);
 		} catch (error) {
 			handleGoogleLoginError(error);

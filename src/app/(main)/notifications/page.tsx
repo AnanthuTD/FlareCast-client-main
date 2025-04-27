@@ -39,7 +39,6 @@ const NotificationPanel = () => {
 	const { notification: newNotification } = useFCM(FCMRoles.USER);
 
 	useEffect(() => {
-		console.log("newNotification", newNotification);
 		if (newNotification) {
 			if (tab === "all" || tab.split(",").includes(newNotification?.type))
 				setNotifications((prev) => [newNotification, ...prev]);
@@ -115,13 +114,11 @@ const NotificationPanel = () => {
 
 			// update the status of the notification
 			const index = notifications.findIndex((n) => notificationId === n.id);
-			console.log("index of notification = " + index);
 			if (index !== -1) {
 				notifications[index].data = {
 					...notifications[index].data,
 					invitationStatus: "ACCEPTED",
 				};
-				console.log(notifications[index].data);
 				setNotifications([...notifications]);
 			}
 
@@ -209,7 +206,6 @@ const NotificationPanel = () => {
 										</span>
 									</div>
 								</div>
-								{console.log(notif) ?? null}
 								{notif.type === "WORKSPACE_INVITATION" &&
 								notif.data &&
 								notif.data.invitationId &&

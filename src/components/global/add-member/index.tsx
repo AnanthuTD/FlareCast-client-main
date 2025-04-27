@@ -77,12 +77,9 @@ export default function AddMembers({ spaceId }: AddMembersProps) {
 				queryClient.getQueryData<{members: Member[]}>(["existingMembers", spaceId]) || [];
 			const memberToAdd = members.find((m) => m.id === memberId);
 			if (memberToAdd) {
-				console.log(`Adding member with ID ${memberId} to space`);
-
 				queryClient.setQueryData(
 					["existingMembers", spaceId],
 					(old: Member[] = []) => {
-						console.log("Current cache before adding:", old);
 						if (old.members.some((m) => m.id === memberId)) return old;
 						return [...old.members, memberToAdd];
 					}
@@ -108,19 +105,15 @@ export default function AddMembers({ spaceId }: AddMembersProps) {
 		mutationFn: ({ memberId }: { memberId: string }) =>
 			removeMemberFromSpace({ memberId, spaceId }),
 		onMutate: async ({ memberId }) => {
-			console.log("Removing memberId:", memberId);
 			await queryClient.cancelQueries(["existingMembers", spaceId]);
 			const previousMembers = queryClient.getQueryData<{ members: Member[] }>([
 				"existingMembers",
 				spaceId,
 			]);
-			console.log("Previous members:", previousMembers);
 			queryClient.setQueryData(
 				["existingMembers", spaceId],
 				(old: Member[] = []) => {
-					console.log("Current cache before filter:", old);
 					const newData = old.members.filter((m) => m.id !== memberId);
-					console.log("New cache after filter:", newData);
 					return newData;
 				}
 			);

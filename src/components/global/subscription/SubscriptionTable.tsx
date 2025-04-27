@@ -23,7 +23,6 @@ const SubscriptionTable: React.FC = () => {
 		const fetchSubscriptions = async () => {
 			try {
 				const response = await getSubscriptions()
-				console.log(response)
 				setSubscriptions(response);
 				setLoading(false);
 			} catch (error) {

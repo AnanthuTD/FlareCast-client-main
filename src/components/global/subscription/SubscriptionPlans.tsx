@@ -43,8 +43,6 @@ const SubscriptionPlans: React.FC<SubscriptionPageProps> = ({
 	onCancel,
   subscriptionData
 }) => {
-  console.log("SubscriptionData", subscriptionData);
-
 	const renderPlanFeatures = (plan: SubscriptionPageProps["plans"][0]) => (
 		<ul className="space-y-3">
 			<PlanFeature

@@ -12,8 +12,6 @@ const Navigation: React.FC = () => {
 	const [isScrolled, setIsScrolled] = useState(false);
 	const navRef = useRef<HTMLDivElement>(null);
 
-	console.log(userId);
-
 	useEffect(() => {
 		const handleScroll = () => {
 			if (window.scrollY > 50) {

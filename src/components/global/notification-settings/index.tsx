@@ -11,7 +11,6 @@ const NotificationSettings = () => {
 
 	useEffect(() => {
 		if (typeof Notification !== "undefined") {
-			console.log("Notification permissions: ", Notification.permission);
 			setNotificationPermission(Notification.permission);
 		}
 	}, []);

@@ -49,7 +49,6 @@ export const getMembers = async (workspaceId: string) => {
 	const { data, error } = await apiRequest(
 		axiosInstance.get(`/api/workspaces/${workspaceId}/members`)
 	);
-	console.log("Workspace data: ", data)
 
 	if (!error) return data;
 

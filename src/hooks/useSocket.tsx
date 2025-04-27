@@ -20,29 +20,27 @@ export const useSocket = (url: string, path: string) => {
 		const accessToken = getAccessTokenFromCookie();
 
     if (!url || !accessToken) {
-      console.log("Missing url or accessToken:", { url, accessToken });
+      console.warn("Missing url or accessToken:", { url, accessToken });
       return;
     }
-
-    console.log("Current cookies:", document.cookie);
 
     const socket = socketClient.connect(url, path, accessToken);
 
     socket.on("connect", () => {
       setIsConnected(true);
       setSocketError(null);
-      console.log("Socket connected");
+      console.log("🟢 Socket connected");
     });
 
     socket.on("connect_error", (error) => {
       setIsConnected(false);
       setSocketError(error.message);
-      console.log("Socket connect error:", error.message);
+      console.error("🔴 Socket connect error:", error.message);
     });
 
     socket.on("disconnect", () => {
       setIsConnected(false);
-      console.log("Socket disconnected");
+      console.debug("🔴 Socket disconnected");
     });
 
     return () => {

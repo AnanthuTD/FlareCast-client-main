@@ -21,7 +21,7 @@ const useFCM = (role: FCMRoles) => {
 	useEffect(() => {
 		const unsubscribe = onMessage(messaging, (payload) => {
 			// toast.info("hi");
-			console.log("Message received. hook ", payload);
+			console.debug("📥 Message received. hook ", payload);
 
 			if (payload.data && payload.data.notification) {
 				setNotification(JSON.parse(payload.data?.notification));

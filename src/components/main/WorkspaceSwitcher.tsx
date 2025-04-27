@@ -53,9 +53,6 @@ export function WorkspaceSwitcher({}: {}) {
 
 				setSelectedWorkspace(selectedWorkspace);
 
-				console.log(selectedWorkspace);
-
-				console.log("Fetched workspaces:", workspaces);
 				setWorkspaces(workspaces);
 			})
 			.catch((error) => {
@@ -65,10 +62,6 @@ export function WorkspaceSwitcher({}: {}) {
 	}, [setSelectedWorkspace, setWorkspaces]);
 
 	const onChangeActiveWorkspace = (value: string) => {
-		console.log("==========================================");
-		console.log("Workspace changed to ", value);
-		console.log("==========================================");
-
 		const selectedWorkspace = workspaces.member.find(
 			(workspace) => workspace.id === value
 		);

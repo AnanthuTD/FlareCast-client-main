@@ -2,7 +2,6 @@ import axiosInstance from "@/axios";
 import { TreeData } from "@/components/global/move-tree";
 
 export async function getPreviewVideo(id: string) {
-	console.log(id);
 	try {
 		const response = await axiosInstance.get(`/api/videos/${id}/video`);
 		return response.data;
@@ -346,7 +345,6 @@ export async function shareVideo({
 	videoId: string;
 	destination: { id: string; type: TreeData["type"] };
 }) {
-	console.log(destination);
 	if (destination.type === "space") {
 		return await axiosInstance.post(`/api/videos/${videoId}/share`, {
 			spaceId: destination.id,
@@ -365,7 +363,6 @@ export async function moveVideo({
 	videoId: string;
 	destination: { id: string; type: TreeData["type"] };
 }) {
-	console.log(destination);
 	if (destination.type === "folder") {
 		return await axiosInstance.post(`/api/videos/${videoId}/move`, {
 			folderId: destination.id,

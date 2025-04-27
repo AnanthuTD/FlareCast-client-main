@@ -22,7 +22,6 @@ function ProfilePicture() {
 		try {
 			await axiosInstance.post("/api/users/auth/logout");
 			clearAccessToken();
-			console.log("User logged out");
 			router.push("/signin");
 		} catch (error) {
 			console.error("Logout failed", error);

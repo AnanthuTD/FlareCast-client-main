@@ -31,7 +31,6 @@ function Player({
 
   const initializePlayer = useCallback(() => {
     const source = hslUrl;
-    console.log("Loading HLS source:", source);
     const video = videoRef.current;
     if (!video) return;
 
@@ -99,7 +98,6 @@ function Player({
             : { enabled: false },
         });
 
-        console.log("Type:", type, "Is Live:", isLive);
         if (isLive) {
           // Start near live edge for live streams
           const liveEdge = video.seekable.length

@@ -76,60 +76,15 @@ function VideoTab({
 		if (messages.length === 0) return;
 
 		const newMessage = messages[messages.length - 1];
-		console.log("new sse message: ", newMessage);
-		console.log(folderId, newMessage.folderId, spaceId, newMessage.spaceId);
 		if (
 			(folderId ?? "") !== (newMessage.folderId ?? "") ||
 			(spaceId ?? "") !== (newMessage.spaceId ?? "")
 		)
 			return;
 
-		setMessages([]); // Clear messages after processing
+		setMessages([]); 
 
 		refetch({});
-
-		// Handle live stream event
-		// if (newMessage.event === "liveStream") {
-		// 	console.log("Live stream started:", newMessage.videoId);
-		// 	refetch(); // Refetch immediately for live streams
-		// 	return;
-		// }
-
-		// Handle VOD processing updates
-		/* const isVod = newMessage.type === "VOD";
-		if (isVod) {
-			// Refetch if transcoding or thumbnail succeeds
-			if (
-				newMessage.transcodeStatus === "SUCCESS" ||
-				newMessage.thumbnailStatus === "SUCCESS"
-			) {
-				console.log(
-					"VOD processing complete (transcode/thumbnail):",
-					newMessage.id
-				);
-				setNewVideoStatus(
-					(prev) => prev.filter((m) => m.id !== newMessage.id) // Remove from pending
-				);
-				refetch();
-			} else if (
-				newMessage.transcodeStatus === "PENDING" ||
-				newMessage.thumbnailStatus === "PENDING"
-			) {
-				// Update or add to pending list
-				setNewVideoStatus((prev) => {
-					const existingIndex = prev.findIndex((m) => m.id === newMessage.id);
-					if (existingIndex !== -1) {
-						const updatedList = [...prev];
-						updatedList[existingIndex] = {
-							...prev[existingIndex],
-							...newMessage,
-						};
-						return updatedList;
-					}
-					return [...prev, newMessage];
-				});
-			}
-		} */
 	}, [messages, setMessages, refetch]);
 
 	const handleOnClick = (videoId: string) => {

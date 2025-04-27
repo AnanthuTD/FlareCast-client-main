@@ -1,12 +1,11 @@
 import { io, Socket } from "socket.io-client";
 
-// Define event types for type safety
 interface SocketEvents {
 	connect: () => void;
 	disconnect: (reason: string) => void;
 	connect_error: (err: Error) => void;
-	initial_data?: (data: any) => void; // Add custom events as needed
-	[key: string]: any; // Allow dynamic event names
+	initial_data?: (data: any) => void;
+	[key: string]: any;
 }
 
 class SocketClient {
@@ -27,18 +26,12 @@ class SocketClient {
 		path: string,
 		token: string
 	): Socket<SocketEvents, SocketEvents> {
-		const key = `${url}${path}`; // Unique key for namespace (e.g., "http://localhost:3000/admin-dashboard")
+		const key = `${url}${path}`;
 
 		// Return existing socket if already connected
 		if (this.sockets.has(key) && this.sockets.get(key)!.connected) {
-			console.log(`Reusing existing socket for ${key}`);
 			return this.sockets.get(key)!;
 		}
-
-		// Create new socket for the namespace
-		console.log("================================");
-		console.log("Connecting to namespace:", { url, path, token });
-		console.log("================================");
 
 		const socket = io(`${url}`, {
 			reconnection: true,
@@ -50,26 +43,19 @@ class SocketClient {
 			path,
 		});
 
-		// Store the socket
 		this.sockets.set(key, socket);
 
-		// Connection event handlers
 		socket.on("connect", () => {
 			const transport = socket.io.engine.transport.name;
-			console.log(`Connected to ${key} using ${transport}`);
-
-			socket.io.engine.on("upgrade", () => {
-				const upgradedTransport = socket.io.engine.transport.name;
-				console.log(`Upgraded to ${upgradedTransport}`);
-			});
+			console.log(`✔️ Connected to ${key} using ${transport}`);
 		});
 
 		socket.on("connect_error", (err) => {
-			console.error(`Connection failed to ${key}: ${err.message}`);
+			console.error(`🔴 Connection failed to ${key}: ${err.message}`);
 		});
 
 		socket.on("disconnect", (reason) => {
-			console.log(`Disconnected from ${key}: ${reason}`);
+			console.debug(`🟡 Disconnected from ${key}: ${reason}`);
 		});
 
 		return socket;
@@ -81,7 +67,6 @@ class SocketClient {
 			if (socket) {
 				socket.disconnect();
 				this.sockets.delete(key);
-				console.log(`Disconnected from namespace: ${key}`);
 			}
 		} else {
 			// Disconnect all
@@ -89,7 +74,6 @@ class SocketClient {
 				socket.disconnect();
 				this.sockets.delete(ns);
 			});
-			console.log("All sockets disconnected.");
 		}
 	}
 
