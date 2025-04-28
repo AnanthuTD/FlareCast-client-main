@@ -22,7 +22,7 @@ export const fetchFolders = async ({
 		const response = await axiosInstance.get(`/api/folders/${workspaceId}`, {
 			params: { folderId, spaceId, limit, skip, createdAt, lastFolderId },
 		});
-		console.log("Fetched folders: ", response.data)
+		console.log("Fetched folders: ", response.data);
 		return response.data;
 	} catch (error) {
 		throw error.response.data;
@@ -107,12 +107,16 @@ export const fetchParentFolders = async (
 	}
 };
 
-export const moveFolder = ({
+export const moveFolder = async ({
 	folderId,
 	destination,
 }: {
 	folderId: string;
-	destination: { type: "folder" | "workspace"; id: "workspace" };
+	destination: { type: "folder" | "workspace"; id: string };
 }) => {
-	return axiosInstance.patch(`/api/folders/${folderId}/move`, destination);
+	const { data } = await axiosInstance.patch(
+		`/api/folders/${folderId}/move`,
+		destination
+	);
+	return data;
 };

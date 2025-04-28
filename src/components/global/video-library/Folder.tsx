@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { DragEvent, useRef, useState } from "react";
 import {
 	Card,
 	CardDescription,
@@ -16,9 +16,26 @@ import Dropdown from "./DropdownFolder";
 
 interface FolderProps extends Props {
 	optimistic?: boolean;
+	hide: boolean;
+	draggable: boolean;
+	onDragStart: (ev: DragEvent<HTMLDivElement>) => void;
+	onDragEnter: (ev: DragEvent<HTMLDivElement>) => void;
+	onDragEnd: (ev: DragEvent<HTMLDivElement>) => void;
+	onDragLeave: (ev: DragEvent<HTMLDivElement>) => void;
 }
 
-function Folder({ id, name, videoCount = 0, optimistic = false }: FolderProps) {
+function Folder({
+	id,
+	name,
+	videoCount = 0,
+	optimistic = false,
+	hide = false,
+	draggable = false,
+	onDragEnd,
+	onDragEnter,
+	onDragStart,
+	onDragLeave,
+}: FolderProps) {
 	const pathName = usePathname();
 	const router = useRouter();
 	const inputRef = useRef<HTMLInputElement | null>(null);
@@ -28,10 +45,8 @@ function Folder({ id, name, videoCount = 0, optimistic = false }: FolderProps) {
 		(state) => state.selectedWorkspace.id
 	);
 
-	// Function to start renaming
 	const startRename = () => setOnRename(true);
 
-	// Function to complete renaming and trigger refetch
 	const completeRename = () => {
 		setOnRename(false);
 	};
@@ -43,13 +58,11 @@ function Folder({ id, name, videoCount = 0, optimistic = false }: FolderProps) {
 		completeRename
 	);
 
-	// Handle double-click to rename
 	const onDoubleClick = (e: React.MouseEvent) => {
 		e.stopPropagation();
 		if (!optimistic) startRename();
 	};
 
-	// Handle renaming logic
 	const updateFolderName = (e: React.FocusEvent<HTMLInputElement>) => {
 		if (inputRef.current) {
 			const newName = inputRef.current.value.trim();
@@ -65,7 +78,6 @@ function Folder({ id, name, videoCount = 0, optimistic = false }: FolderProps) {
 		}
 	};
 
-	// Handle folder click for navigation
 	const handleFolderClick = (e: React.MouseEvent<HTMLDivElement>) => {
 		/* 
 			if the folder is created, then check if its already inside a folder. 
@@ -84,53 +96,63 @@ function Folder({ id, name, videoCount = 0, optimistic = false }: FolderProps) {
 	};
 
 	return (
-		<Card
-			ref={folderCardRef}
-			className={`w-[227px] h-fit hover:cursor-pointer ${
-				optimistic ? "pointer-events-none opacity-50" : ""
-			}`}
-			onClick={handleFolderClick}
+		<div
+			draggable={draggable}
+			onDragStart={onDragStart}
+			onDragEnter={onDragEnter}
+			onDragEnd={onDragEnd}
+			onDragLeave={onDragLeave}
+			id={id}
+			className="folder"
 		>
-			<CardHeader className="p-4">
-				<div
-					className={`flex gap-3 w-full items-center ${
-						optimistic ? "pointer-events-none" : ""
-					}`}
-				>
-					<Image
-						src={"/folder-icon.svg"}
-						width={24}
-						height={24}
-						alt="folder-icon"
-					/>
-					<div className="flex justify-between items-center w-full">
-						<div>
-							<CardTitle
-								onDoubleClick={!optimistic ? onDoubleClick : undefined}
-								className="hover:cursor-text select-none font-medium"
-							>
-								{onRename ? (
-									<Input
-										autoFocus
-										placeholder={name}
-										className="border-none underline text-base outline-none bg-transparent p-0"
-										onBlur={updateFolderName}
-										ref={inputRef}
-										disabled={optimistic || isPending}
-									/>
-								) : (
-									<span onClick={(e) => e.stopPropagation()}>{name}</span>
-								)}
-							</CardTitle>
-							<CardDescription>{videoCount} videos</CardDescription>
-						</div>
+			<Card
+				ref={folderCardRef}
+				className={`w-[227px] h-fit hover:cursor-pointer ${
+					optimistic ? "pointer-events-none opacity-50" : ""
+				} ${hide ? "hidden" : ""}`}
+				onClick={handleFolderClick}
+			>
+				<CardHeader className="p-4">
+					<div
+						className={`flex gap-3 w-full items-center ${
+							optimistic ? "pointer-events-none" : ""
+						}`}
+					>
+						<Image
+							src={"/folder-icon.svg"}
+							width={24}
+							height={24}
+							alt="folder-icon"
+						/>
+						<div className="flex justify-between items-center w-full">
+							<div>
+								<CardTitle
+									onDoubleClick={!optimistic ? onDoubleClick : undefined}
+									className="hover:cursor-text select-none font-medium"
+								>
+									{onRename ? (
+										<Input
+											autoFocus
+											placeholder={name}
+											className="border-none underline text-base outline-none bg-transparent p-0"
+											onBlur={updateFolderName}
+											ref={inputRef}
+											disabled={optimistic || isPending}
+										/>
+									) : (
+										<span onClick={(e) => e.stopPropagation()}>{name}</span>
+									)}
+								</CardTitle>
+								<CardDescription>{videoCount} videos</CardDescription>
+							</div>
 
-						{/* Dropdown */}
-						<Dropdown sourceId={id} type={"folder"} />
+							{/* Dropdown */}
+							<Dropdown sourceId={id} type={"folder"} />
+						</div>
 					</div>
-				</div>
-			</CardHeader>
-		</Card>
+				</CardHeader>
+			</Card>
+		</div>
 	);
 }
 

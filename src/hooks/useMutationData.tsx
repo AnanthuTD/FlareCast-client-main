@@ -11,17 +11,17 @@ export const useMutationData = (
 	mutationKey: MutationKey,
 	mutationFn: MutationFunction<any, any>,
 	queryKey?: string,
-	onSuccess?: () => void
+	onSuccess?: (data: any, variable: any, context: unknown) => void
 ) => {
 	const queryClient = useQueryClient();
 
 	return useMutation({
 		mutationKey,
 		mutationFn,
-		onSuccess: (data) => {
+		onSuccess: (data, variable, context) => {
 			if (onSuccess) {
-				onSuccess();
-				return toast.success(data.status === 200 ? "Success" : "Error", {
+				onSuccess(data, variable, context);
+				return toast.success("Success", {
 					description: data.message,
 				});
 			}

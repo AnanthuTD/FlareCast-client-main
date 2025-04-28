@@ -7,7 +7,6 @@ import { LibraryHeader } from "./LibraryHeader";
 import { FolderList } from "./FolderList";
 import { Folder } from "@/types";
 import { useWorkspaceStore } from "@/providers/WorkspaceStoreProvider";
-import { useQueryData } from "@/hooks/useQueryData";
 import FolderPredecessors from "@/components/library/bread-crumb";
 import { useSocket } from "@/hooks/useSocket";
 import { SocketEvents } from "@/lib/socket/socketEvents";
@@ -40,14 +39,11 @@ export const VideoLibrary: React.FC<VideoLibraryProps> = ({
 		fetchNextPage,
 		hasNextPage,
 		isFetchingNextPage,
-		isLoading,
-		error,
 		refetch,
 	} = useInfiniteQuery({
 		queryKey: ["workspace-folders", activeWorkspaceId, folderId],
 		queryFn: async ({ pageParam = {} }) => {
 			const { createdAt, lastFolderId, skip = 0 } = pageParam;
-			console.log("hellow: ");
 			const response = await fetchFolders({
 				workspaceId: activeWorkspaceId,
 				folderId: folderId as string,
@@ -57,7 +53,6 @@ export const VideoLibrary: React.FC<VideoLibraryProps> = ({
 				limit: 10,
 				skip,
 			});
-			console.log("response", response);
 			return response;
 		},
 		getNextPageParam: (lastPage, allPages) => {
@@ -76,10 +71,7 @@ export const VideoLibrary: React.FC<VideoLibraryProps> = ({
 		enabled: !!activeWorkspaceId,
 	});
 
-	console.log("💾 data: ", data);
-
 	const folders = useMemo(() => {
-		console.debug("♾️ folders: ", data);
 		return data?.pages.flatMap((page) => page.folders) ?? [];
 	}, [data]);
 
@@ -121,7 +113,12 @@ export const VideoLibrary: React.FC<VideoLibraryProps> = ({
 
 				<h2 className="text-xl font-bold">Folders</h2>
 
-				<FolderList folders={folders as Folder[]} fetchNextPage={fetchNextPage} isFetchingNextPage={isFetchingNextPage} hasNextPage={hasNextPage} />
+				<FolderList
+					folders={folders as Folder[]}
+					fetchNextPage={fetchNextPage}
+					isFetchingNextPage={isFetchingNextPage}
+					hasNextPage={hasNextPage}
+				/>
 			</div>
 
 			<Separator />
