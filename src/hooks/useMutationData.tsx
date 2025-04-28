@@ -11,7 +11,14 @@ export const useMutationData = (
 	mutationKey: MutationKey,
 	mutationFn: MutationFunction<any, any>,
 	queryKey?: string,
-	onSuccess?: (data: any, variable: any, context: unknown) => void
+	onSuccess?: (data: any, variable: any, context: unknown) => void,
+	onError?:
+		| ((
+				error: Error,
+				variables: any,
+				context: unknown
+		  ) => Promise<unknown> | unknown)
+		| undefined
 ) => {
 	const queryClient = useQueryClient();
 
@@ -31,7 +38,8 @@ export const useMutationData = (
 				await queryClient.invalidateQueries({ queryKey: [queryKey] });
 			}
 		},
-		onError: (error) => {
+		onError: (error, variable, context) => {
+			onError?.(error, variable, context);
 			toast.error("Error", { description: error.message });
 		},
 	});

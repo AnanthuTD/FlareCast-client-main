@@ -14,6 +14,7 @@ import Divider from "../divider";
 import AddMembers from "../add-member";
 import { fetchFolders } from "@/actions/folder";
 import { useInfiniteQuery } from "@tanstack/react-query";
+import useMoveFolder from "@/hooks/useMoveFolder";
 
 interface VideoLibraryProps {
 	spaceId?: string;
@@ -35,41 +36,45 @@ export const VideoLibrary: React.FC<VideoLibraryProps> = ({
 	);
 
 	const {
-		data,
-		fetchNextPage,
-		hasNextPage,
-		isFetchingNextPage,
-		refetch,
-	} = useInfiniteQuery({
-		queryKey: ["workspace-folders", activeWorkspaceId, folderId],
-		queryFn: async ({ pageParam = {} }) => {
-			const { createdAt, lastFolderId, skip = 0 } = pageParam;
-			const response = await fetchFolders({
-				workspaceId: activeWorkspaceId,
-				folderId: folderId as string,
-				spaceId,
-				createdAt,
-				lastFolderId,
-				limit: 10,
-				skip,
-			});
-			return response;
-		},
-		getNextPageParam: (lastPage, allPages) => {
-			if (!lastPage.nextCursor) return undefined;
-			return {
-				createdAt: lastPage.nextCursor.createdAt,
-				lastFolderId: lastPage.nextCursor.lastFolderId,
-				skip: allPages.reduce((acc, page) => acc + page.folders.length, 0),
-			};
-		},
-		initialPageParam: {
-			createdAt: undefined,
-			lastFolderId: folderId,
-			skip: 0,
-		},
-		enabled: !!activeWorkspaceId,
-	});
+		dragOverFolderId,
+		handleFolderMove,
+		movingFolders,
+		selectedFolder,
+		setDragOverFolderId,
+		setSelectedFolder,
+	} = useMoveFolder();
+
+	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, refetch } =
+		useInfiniteQuery({
+			queryKey: ["workspace-folders", activeWorkspaceId, folderId],
+			queryFn: async ({ pageParam = {} }) => {
+				const { createdAt, lastFolderId, skip = 0 } = pageParam;
+				const response = await fetchFolders({
+					workspaceId: activeWorkspaceId,
+					folderId: folderId as string,
+					spaceId,
+					createdAt,
+					lastFolderId,
+					limit: 10,
+					skip,
+				});
+				return response;
+			},
+			getNextPageParam: (lastPage, allPages) => {
+				if (!lastPage.nextCursor) return undefined;
+				return {
+					createdAt: lastPage.nextCursor.createdAt,
+					lastFolderId: lastPage.nextCursor.lastFolderId,
+					skip: allPages.reduce((acc, page) => acc + page.folders.length, 0),
+				};
+			},
+			initialPageParam: {
+				createdAt: undefined,
+				lastFolderId: folderId,
+				skip: 0,
+			},
+			enabled: !!activeWorkspaceId,
+		});
 
 	const folders = useMemo(() => {
 		return data?.pages.flatMap((page) => page.folders) ?? [];
@@ -106,7 +111,12 @@ export const VideoLibrary: React.FC<VideoLibraryProps> = ({
 			<Divider />
 
 			{/* Optional FolderPredecessors if needed */}
-			<FolderPredecessors folderId={folderId} />
+			<FolderPredecessors
+				folderId={folderId || ""}
+				selectedFolder={selectedFolder}
+				onMoveFolder={handleFolderMove}
+				setDragOverFolderId={setDragOverFolderId}
+			/>
 
 			<div className="flex flex-col mt-8 w-full tracking-normal max-md:max-w-full">
 				{/* Folder List */}
@@ -118,6 +128,12 @@ export const VideoLibrary: React.FC<VideoLibraryProps> = ({
 					fetchNextPage={fetchNextPage}
 					isFetchingNextPage={isFetchingNextPage}
 					hasNextPage={hasNextPage}
+					selectedFolder={selectedFolder}
+					setSelectedFolder={setSelectedFolder}
+					dragOverFolderId={dragOverFolderId}
+					setDragOverFolderId={setDragOverFolderId}
+					onMoveFolder={handleFolderMove}
+					movingFolders={movingFolders}
 				/>
 			</div>
 
