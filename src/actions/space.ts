@@ -5,6 +5,7 @@ export async function getSpaces(workspaceId: string) {
 		const { data } = await axiosInstance.get(
 			`/api/spaces/workspace/${workspaceId}`
 		);
+		console.log(data)
 		return data;
 	} catch {
 		return [];

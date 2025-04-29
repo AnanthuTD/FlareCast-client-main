@@ -16,6 +16,7 @@ import { getSpaces } from "@/actions/space";
 import { isAxiosError } from "axios";
 import { toast } from "sonner";
 import { moveVideo, shareVideo } from "@/actions/video";
+import { Folder } from "@/types";
 
 export interface TreeData {
 	id: string;
@@ -46,9 +47,12 @@ export default function MovePopover({
 
 	useEffect(() => {
 		async function createTreeData() {
-			let workspaceFolders = [];
+			let workspaceFolders: Folder[] = [];
 			if (showWorkspace) {
-				workspaceFolders = await fetchFolders(activeWorkspace.id);
+				const response = await fetchFolders({
+					workspaceId: activeWorkspace.id,
+				});
+				workspaceFolders = response.folders;
 			}
 
 			let spaces = [];
@@ -80,7 +84,7 @@ export default function MovePopover({
 		}
 
 		createTreeData();
-	}, [activeWorkspace]);
+	}, [activeWorkspace.id]);
 
 	useEffect(() => {
 		async function updateTreeData() {
@@ -91,7 +95,10 @@ export default function MovePopover({
 			let children: TreeData[] = [];
 
 			if (selectedNode.type === "folder") {
-				const folders = await fetchFolders(activeWorkspace.id, selectedNode.id);
+				const { folders } = await fetchFolders({
+					workspaceId: activeWorkspace.id,
+					folderId: selectedNode.id,
+				});
 				children = folders.map((folder) => ({
 					id: folder.id,
 					name: folder.name,
@@ -99,11 +106,10 @@ export default function MovePopover({
 					type: "folder",
 				}));
 			} else if (selectedNode.type === "space") {
-				const folders = await fetchFolders(
-					activeWorkspace.id,
-					"",
-					selectedNode.id
-				);
+				const { folders } = await fetchFolders({
+					workspaceId: activeWorkspace.id,
+					spaceId: selectedNode.id,
+				});
 				children = folders.map((folder) => ({
 					id: folder.id,
 					name: folder.name,

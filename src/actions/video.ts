@@ -1,4 +1,5 @@
 import axiosInstance from "@/axios";
+import { apiRequest } from "@/axios/adapter";
 import { TreeData } from "@/components/global/move-tree";
 
 export async function getPreviewVideo(id: string) {
@@ -14,11 +15,11 @@ export async function getPreviewVideo(id: string) {
 export async function getPreviewVideoServer(id: string) {
 	try {
 		const response = await axiosInstance.get(
-			`${process.env.NEXT_PUBLIC_VIDEO_SERVICE_URL}/api/${id}/preview`
+			`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/videos/${id}/preview`
 		);
 		return response.data;
 	} catch (error) {
-		console.error(error);
+		console.error(error.response.data);
 	}
 }
 
@@ -68,7 +69,7 @@ export async function getPromotionalVideos(
 		params: {
 			limit,
 			skip,
-			category
+			category,
 		},
 	});
 
@@ -381,4 +382,28 @@ export async function updateVideoVisibility({
 		videoId,
 		isPublic,
 	});
+}
+
+export async function getVideoCount({
+	folderId,
+	spaceId,
+	workspaceId,
+}: {
+	folderId?: string;
+	workspaceId?: string;
+	spaceId?: string;
+}) {
+	if (!folderId && !workspaceId && !spaceId) {
+		return { error: "Required any one of the parameters!" };
+	}
+
+	return apiRequest(
+		axiosInstance.get(`/api/videos/count`, {
+			params: {
+				folderId,
+				spaceId,
+				workspaceId,
+			},
+		})
+	);
 }

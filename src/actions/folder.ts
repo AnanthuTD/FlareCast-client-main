@@ -5,8 +5,8 @@ export const fetchFolders = async ({
 	workspaceId,
 	folderId,
 	spaceId,
-	limit,
-	skip,
+	limit = 20,
+	skip = 0,
 	createdAt,
 	lastFolderId,
 }: {
@@ -15,9 +15,9 @@ export const fetchFolders = async ({
 	spaceId?: string;
 	createdAt?: string;
 	lastFolderId?: string;
-	limit: number;
-	skip: number;
-}): Promise<Folder[] | never> => {
+	limit?: number;
+	skip?: number;
+}): Promise<{ folders: Folder[]; nextCursor: unknown } | never> => {
 	try {
 		const response = await axiosInstance.get(`/api/folders/${workspaceId}`, {
 			params: { folderId, spaceId, limit, skip, createdAt, lastFolderId },
