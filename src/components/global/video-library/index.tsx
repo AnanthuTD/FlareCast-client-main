@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { VideoLibraryTabs } from "./videoLibraryTabs";
 import { Separator } from "@/components/ui/separator";
 import { LibraryHeader } from "./LibraryHeader";
@@ -15,6 +15,7 @@ import AddMembers from "../add-member";
 import { fetchFolders } from "@/actions/folder";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import useMoveFolder from "@/hooks/useMoveFolder";
+import { getVideoCount } from "@/actions/video";
 
 interface VideoLibraryProps {
 	spaceId?: string;
@@ -34,6 +35,7 @@ export const VideoLibrary: React.FC<VideoLibraryProps> = ({
 		`${process.env.NEXT_PUBLIC_BACKEND_URL}/folders`,
 		"/folders/socket.io"
 	);
+	const [videoCount, setVideoCount] = useState(0);
 
 	const {
 		dragOverFolderId,
@@ -81,6 +83,15 @@ export const VideoLibrary: React.FC<VideoLibraryProps> = ({
 	}, [data]);
 
 	useEffect(() => {
+		getVideoCount({ folderId, spaceId, workspaceId: activeWorkspaceId }).then(
+			({ data, error }) => {
+				if (error) {
+					console.error(error);
+					return;
+				}
+				setVideoCount(data.count);
+			}
+		);
 		onEvent(SocketEvents.FOLDER_CREATED, () => {
 			refetch();
 		});
@@ -104,7 +115,7 @@ export const VideoLibrary: React.FC<VideoLibraryProps> = ({
 			<div className="flex my-4 mt-10 justify-between text-sm">
 				<div>{spaceId && <AddMembers spaceId={spaceId} />}</div>
 				<div>
-					<p className="text-slate-500">{"2"} video</p>
+					<p className="text-slate-500">{videoCount} video</p>
 				</div>
 			</div>
 

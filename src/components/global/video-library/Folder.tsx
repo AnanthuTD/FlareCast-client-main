@@ -1,4 +1,4 @@
-import React, { DragEvent, useRef, useState } from "react";
+import React, { DragEvent, useEffect, useRef, useState } from "react";
 import {
 	Card,
 	CardDescription,
@@ -11,8 +11,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { useMutationData } from "@/hooks/useMutationData";
 import { renameFolder } from "@/actions/folder";
 import { Input } from "../../ui/input";
-import { useWorkspaceStore } from "@/providers/WorkspaceStoreProvider";
 import Dropdown from "./DropdownFolder";
+import { getVideoCount } from "@/actions/video";
 
 interface FolderProps extends Props {
 	optimistic?: boolean;
@@ -27,7 +27,6 @@ interface FolderProps extends Props {
 function Folder({
 	id,
 	name,
-	videoCount = 0,
 	optimistic = false,
 	hide = false,
 	draggable = false,
@@ -41,9 +40,7 @@ function Folder({
 	const inputRef = useRef<HTMLInputElement | null>(null);
 	const folderCardRef = useRef<HTMLDivElement | null>(null);
 	const [onRename, setOnRename] = useState(false);
-	const activeWorkspaceId = useWorkspaceStore(
-		(state) => state.selectedWorkspace.id
-	);
+	const [videoCount, setVideoCount] = useState(0);
 
 	const startRename = () => setOnRename(true);
 
@@ -94,6 +91,16 @@ function Folder({
 			} else router.push(`${pathName}/folder/${id}?title=${name}`);
 		}
 	};
+
+	useEffect(() => {
+		getVideoCount({ folderId: id }).then(({ data, error }) => {
+			if (error) {
+				console.error(error);
+				return;
+			}
+			setVideoCount(data.count);
+		});
+	}, [id]);
 
 	return (
 		<div
