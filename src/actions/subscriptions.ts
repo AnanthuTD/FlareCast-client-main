@@ -10,7 +10,7 @@ export const checkCanSubscribe = async (): Promise<{
 	message?: string;
 }> => {
 	try {
-		const response = await axiosInstance.get(`${API_BASE_URL}/canSubscribe`);
+		const response = await axiosInstance.get(`${API_BASE_URL}/eligibility`);
 		return { canSubscribe: true, message: response.data.message };
 	} catch (error) {
 		const axiosError = error as AxiosError<ErrorResponse>;
