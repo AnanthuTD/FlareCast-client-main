@@ -31,8 +31,8 @@ export const VideoLibrary: React.FC<VideoLibraryProps> = ({
 		(state) => state.selectedWorkspace.id
 	);
 	const { onEvent, emitEvent } = useSocket(
-		"/api/folders" as string,
-		"/folders/ws"
+		`${process.env.NEXT_PUBLIC_BACKEND_URL}/folders`,
+		"/folders/socket.io"
 	);
 
 	const {
@@ -95,7 +95,7 @@ export const VideoLibrary: React.FC<VideoLibraryProps> = ({
 			activeWorkspaceId,
 			spaceId,
 		});
-	}, [refetch, onEvent, emitEvent, folderId, activeWorkspaceId, spaceId]);
+	}, [refetch, folderId, activeWorkspaceId, spaceId]);
 
 	return (
 		<div className="flex flex-col px-10 py-6 max-md:px-5 w-full">
