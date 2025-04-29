@@ -16,8 +16,8 @@ export const VideoLibraryTabs: React.FC<{
 		<Tabs defaultValue="video" className="w-full">
 			<TabsList>
 				<TabsTrigger value="video">Video</TabsTrigger>
-				<TabsTrigger value="archive">Archive</TabsTrigger>
-				<TabsTrigger value="screenshot">Screenshot</TabsTrigger>
+				{/* <TabsTrigger value="archive">Archive</TabsTrigger>
+				<TabsTrigger value="screenshot">Screenshot</TabsTrigger> */}
 			</TabsList>
 
 			<TabsContent value="video">
@@ -29,7 +29,7 @@ export const VideoLibraryTabs: React.FC<{
 				</div>
 			</TabsContent>
 
-			<TabsContent value="archive">
+			{/* <TabsContent value="archive">
 				<div className="text-xl font-bold tracking-tight leading-loose text-neutral-800">
 					Archive
 				</div>
@@ -41,7 +41,7 @@ export const VideoLibraryTabs: React.FC<{
 					Screenshots
 				</div>
 				<ScreenshotTab />
-			</TabsContent>
+			</TabsContent> */}
 		</Tabs>
 	);
 };

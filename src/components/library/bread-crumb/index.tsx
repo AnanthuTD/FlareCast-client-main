@@ -127,7 +127,7 @@ function FolderPredecessors({
 										onDragLeave={handleDragLeave}
 										className="folder"
 									>
-										<Link href={`/library/folder/${folder.id}`}>
+										<Link href={`/library/folder/${folder.id}?title=${folder.name}`}>
 											{folder.name}
 										</Link>
 									</DropdownMenuItem>
@@ -148,7 +148,7 @@ function FolderPredecessors({
 							onDrop={handleDrop}
 							onDragLeave={handleDragLeave}
 						>
-							<Link href={`/library/folder/${folder.id}`}>{folder.name}</Link>
+							<Link href={`/library/folder/${folder.id}?title=${folder.name}`}>{folder.name}</Link>
 						</BreadcrumbItem>
 						{index < visibleFolders.length - 1 && <BreadcrumbSeparator />}
 					</React.Fragment>
