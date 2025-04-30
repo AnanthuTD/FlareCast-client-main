@@ -47,7 +47,9 @@ function VideoTab({
 
 	// SSE for real-time video events
 	const { messages, setMessages } = useSSE<NewVideo>(
-		`/api/videos/${selectedWorkspace.id}/events?userId=${userId}`,
+		`/api/videos/${selectedWorkspace.id}/events?userId=${userId}&spaceId=${
+			spaceId ?? ""
+		}`,
 		[selectedWorkspace.id, userId]
 	);
 
@@ -58,7 +60,7 @@ function VideoTab({
 		isFetching,
 		isPending,
 		isFetched,
-	} = useQueryData<VideoResponse>(
+	} = useQueryData(
 		["workspace-videos", selectedWorkspace.id, folderId, spaceId, page],
 		() =>
 			getMyVideos(
@@ -69,6 +71,10 @@ function VideoTab({
 				pageSize
 			)
 	);
+
+	useEffect(() => {
+		refetch();
+	}, [folderId, spaceId, selectedWorkspace?.id, refetch]);
 
 	const videos = videoResponse?.videos || [];
 
@@ -82,7 +88,7 @@ function VideoTab({
 		)
 			return;
 
-		setMessages([]); 
+		setMessages([]);
 
 		refetch({});
 	}, [messages, setMessages, refetch]);
@@ -128,7 +134,7 @@ function VideoTab({
 			</div>
 
 			{/* Pagination */}
-			{videoResponse && videoResponse.totalCount > pageSize && (
+			{videoResponse && (
 				<div className="mt-4 flex justify-center gap-4">
 					<Button
 						onClick={handlePrevPage}

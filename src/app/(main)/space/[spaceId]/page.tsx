@@ -21,6 +21,7 @@ const VideoPage = () => {
 				spaceId={params.spaceId}
 				title={searchParams.get("title") || "My-Space"}
 				fetchFolders={fetchFolders}
+				key={params.spaceId}
 			/>
 		</>
 	);

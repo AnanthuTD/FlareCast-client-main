@@ -14,6 +14,7 @@ const SpaceFolderPage = () => {
         spaceId={params.spaceId}
         title={searchParams.get("title") || "My-Folder"}
         folderId={params.folderId}
+        key={params.folderId}
       />
     </>
   );

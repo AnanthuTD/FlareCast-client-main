@@ -48,7 +48,7 @@ export const VideoLibrary: React.FC<VideoLibraryProps> = ({
 
 	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, refetch } =
 		useInfiniteQuery({
-			queryKey: ["workspace-folders", activeWorkspaceId, folderId],
+			queryKey: ["workspace-folders", activeWorkspaceId, folderId, spaceId],
 			queryFn: async ({ pageParam = {} }) => {
 				const { createdAt, lastFolderId, skip = 0 } = pageParam;
 				const response = await fetchFolders({
@@ -151,7 +151,10 @@ export const VideoLibrary: React.FC<VideoLibraryProps> = ({
 			<Separator />
 
 			{/* Tabs Section */}
-			<VideoLibraryTabs folderId={folderId} />
+			<VideoLibraryTabs
+				key={folderId ?? spaceId ?? activeWorkspaceId}
+				folderId={folderId}
+			/>
 		</div>
 	);
 };

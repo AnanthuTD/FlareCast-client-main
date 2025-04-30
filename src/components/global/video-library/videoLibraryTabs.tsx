@@ -25,7 +25,7 @@ export const VideoLibraryTabs: React.FC<{
 					<div className="text-xl font-bold tracking-tight leading-loose text-neutral-800">
 						Videos
 					</div>
-					<VideoTab folderId={folderId} spaceId={selectedSpaceId} />
+					<VideoTab key={folderId ?? selectedSpaceId ?? ''} folderId={folderId} spaceId={selectedSpaceId} />
 				</div>
 			</TabsContent>
 

@@ -11,6 +11,7 @@ export default function Page() {
 		<VideoLibrary
 			title={searchParams.get("title") ?? ""}
 			folderId={params.folderId}
+			key={params.folderId}
 		/>
 	);
 }
