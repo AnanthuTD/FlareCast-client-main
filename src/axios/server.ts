@@ -1,18 +1,25 @@
-'use server'
+"use server";
 
+import { AxiosInstance, AxiosRequestConfig, isAxiosError } from "axios";
+import { cookies } from "next/headers";
 import { createBaseAxiosInstance } from "./base";
-import { AxiosInstance, AxiosRequestConfig } from "axios";
+import { AuthError } from "@/utils/Errors";
 
-export const createServerAxiosInstance = (cookies?: string): AxiosInstance => {
+export const createServerAxiosInstance = async (
+	initialAccessToken?: string
+): Promise<AxiosInstance> => {
 	const axiosInstance = createBaseAxiosInstance();
 
-	if (cookies) {
-		axiosInstance.defaults.headers.common["Cookie"] = cookies;
+	if (initialAccessToken) {
+		axiosInstance.defaults.headers.common[
+			"Authorization"
+		] = `Bearer ${initialAccessToken}`;
 	}
 
 	axiosInstance.interceptors.response.use(
 		(response) => response,
 		async (error) => {
+			"use server";
 			const originalRequest = error.config as AxiosRequestConfig & {
 				_retry?: boolean;
 			};
@@ -21,18 +28,41 @@ export const createServerAxiosInstance = (cookies?: string): AxiosInstance => {
 				originalRequest._retry = true;
 
 				try {
-					const response = await axiosInstance.post(
-						"/api/users/auth/refresh-token"
-					);
-					const newAccessToken = response.data.accessToken;
+					const cookieStore = await cookies();
+					const refreshToken = cookieStore.get("refreshToken")?.value;
 
-					axiosInstance.defaults.headers.common[
-						"Authorization"
-					] = `Bearer ${newAccessToken}`;
+					if (!refreshToken) {
+						throw new Error("No refresh token available");
+					}
+
+					const response = await createBaseAxiosInstance().post(
+						`${process.env.NEXT_PUBLIC_API_GATEWAY_URL}/api/admin/auth/refresh-token`,
+						{
+							refreshToken,
+						},
+						{
+							headers: {
+								Authorization: `Bearer ${initialAccessToken}`,
+							},
+						}
+					);
+
+					const { accessToken, refreshToken: newRefreshToken } = response.data;
+
+					if (!originalRequest.headers) {
+						originalRequest.headers = {};
+					}
+					originalRequest.headers.Authorization = `Bearer ${accessToken}`;
 
 					return axiosInstance(originalRequest);
 				} catch (refreshError) {
-					return Promise.reject(refreshError);
+					if (isAxiosError(refreshError)) {
+						console.error(refreshError.response?.data);
+						throw new AuthError("Failed to refresh token");
+					} else {
+						console.error(refreshError);
+						throw new AuthError("Unexpected error during token refresh");
+					}
 				}
 			}
 
