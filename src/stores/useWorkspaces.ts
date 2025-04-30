@@ -21,14 +21,16 @@ export type CombinedWorkspaces = {
 
 export type WorkspaceState = {
 	workspaces: CombinedWorkspaces;
-	selectedWorkspace: Workspace;
+	selectedWorkspace?: Workspace;
 	selectedSpace?: string;
+	refetchTrigger: number;
 };
 
 export type WorkspaceActions = {
 	setWorkspaces: (workspaces: CombinedWorkspaces) => void;
 	setSelectedWorkspace: (workspace: Workspace) => void;
 	setSelectedSpace: (spaceId: string) => void;
+	triggerRefetch: () => void;
 };
 
 export type WorkspaceStore = WorkspaceState & WorkspaceActions;
@@ -37,6 +39,9 @@ export const defaultInitState: WorkspaceState = {
 	workspaces: {
 		member: [],
 	},
+	selectedWorkspace: undefined,
+	selectedSpace: undefined,
+	refetchTrigger: 0,
 };
 
 export const createWorkspaceStore = (
@@ -45,11 +50,9 @@ export const createWorkspaceStore = (
 	return createStore<WorkspaceStore>()((set) => ({
 		...initState,
 		setWorkspaces: (workspaces) => set({ workspaces }),
-		setSelectedWorkspace(workspace) {
-			set({ selectedWorkspace: workspace });
-		},
-		setSelectedSpace(spaceId) {
-			set({ selectedSpace: spaceId });
-		},
+		setSelectedWorkspace: (workspace) => set({ selectedWorkspace: workspace }),
+		setSelectedSpace: (spaceId) => set({ selectedSpace: spaceId }),
+		triggerRefetch: () =>
+			set((state) => ({ refetchTrigger: state.refetchTrigger + 1 })),
 	}));
 };

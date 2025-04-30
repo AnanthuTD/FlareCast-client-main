@@ -27,6 +27,7 @@ import { toast } from "sonner";
 import useFCM, { FCMRoles } from "@/hooks/useFCM";
 import { acceptInvitation, rejectInvitation } from "@/actions/invitation";
 import { Badge } from "@/components/ui/badge";
+import { useWorkspaceStore } from "@/providers/WorkspaceStoreProvider";
 
 const NotificationPanel = () => {
 	const [selected, setSelected] = useState(new Set());
@@ -35,6 +36,9 @@ const NotificationPanel = () => {
 	const limit = 10;
 	const [totalPages, setTotalPages] = useState(1);
 	const [notifications, setNotifications] = useState([]);
+	const triggerWorkspaceRefetch = useWorkspaceStore(
+		(state) => state.triggerRefetch
+	);
 
 	const { notification: newNotification } = useFCM(FCMRoles.USER);
 
@@ -121,6 +125,8 @@ const NotificationPanel = () => {
 				};
 				setNotifications([...notifications]);
 			}
+
+			triggerWorkspaceRefetch();
 
 			toast.success(data.message || "Workspace invite accepted!");
 		} catch (err) {

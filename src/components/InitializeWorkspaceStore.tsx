@@ -32,7 +32,7 @@ export const getDefaultWorkspace = (
 
 export const InitializeWorkspaceStore = ({ children }) => {
 	const { isConnected, onEvent } = useSocket(
-		`${process.env.NEXT_PUBLIC_BACKEND_URL}/workspaces` as string, 
+		`${process.env.NEXT_PUBLIC_BACKEND_URL}/workspaces` as string,
 		"/workspaces/socket.io"
 	);
 
@@ -49,6 +49,7 @@ export const InitializeWorkspaceStore = ({ children }) => {
 	const setSelectedWorkspace = useWorkspaceStore(
 		(store) => store.setSelectedWorkspace
 	);
+	const refetchTrigger = useWorkspaceStore((store) => store.refetchTrigger);
 	const [initializing, setInitializing] = useState(true);
 	const [creatingWorkspace, setCreatingWorkspace] = useState(false);
 
@@ -97,7 +98,7 @@ export const InitializeWorkspaceStore = ({ children }) => {
 				clearInterval(interval);
 			}
 		};
-	}, [creatingWorkspace, setSelectedWorkspace]);
+	}, [creatingWorkspace, setSelectedWorkspace, refetchTrigger]);
 
 	return (
 		<>
