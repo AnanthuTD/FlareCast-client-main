@@ -85,7 +85,7 @@ export const UserLayout: React.FC<{ children: React.ReactNode }> = ({
 				</div>
 
 				{/* Main Content Area */}
-				<div className="flex-1 flex flex-col ml-64 h-full">
+				<div className="flex-1 flex flex-col pl-64 h-full w-full">
 					{/* Fixed Header */}
 					<header className="fixed top-0 left-64 right-0 flex gap-10 justify-between items-center px-4 py-3.5 bg-white z-10">
 						<form className="flex flex-wrap gap-5 self-stretch px-11 py-4 my-auto tracking-normal min-w-[240px] w-[1120px] max-md:px-5 max-md:max-w-full">
