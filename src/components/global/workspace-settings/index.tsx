@@ -23,7 +23,7 @@ import { toast } from "sonner";
 import { isAxiosError } from "axios";
 import { InviteMembers } from "../invite-members";
 import { useUserStore } from "@/providers/UserStoreProvider";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as Dialog from "@radix-ui/react-dialog";
 
 interface User {
@@ -49,9 +49,6 @@ const WorkspaceSettings = () => {
 		activeWorkspace?.name || ""
 	);
 	const userId = useUserStore((s) => s.id);
-	const [isRenaming, setIsRenaming] = useState(false);
-	const [isUpdatingRole, setIsUpdatingRole] = useState<string | null>(null);
-	const [isRemovingMember, setIsRemovingMember] = useState<string | null>(null);
 	const [dialogOpen, setDialogOpen] = useState(false);
 	const [memberToRemove, setMemberToRemove] = useState<MemberData | null>(null);
 	const queryClient = useQueryClient();
@@ -76,60 +73,68 @@ const WorkspaceSettings = () => {
 		return user ? user.role === "ADMIN" || user.role === "OWNER" : false;
 	}, [userId, workspaceMembers]);
 
-	const handleRoleUpdate = useCallback(
-		async (memberId: string, role: string) => {
-			setIsUpdatingRole(memberId);
-			try {
-				await updateRole(activeWorkspace.id, memberId, role);
-				toast.success("Role updated successfully!");
-				queryClient.invalidateQueries({
-					queryKey: ["workspace-members", activeWorkspace.id],
-				});
-			} catch (err) {
-				if (isAxiosError(err)) toast.error(err.response?.data?.message);
-				else toast.error(err?.message || "Failed to update role!");
-			} finally {
-				setIsUpdatingRole(null);
-			}
+	// Mutation for renaming workspace
+	const renameWorkspaceMutation = useMutation({
+		mutationFn: () => renameWorkspace(activeWorkspace.id, workspaceName),
+		onSuccess: () => {
+			toast.success("Workspace name updated successfully!");
+			queryClient.invalidateQueries({
+				queryKey: ["workspace-members", activeWorkspace.id],
+			});
 		},
-		[activeWorkspace.id, queryClient]
-	);
-
-	const handleRemoveMember = useCallback(
-		async (memberId: string) => {
-			setIsRemovingMember(memberId);
-			try {
-				await removeMember(activeWorkspace.id, memberId);
-				toast.success("Member removed successfully!");
-				queryClient.invalidateQueries({
-					queryKey: ["workspace-members", activeWorkspace.id],
-				});
-			} catch (err) {
-				if (isAxiosError(err)) toast.error(err.response?.data?.message);
-				else toast.error(err?.message || "Failed to remove member!");
-			} finally {
-				setIsRemovingMember(null);
-			}
+		onError: (err) => {
+			if (isAxiosError(err)) toast.error(err.response?.data?.message);
+			else toast.error(err?.message || "Failed to update workspace name!");
 		},
-		[activeWorkspace.id, queryClient]
-	);
+	});
 
-	const handleWorkspaceRename = async () => {
+	// Mutation for updating role
+	const updateRoleMutation = useMutation({
+		mutationFn: ({ memberId, role }: { memberId: string; role: string }) =>
+			updateRole(activeWorkspace.id, memberId, role),
+		onSuccess: () => {
+			toast.success("Role updated successfully!");
+			queryClient.invalidateQueries({
+				queryKey: ["workspace-members", activeWorkspace.id],
+			});
+		},
+		onError: (err) => {
+			if (isAxiosError(err)) toast.error(err.response?.data?.message);
+			else toast.error(err?.message || "Failed to update role!");
+		},
+	});
+
+	// Mutation for removing member
+	const removeMemberMutation = useMutation({
+		mutationFn: (memberId: string) =>
+			removeMember(activeWorkspace.id, memberId),
+		onSuccess: () => {
+			toast.success("Member removed successfully!");
+			queryClient.invalidateQueries({
+				queryKey: ["workspace-members", activeWorkspace.id],
+			});
+		},
+		onError: (err) => {
+			if (isAxiosError(err)) toast.error(err.response?.data?.message);
+			else toast.error(err?.message || "Failed to remove member!");
+		},
+	});
+
+	const handleWorkspaceRename = async (e: React.FormEvent) => {
+		e.preventDefault();
 		if (!workspaceName.trim()) {
 			toast.error("Workspace name cannot be empty!");
 			return;
 		}
-		setIsRenaming(true);
-		try {
-			await renameWorkspace(activeWorkspace.id, workspaceName);
-			toast.success("Workspace name updated successfully!");
-		} catch (err) {
-			if (isAxiosError(err)) toast.error(err.response?.data?.message);
-			else toast.error(err?.message || "Failed to update workspace name!");
-		} finally {
-			setIsRenaming(false);
-		}
+		renameWorkspaceMutation.mutate();
 	};
+
+	const handleRoleUpdate = useCallback(
+		(memberId: string, role: string) => {
+			updateRoleMutation.mutate({ memberId, role });
+		},
+		[updateRoleMutation]
+	);
 
 	const openRemoveDialog = (member: MemberData) => {
 		setMemberToRemove(member);
@@ -138,7 +143,7 @@ const WorkspaceSettings = () => {
 
 	const confirmRemoveMember = () => {
 		if (memberToRemove) {
-			handleRemoveMember(memberToRemove.id);
+			removeMemberMutation.mutate(memberToRemove.id);
 		}
 		setDialogOpen(false);
 		setMemberToRemove(null);
@@ -157,7 +162,10 @@ const WorkspaceSettings = () => {
 						<Select
 							defaultValue={member.role}
 							onValueChange={(role) => handleRoleUpdate(member.id, role)}
-							disabled={isUpdatingRole === member.id}
+							disabled={
+								updateRoleMutation.isPending &&
+								updateRoleMutation.variables?.memberId === member.id
+							}
 						>
 							<SelectTrigger
 								className="w-[120px]"
@@ -176,10 +184,16 @@ const WorkspaceSettings = () => {
 						<Button
 							className="ml-2 bg-red-500"
 							onClick={() => openRemoveDialog(member)}
-							disabled={isRemovingMember === member.id}
+							disabled={
+								removeMemberMutation.isPending &&
+								removeMemberMutation.variables === member.id
+							}
 							aria-label={`Remove ${member.User.name} from workspace`}
 						>
-							{isRemovingMember === member.id ? "Deleting..." : "Delete"}
+							{removeMemberMutation.isPending &&
+							removeMemberMutation.variables === member.id
+								? "Deleting..."
+								: "Delete"}
 						</Button>
 					</>
 				) : (
@@ -190,10 +204,9 @@ const WorkspaceSettings = () => {
 	}, [
 		workspaceMembers,
 		isAdminOrOwner,
-		isUpdatingRole,
-		isRemovingMember,
 		handleRoleUpdate,
-		handleRemoveMember,
+		updateRoleMutation,
+		removeMemberMutation,
 	]);
 
 	if (!activeWorkspace) {
@@ -230,12 +243,7 @@ const WorkspaceSettings = () => {
 			{/* Workspace Name Editor */}
 			<Card>
 				<CardContent className="p-4 space-y-2">
-					<form
-						onSubmit={(e) => {
-							e.preventDefault();
-							handleWorkspaceRename();
-						}}
-					>
+					<form onSubmit={handleWorkspaceRename}>
 						<label htmlFor="workspace-name" className="text-sm font-medium">
 							Workspace Name
 						</label>
@@ -252,9 +260,9 @@ const WorkspaceSettings = () => {
 						<Button
 							type="submit"
 							className="mt-2 bg-indigo-500"
-							disabled={isRenaming}
+							disabled={renameWorkspaceMutation.isPending}
 						>
-							{isRenaming ? "Saving..." : "Save"}
+							{renameWorkspaceMutation.isPending ? "Saving..." : "Save"}
 						</Button>
 					</form>
 				</CardContent>
@@ -308,11 +316,9 @@ const WorkspaceSettings = () => {
 							<Button
 								className="bg-red-500"
 								onClick={confirmRemoveMember}
-								disabled={isRemovingMember === memberToRemove?.id}
+								disabled={removeMemberMutation.isPending}
 							>
-								{isRemovingMember === memberToRemove?.id
-									? "Deleting..."
-									: "Confirm"}
+								{removeMemberMutation.isPending ? "Deleting..." : "Confirm"}
 							</Button>
 						</div>
 					</Dialog.Content>
