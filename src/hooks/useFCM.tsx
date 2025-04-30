@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { onMessage } from "firebase/messaging";
 import { messaging } from "@/lib/firebaseConfig";
 import { toast } from "sonner";
+import Link from "next/link";
 
 export enum FCMRoles {
 	ADMIN = "admin",
@@ -54,9 +55,9 @@ const handleForegroundMessage = (payload: FCMMessagePayload) => {
 
 	toast.info(title, {
 		description: (
-			<div>
+			<Link href={"/notifications"}>
 				<p>{body}</p>
-			</div>
+			</Link>
 		),
 		position: "top-right",
 	});
