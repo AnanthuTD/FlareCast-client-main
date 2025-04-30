@@ -12,6 +12,7 @@ import axiosInstance from "@/axios";
 import Chat from "./ChatFlat";
 import { useSocket } from "@/hooks/useSocket";
 import Loader from "../loader";
+import { isShiftEnter } from "@/utils/helpers";
 
 interface Props {
 	videoId: string;
@@ -89,11 +90,10 @@ const ChatBox = ({ videoId }: Props) => {
 		return () => {
 			emitEvent("leaveSpace", { videoId });
 		};
-	}, [emitEvent, onEvent, queryClient, videoId]);
+	}, [queryClient, videoId]);
 
 	useEffect(() => {
 		const unsubscribe = onEvent("newMessage", (newMessage: IChatFlat) => {
-
 			queryClient.setQueryData(["chats", videoId], (old: any) => {
 				if (!old || !old.pages?.length) return old;
 
@@ -305,6 +305,17 @@ const ChatBox = ({ videoId }: Props) => {
 		});
 	};
 
+	function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
+		if (isShiftEnter(e)) {
+			// Shift + Enter: Allow new line (default behavior)
+			return;
+		}
+		if (e.key === "Enter") {
+			// Enter alone: Prevent default and submit
+			handleSendMessage();
+		}
+	}
+
 	return (
 		<TabsContent
 			value="Activity"
@@ -352,6 +363,7 @@ const ChatBox = ({ videoId }: Props) => {
 							replyTo ? "rounded-t-none" : ""
 						}`}
 						onChange={(e) => setMessage(e.target.value)}
+						onKeyDown={handleKeyDown}
 					/>
 				</div>
 				<Button
