@@ -317,63 +317,62 @@ const ChatBox = ({ videoId }: Props) => {
 	}
 
 	return (
-		<TabsContent
-			value="Activity"
-			className="rounded-xl flex flex-col gap-y-2 p-3 bg-gray-100 h-[65vh] justify-between"
-		>
-			<div
-				ref={chatContainerRef}
-				onScroll={handleScroll}
-				className="flex flex-col gap-y-2 px-1 scrollbar-w-1 scrollbar-thumb-rounded-full scrollbar-track-rounded-full scrollbar scrollbar-thumb-indigo-300 scrollbar-track-indigo-100 overflow-y-scroll"
-			>
-				{isFetchingNextPage && <Loader state={true} />}
-				{chats.map((chat) => {
-					return (
-						<Chat
-							chat={chat}
-							key={chat.id}
-							own={chat.user.id === userId}
-							onReply={handleReplyTo}
-							onDelete={handleDelete}
-							onEdit={handleEditMessage}
-						/>
-					);
-				})}
-			</div>
-			<div className="flex gap-1">
-				<div className="w-full">
-					{replyTo?.message && (
-						<div className="items-center bg-gray-200 rounded-b-none rounded-md flex overflow-hidden max-h-[50px] w-full">
-							<div className="bg-indigo-400 w-[3px] rounded-s-md rounded-b-none mr-1"></div>
-							<p className="text-xs p-1 overflow-hidden text-ellipsis whitespace-nowrap">
-								{replyTo?.message}
-							</p>
-							<CircleXIcon
-								color="#ba2121"
-								size={16}
-								className="ml-auto mr-1"
-								onClick={() => setReplyTo(null)}
-							/>
-						</div>
-					)}
-					<Textarea
-						value={message}
-						rows={1}
-						className={`bg-white focus-visible:ring-indigo-300 ${
-							replyTo ? "rounded-t-none" : ""
-						}`}
-						onChange={(e) => setMessage(e.target.value)}
-						onKeyDown={handleKeyDown}
-					/>
-				</div>
-				<Button
-					onClick={handleSendMessage}
-					variant="default"
-					size="icon"
-					className="bg-indigo-400 place-self-end"
+		<TabsContent value="Activity">
+			<div className="rounded-xl flex flex-col gap-y-2 p-3 bg-gray-100 h-[65vh] justify-between">
+				<div
+					ref={chatContainerRef}
+					onScroll={handleScroll}
+					className="flex flex-col gap-y-2 px-1 scrollbar-w-1 scrollbar-thumb-rounded-full scrollbar-track-rounded-full scrollbar scrollbar-thumb-indigo-300 scrollbar-track-indigo-100 overflow-y-scroll"
 				>
-					<SendHorizontal />
-				</Button>
+					{isFetchingNextPage && <Loader state={true} />}
+					{chats.map((chat) => {
+						return (
+							<Chat
+								chat={chat}
+								key={chat.id}
+								own={chat.user.id === userId}
+								onReply={handleReplyTo}
+								onDelete={handleDelete}
+								onEdit={handleEditMessage}
+							/>
+						);
+					})}
+				</div>
+				<div className="flex gap-1">
+					<div className="w-full">
+						{replyTo?.message && (
+							<div className="items-center bg-gray-200 rounded-b-none rounded-md flex overflow-hidden max-h-[50px] w-full">
+								<div className="bg-indigo-400 w-[3px] rounded-s-md rounded-b-none mr-1"></div>
+								<p className="text-xs p-1 overflow-hidden text-ellipsis whitespace-nowrap">
+									{replyTo?.message}
+								</p>
+								<CircleXIcon
+									color="#ba2121"
+									size={16}
+									className="ml-auto mr-1"
+									onClick={() => setReplyTo(null)}
+								/>
+							</div>
+						)}
+						<Textarea
+							value={message}
+							rows={1}
+							className={`bg-white focus-visible:ring-indigo-300 ${
+								replyTo ? "rounded-t-none" : ""
+							}`}
+							onChange={(e) => setMessage(e.target.value)}
+							onKeyDown={handleKeyDown}
+						/>
+					</div>
+					<Button
+						onClick={handleSendMessage}
+						variant="default"
+						size="icon"
+						className="bg-indigo-400 place-self-end"
+					>
+						<SendHorizontal />
+					</Button>
+				</div>
 			</div>
 		</TabsContent>
 	);

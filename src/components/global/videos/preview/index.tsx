@@ -38,7 +38,6 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import Loader from "@/components/loader";
 
-// Lazy load heavy components
 const Player = React.lazy(() => import("@/components/global/videos/Player"));
 const AiTools = React.lazy(() => import("../../ai-tools"));
 const VideoTranscript = React.lazy(() => import("../../video-transcript"));
@@ -275,7 +274,7 @@ const VideoPreview = ({ videoId }: Props) => {
 							</CardContent>
 						</Card>
 					</div>
-					<div className="lg:col-span-1">
+					<div className="lg:col-span-1 h-[70vh]">
 						<TabMenu
 							defaultValue="AI Tool"
 							triggers={["AI Tool", "Transcript", "Activity"]}
