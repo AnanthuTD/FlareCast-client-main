@@ -36,7 +36,7 @@ async function HomePage() {
 	});
 
 	return (
-		<div className="flex flex-col py-px max-w-full">
+		<div className="flex flex-col py-px w-full">
 			<div className="text-lg font-medium tracking-tight leading-7 text-neutral-800 max-md:max-w-full">
 				GET STARTED
 			</div>
