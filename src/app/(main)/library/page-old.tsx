@@ -7,7 +7,7 @@ import React, {
 	useTransition,
 } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import VideoTab from "@/components/library/VideoTab";
+import VideoTab from "@/components/global/video-tab";
 import Folder from "@/components/library/folder/Folder";
 import { Folder as FolderType } from "@/types";
 import { createFolder, deleteFolder, fetchFolders } from "@/actions/folder";

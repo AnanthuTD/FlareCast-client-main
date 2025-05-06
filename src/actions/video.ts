@@ -364,10 +364,20 @@ export async function moveVideo({
 	videoId: string;
 	destination: { id: string; type: TreeData["type"] };
 }) {
-	if (destination.type === "folder") {
-		return await axiosInstance.post(`/api/videos/${videoId}/move`, {
-			folderId: destination.id,
+	try {
+		const { data } = await axiosInstance.post(`/api/videos/${videoId}/move`, {
+			...{ [`${destination.type}Id`]: destination.id },
 		});
+		return {
+			...data,
+			videoId,
+			...(destination.type === "folder"
+				? { folderId: destination.id }
+				: { folderId: "" }),
+		};
+	} catch (err) {
+		console.error(err);
+		throw { data: null, error: err.response.message, videoId };
 	}
 }
 

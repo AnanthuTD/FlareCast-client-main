@@ -2,10 +2,10 @@
 
 import * as React from "react";
 import { VideoCardProps } from "@/types";
-import { Card, CardContent, CardHeader } from "../ui/card";
+import { Card, CardContent, CardHeader } from "../../ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ExternalLink, Eye, Video } from "lucide-react";
-import DropdownVideo from "../global/video-library/DropdownVideo";
+import DropdownVideo from "../video-library/DropdownVideo";
 
 export const VideoCard: React.FC<VideoCardProps> = ({
 	duration,
@@ -21,6 +21,12 @@ export const VideoCard: React.FC<VideoCardProps> = ({
 	id,
 	spaceId,
 	type = "VOD",
+	hide = false,
+	draggable = false,
+	onDragEnd,
+	onDragEnter,
+	onDragStart,
+	onDragLeave,
 }) => {
 	const isLive = type === "LIVE";
 	const isClickable = isLive || transcodeStatus === "SUCCESS";
@@ -50,11 +56,22 @@ export const VideoCard: React.FC<VideoCardProps> = ({
 		);
 	};
 
+	function dragStart(ev: React.DragEvent<HTMLDivElement>, videoId: string) {
+		ev.dataTransfer.effectAllowed = "copyMove";
+		ev.dataTransfer.setData("type", "video");
+		ev.dataTransfer.setData("videoId", videoId);
+	}
+
 	return (
 		<Card
 			className={`w-[350px] rounded-xl overflow-hidden transition-opacity ${
 				isClickable ? "opacity-100" : "opacity-50"
-			}`}
+			} ${hide && "hidden"}`}
+			draggable={true}
+			onDragStart={(e) => dragStart(e, id)}
+			data-video-id={id}
+			data-type={"video"}
+			id={id}
 		>
 			<CardHeader>
 				<div className="relative w-full h-48 rounded-2xl overflow-hidden">

@@ -20,8 +20,11 @@ import Link from "next/link";
 
 interface FolderPredecessorsProps {
 	folderId: string;
-	selectedFolder: Folder | null;
 	onMoveFolder: (
+		sourceId: string,
+		destination: { type: "folder" | "workspace"; id: string }
+	) => void;
+	onMoveVideo: (
 		sourceId: string,
 		destination: { type: "folder" | "workspace"; id: string }
 	) => void;
@@ -30,8 +33,8 @@ interface FolderPredecessorsProps {
 
 function FolderPredecessors({
 	folderId,
-	selectedFolder,
 	onMoveFolder,
+	onMoveVideo,
 	setDragOverFolderId,
 }: FolderPredecessorsProps) {
 	const [parentFolders, setParentFolders] = useState<Folder[]>([]);
@@ -55,34 +58,71 @@ function FolderPredecessors({
 		}
 	}, [folderId, activeWorkspaceId]);
 
-	// Drag Handlers
-	function handleDragEnter(ev: DragEvent<HTMLDivElement>) {
+	function handleDragEnter(ev: DragEvent<HTMLElement>) {
 		ev.preventDefault();
-		ev.dataTransfer.dropEffect = "move";
-		const targetFolderId = ev.currentTarget.id;
+		const folderId = ev.currentTarget.id;
+		const componentType = ev.dataTransfer.getData("type");
 
-		if (
-			!targetFolderId ||
-			targetFolderId === selectedFolder?.id ||
-			!ev.currentTarget.classList.contains("folder")
-		) {
+		if (componentType === "video" || !folderId) {
 			setDragOverFolderId(null);
-			ev.dataTransfer.dropEffect = "none";
 			return;
 		}
 
-		ev.dataTransfer.dropEffect = "move";
-		setDragOverFolderId(ev.currentTarget.id);
+		const selectedFolderId = ev.dataTransfer.getData("folderId");
+
+		if (
+			componentType !== "folder" ||
+			!folderId ||
+			folderId === selectedFolderId ||
+			!ev.currentTarget.classList.contains("folder")
+		) {
+			setDragOverFolderId(null);
+			return;
+		}
+
+		setDragOverFolderId(folderId);
 	}
 
-	function handleDrop(ev: DragEvent<HTMLDivElement>) {
+	function handleDrop(
+		ev: DragEvent<HTMLElement>,
+		destinationType: "workspace" | "folder"
+	) {
+		console.log('dropped!')
 		ev.preventDefault();
-		if (selectedFolder && selectedFolder.id !== ev.currentTarget.id) {
-			onMoveFolder(selectedFolder.id, {
-				type: "folder",
-				id: ev.currentTarget.id,
-			});
+		const targetFolderId = ev.currentTarget.id;
+
+		if (!targetFolderId) {
+			setDragOverFolderId(null);
+			return;
 		}
+
+		const componentType = ev.dataTransfer.getData("type");
+
+		if (componentType === "video") {
+			const videoId = ev.dataTransfer.getData("videoId");
+
+			if (!videoId) {
+				console.warn(
+					"🔴 'videoId' is missing in dataTransfer for type 'video'"
+				);
+			} else {
+				onMoveVideo(videoId, {
+					type: destinationType,
+					id: targetFolderId,
+				});
+			}
+		} else if (componentType === "folder") {
+			const selectedFolderId = ev.dataTransfer.getData("folderId");
+			if (selectedFolderId !== targetFolderId) {
+				onMoveFolder(selectedFolderId, {
+					type: destinationType,
+					id: targetFolderId,
+				});
+			}
+		} else {
+			console.warn(`⚠️ Unknown component type dropped: ${componentType}`);
+		}
+
 		setDragOverFolderId(null);
 	}
 
@@ -105,7 +145,11 @@ function FolderPredecessors({
 		<Breadcrumb>
 			<BreadcrumbList>
 				{/* Home */}
-				<BreadcrumbItem>
+				<BreadcrumbItem
+					onDrop={(e) => handleDrop(e, "workspace")}
+					onDragOver={(ev) => ev.preventDefault()}
+					id={activeWorkspaceId}
+				>
 					<Link href="/library">Home</Link>
 				</BreadcrumbItem>
 				<BreadcrumbSeparator />
@@ -123,11 +167,13 @@ function FolderPredecessors({
 										key={folder.id}
 										id={folder.id}
 										onDragEnter={handleDragEnter}
-										onDrop={handleDrop}
+										onDrop={(e) => handleDrop(e, "folder")}
 										onDragLeave={handleDragLeave}
-										className="folder"
+										onDragOver={(ev) => ev.preventDefault()}
 									>
-										<Link href={`/library/folder/${folder.id}?title=${folder.name}`}>
+										<Link
+											href={`/library/folder/${folder.id}?title=${folder.name}`}
+										>
 											{folder.name}
 										</Link>
 									</DropdownMenuItem>
@@ -145,10 +191,13 @@ function FolderPredecessors({
 							id={folder.id}
 							className="folder"
 							onDragEnter={handleDragEnter}
-							onDrop={handleDrop}
+							onDrop={(e) => handleDrop(e, "folder")}
 							onDragLeave={handleDragLeave}
+							onDragOver={(ev) => ev.preventDefault()}
 						>
-							<Link href={`/library/folder/${folder.id}?title=${folder.name}`}>{folder.name}</Link>
+							<Link href={`/library/folder/${folder.id}?title=${folder.name}`}>
+								{folder.name}
+							</Link>
 						</BreadcrumbItem>
 						{index < visibleFolders.length - 1 && <BreadcrumbSeparator />}
 					</React.Fragment>

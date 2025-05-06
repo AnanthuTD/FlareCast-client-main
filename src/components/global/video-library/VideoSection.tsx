@@ -1,5 +1,5 @@
 import React from "react";
-import VideoTab from "@/components/library/VideoTab";
+import VideoTab from "@/components/global/video-tab";
 
 export const VideoSection: React.FC = ({ folderId, spaceId }) => {
 	return (

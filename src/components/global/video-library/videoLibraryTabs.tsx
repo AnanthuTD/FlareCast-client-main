@@ -2,14 +2,15 @@
 
 import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import VideoTab from "@/components/library/VideoTab";
+import VideoTab from "@/components/global/video-tab";
 import ArchiveTab from "@/components/library/ArchiveTab";
 import ScreenshotTab from "@/components/library/ScreenshotTab";
 import { useWorkspaceStore } from "@/providers/WorkspaceStoreProvider";
 
 export const VideoLibraryTabs: React.FC<{
 	folderId?: string;
-}> = ({ folderId }) => {
+	movingVideos: Set<string>
+}> = ({ folderId, movingVideos }) => {
 	const selectedSpaceId = useWorkspaceStore((state) => state.selectedSpace);
 
 	return (
@@ -25,7 +26,7 @@ export const VideoLibraryTabs: React.FC<{
 					<div className="text-xl font-bold tracking-tight leading-loose text-neutral-800">
 						Videos
 					</div>
-					<VideoTab key={folderId ?? selectedSpaceId ?? ''} folderId={folderId} spaceId={selectedSpaceId} />
+					<VideoTab movingVideos={movingVideos} key={folderId ?? selectedSpaceId ?? ''} folderId={folderId} spaceId={selectedSpaceId} />
 				</div>
 			</TabsContent>
 

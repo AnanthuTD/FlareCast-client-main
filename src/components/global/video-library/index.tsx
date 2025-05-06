@@ -41,9 +41,9 @@ export const VideoLibrary: React.FC<VideoLibraryProps> = ({
 		dragOverFolderId,
 		handleFolderMove,
 		movingFolders,
-		selectedFolder,
 		setDragOverFolderId,
-		setSelectedFolder,
+		handleVideoMove,
+		movingVideos,
 	} = useMoveFolder();
 
 	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, refetch } =
@@ -124,9 +124,9 @@ export const VideoLibrary: React.FC<VideoLibraryProps> = ({
 			{/* Optional FolderPredecessors if needed */}
 			<FolderPredecessors
 				folderId={folderId || ""}
-				selectedFolder={selectedFolder}
 				onMoveFolder={handleFolderMove}
 				setDragOverFolderId={setDragOverFolderId}
+				onMoveVideo={handleVideoMove}
 			/>
 
 			<div className="flex flex-col mt-8 w-full tracking-normal max-md:max-w-full">
@@ -139,12 +139,11 @@ export const VideoLibrary: React.FC<VideoLibraryProps> = ({
 					fetchNextPage={fetchNextPage}
 					isFetchingNextPage={isFetchingNextPage}
 					hasNextPage={hasNextPage}
-					selectedFolder={selectedFolder}
-					setSelectedFolder={setSelectedFolder}
 					dragOverFolderId={dragOverFolderId}
 					setDragOverFolderId={setDragOverFolderId}
 					onMoveFolder={handleFolderMove}
 					movingFolders={movingFolders}
+					onMoveVideo={handleVideoMove}
 				/>
 			</div>
 
@@ -154,6 +153,7 @@ export const VideoLibrary: React.FC<VideoLibraryProps> = ({
 			<VideoLibraryTabs
 				key={folderId ?? spaceId ?? activeWorkspaceId}
 				folderId={folderId}
+				movingVideos={movingVideos}
 			/>
 		</div>
 	);

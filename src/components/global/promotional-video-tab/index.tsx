@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { VideoCard } from "@/components/main/VideoCard";
+import { VideoCard } from "@/components/global/video-card";
 import { useRouter } from "next/navigation";
 import { getPromotionalVideos } from "@/actions/video";
 import { useWorkspaceStore } from "@/providers/WorkspaceStoreProvider";

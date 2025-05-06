@@ -28,8 +28,8 @@ export const useMutationData = (
 		onSuccess: (data, variable, context) => {
 			if (onSuccess) {
 				onSuccess(data, variable, context);
-				return toast.success("Success", {
-					description: data.message,
+				return data?.message && toast.success("Success", {
+					description: data?.message,
 				});
 			}
 		},

@@ -13,6 +13,9 @@ import { renameFolder } from "@/actions/folder";
 import { Input } from "../../ui/input";
 import Dropdown from "./DropdownFolder";
 import { getVideoCount } from "@/actions/video";
+import { useQuery } from "@tanstack/react-query";
+import { useQueryData } from "@/hooks/useQueryData";
+import { getQueryClient } from "@/lib/get-query-client";
 
 interface FolderProps extends Props {
 	optimistic?: boolean;
@@ -20,7 +23,7 @@ interface FolderProps extends Props {
 	draggable: boolean;
 	onDragStart: (ev: DragEvent<HTMLDivElement>) => void;
 	onDragEnter: (ev: DragEvent<HTMLDivElement>) => void;
-	onDragEnd: (ev: DragEvent<HTMLDivElement>) => void;
+	onDrop: (ev: DragEvent<HTMLDivElement>) => void;
 	onDragLeave: (ev: DragEvent<HTMLDivElement>) => void;
 }
 
@@ -30,7 +33,7 @@ function Folder({
 	optimistic = false,
 	hide = false,
 	draggable = false,
-	onDragEnd,
+	onDrop,
 	onDragEnter,
 	onDragStart,
 	onDragLeave,
@@ -40,7 +43,6 @@ function Folder({
 	const inputRef = useRef<HTMLInputElement | null>(null);
 	const folderCardRef = useRef<HTMLDivElement | null>(null);
 	const [onRename, setOnRename] = useState(false);
-	const [videoCount, setVideoCount] = useState(0);
 
 	const startRename = () => setOnRename(true);
 
@@ -56,6 +58,7 @@ function Folder({
 	);
 
 	const onDoubleClick = (e: React.MouseEvent) => {
+		e.preventDefault();
 		e.stopPropagation();
 		if (!optimistic) startRename();
 	};
@@ -76,6 +79,7 @@ function Folder({
 	};
 
 	const handleFolderClick = (e: React.MouseEvent<HTMLDivElement>) => {
+		e.preventDefault();
 		/* 
 			if the folder is created, then check if its already inside a folder. 
 			if it is, then only replace the folderId in the path with the new folderId.
@@ -92,14 +96,21 @@ function Folder({
 		}
 	};
 
+	const { data: videoCountData } = useQueryData(
+		["folder-video-count", id],
+		() => getVideoCount({ folderId: id }),
+		true
+	);
+
+	console.log(videoCountData);
+
+	const videoCount = videoCountData?.data?.count ?? 0;
+
 	useEffect(() => {
-		getVideoCount({ folderId: id }).then(({ data, error }) => {
-			if (error) {
-				console.error(error);
-				return;
-			}
-			setVideoCount(data.count);
-		});
+		const queryClient = getQueryClient();
+		if (id) {
+			queryClient.invalidateQueries({ queryKey: ["folder-video-count"] });
+		}
 	}, [id]);
 
 	return (
@@ -107,10 +118,12 @@ function Folder({
 			draggable={draggable}
 			onDragStart={onDragStart}
 			onDragEnter={onDragEnter}
-			onDragEnd={onDragEnd}
+			onDragEnd={onDrop}
 			onDragLeave={onDragLeave}
 			id={id}
 			className="folder"
+			onDrop={onDrop}
+			onDragOver={(e) => e.preventDefault()}
 		>
 			<Card
 				ref={folderCardRef}
@@ -147,7 +160,14 @@ function Folder({
 											disabled={optimistic || isPending}
 										/>
 									) : (
-										<span onClick={(e) => e.stopPropagation()}>{name}</span>
+										<span
+											onClick={(e) => {
+												e.stopPropagation();
+												e.preventDefault();
+											}}
+										>
+											{name}
+										</span>
 									)}
 								</CardTitle>
 								<CardDescription>{videoCount} videos</CardDescription>

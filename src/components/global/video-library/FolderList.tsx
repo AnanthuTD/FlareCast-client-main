@@ -12,11 +12,13 @@ type FolderListProps = {
 	fetchNextPage: () => void;
 	hasNextPage?: boolean;
 	isFetchingNextPage: boolean;
-	selectedFolder: FolderType | null;
-	setSelectedFolder: (folder: FolderType | null) => void;
 	dragOverFolderId: string | null;
 	setDragOverFolderId: (folderId: string | null) => void;
 	onMoveFolder: (
+		sourceId: string,
+		destination: { type: "folder" | "workspace"; id: string }
+	) => void;
+	onMoveVideo: (
 		sourceId: string,
 		destination: { type: "folder" | "workspace"; id: string }
 	) => void;
@@ -28,64 +30,87 @@ export const FolderList: React.FC<FolderListProps> = ({
 	fetchNextPage,
 	hasNextPage,
 	isFetchingNextPage,
-	dragOverFolderId,
 	movingFolders,
 	onMoveFolder,
-	selectedFolder,
 	setDragOverFolderId,
-	setSelectedFolder,
+	onMoveVideo,
 }) => {
 	const { latestVariables: latestFolder } = useMutationDataState([
 		"create-folder",
 	]);
 
 	function handleDragStart(ev: DragEvent<HTMLDivElement>) {
-		const folder = folders.find((f) => f.id === ev.currentTarget.id);
-		setSelectedFolder(folder ?? null);
+		const folderId = ev.currentTarget.id;
+		ev.dataTransfer.setData("type", "folder");
+		ev.dataTransfer.setData("folderId", folderId);
 	}
 
 	function handleDragEnter(ev: DragEvent<HTMLDivElement>) {
 		ev.preventDefault();
 		const folderId = ev.currentTarget.id;
+		const componentType = ev.dataTransfer.getData("type");
 
-		if (
-			!folderId ||
-			folderId === selectedFolder?.id ||
-			!ev.currentTarget.classList.contains("folder")
-		) {
+		if (componentType === "video" || !folderId) {
 			setDragOverFolderId(null);
-			ev.currentTarget.classList.add(styles.nonDroppable);
-			ev.dataTransfer.dropEffect = "none";
 			return;
 		}
 
-		ev.currentTarget.classList.remove(styles.nonDroppable);
-		ev.dataTransfer.dropEffect = "move";
+		const selectedFolderId = ev.dataTransfer.getData("folderId");
+
+		if (
+			componentType !== "folder" ||
+			!folderId ||
+			folderId === selectedFolderId ||
+			!ev.currentTarget.classList.contains("folder")
+		) {
+			setDragOverFolderId(null);
+			return;
+		}
+
 		setDragOverFolderId(folderId);
 	}
 
 	function handleDrop(ev: DragEvent<HTMLDivElement>) {
 		ev.preventDefault();
-		const targetFolderId = dragOverFolderId;
+		const targetFolderId = ev.currentTarget.id;
 
-		if (
-			selectedFolder &&
-			targetFolderId &&
-			selectedFolder.id !== targetFolderId
-		) {
-			onMoveFolder(selectedFolder.id, {
-				type: "folder",
-				id: targetFolderId,
-			});
+		if (!targetFolderId) {
+			setDragOverFolderId(null);
+			return;
 		}
 
-		setSelectedFolder(null);
+		const componentType = ev.dataTransfer.getData("type");
+
+		if (componentType === "video") {
+			const videoId = ev.dataTransfer.getData("videoId");
+
+			if (!videoId) {
+				console.warn(
+					"🔴 'videoId' is missing in dataTransfer for type 'video'"
+				);
+			} else {
+				onMoveVideo(videoId, {
+					type: "folder",
+					id: targetFolderId,
+				});
+			}
+		} else if (componentType === "folder") {
+			const selectedFolderId = ev.dataTransfer.getData("folderId");
+			if (selectedFolderId !== targetFolderId) {
+				onMoveFolder(selectedFolderId, {
+					type: "folder",
+					id: targetFolderId,
+				});
+			}
+		} else {
+			console.warn(`⚠️ Unknown component type dropped: ${componentType}`);
+		}
+
 		setDragOverFolderId(null);
-		ev.currentTarget.classList.remove(styles.nonDroppable);
 	}
 
 	function handleDragLeave(ev: DragEvent<HTMLDivElement>) {
-		ev.currentTarget.classList.remove(styles.nonDroppable);
+		ev.preventDefault();
 	}
 
 	return (
@@ -101,10 +126,9 @@ export const FolderList: React.FC<FolderListProps> = ({
 							key={folder.id}
 							draggable
 							hide={movingFolders.has(folder.id)}
-							optimistic={folder.id === selectedFolder?.id}
 							onDragStart={handleDragStart}
 							onDragEnter={handleDragEnter}
-							onDragEnd={handleDrop}
+							onDrop={handleDrop}
 							onDragLeave={handleDragLeave}
 						/>
 					))

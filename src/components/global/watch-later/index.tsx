@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useWorkspaceStore } from "@/providers/WorkspaceStoreProvider";
 import { Video } from "@/types";
 import { getWatchLaterVideos } from "@/actions/video";
-import { VideoCard } from "@/components/main/VideoCard";
+import { VideoCard } from "@/components/global/video-card";
 
 interface VideoTabProps {
 	videosPerPage?: number; // Items to fetch per "page"

@@ -1,4 +1,5 @@
 import { LucideIcon } from "lucide-react";
+import { DragEvent } from "react";
 
 export interface TestimonialProps {
 	rating: number;
@@ -127,12 +128,12 @@ export interface SignInButtonProps {
 export interface VideoCardProps {
 	id: string;
 	duration: string;
-	userName?: string; // Optional, derived from User relation
-	timeAgo?: string; // Calculated elsewhere (e.g., "2 hours ago")
+	userName?: string; 
+	timeAgo?: string;
 	title?: string;
-	totalViews: number; // Renamed from `views` to match Prisma
-	comments: number; // Derived from Chat[] or similar
-	shares: number; // Derived elsewhere
+	totalViews: number;
+	comments: number;
+	shares: number;
 	thumbnailUrl?: string;
 	userAvatarUrl?: string;
 	onClick?: () => void;
@@ -140,6 +141,12 @@ export interface VideoCardProps {
 	spaceId?: string;
 	type?: VideoType;
 	thumbnailStatus: VideoStatus;
+	hide: boolean;
+	draggable: boolean;
+	onDragStart: (ev: DragEvent<HTMLDivElement>) => void;
+	onDragEnter: (ev: DragEvent<HTMLDivElement>) => void;
+	onDragEnd: (ev: DragEvent<HTMLDivElement>) => void;
+	onDragLeave: (ev: DragEvent<HTMLDivElement>) => void;
 }
 
 export interface SectionProps {

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { VideoCard } from "../main/VideoCard";
+import { VideoCard } from "../video-card";
 import { useRouter } from "next/navigation";
 import { getMyVideos } from "@/actions/video";
 import { useWorkspaceStore } from "@/providers/WorkspaceStoreProvider";
@@ -32,9 +32,11 @@ interface VideoResponse {
 function VideoTab({
 	folderId,
 	spaceId,
+	movingVideos,
 }: {
 	folderId?: string;
 	spaceId?: string;
+	movingVideos: Set<string>;
 }) {
 	const router = useRouter();
 	const selectedWorkspace = useWorkspaceStore(
@@ -61,7 +63,14 @@ function VideoTab({
 		isPending,
 		isFetched,
 	} = useQueryData(
-		["workspace-videos", selectedWorkspace.id, folderId, spaceId, page],
+		[
+			`videos`,
+			"workspace-videos",
+			selectedWorkspace.id,
+			folderId,
+			spaceId,
+			page,
+		],
 		() =>
 			getMyVideos(
 				selectedWorkspace.id,
@@ -129,11 +138,17 @@ function VideoTab({
 
 				{/* Completed videos */}
 				{videos.map((v) => (
-					<VideoCard {...v} key={v.id} onClick={() => handleOnClick(v.id)} />
+					<VideoCard
+						hide={movingVideos.has(v.id)}
+						{...v}
+						key={v.id}
+						onClick={() => handleOnClick(v.id)}
+					/>
 				))}
 			</div>
 
 			{/* Pagination */}
+
 			{videoResponse && (
 				<div className="mt-4 flex justify-center gap-4">
 					<Button
